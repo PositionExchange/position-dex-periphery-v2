@@ -1,0 +1,35 @@
+{
+  "name": "position-evm-dex-v2",
+  "version": "1.0.0",
+  "description": "This is the next-gen of position dex. Embed orderbook and auto market maker",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx hardhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PositionExchange/position-evm-dex-v2.git"
+  },
+  "keywords": [
+    "position-exchange",
+    "evm",
+    "smart-contract",
+    "auto-market-maker",
+    "fully-onchain",
+    "orderbook"
+  ],
+  "author": "position.exchange",
+  "license": "BUSL-1.1",
+  "bugs": {
+    "url": "https://github.com/PositionExchange/position-evm-dex-v2/issues"
+  },
+  "homepage": "https://github.com/PositionExchange/position-evm-dex-v2#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.12.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.8.0-rc.1"
+  }
+}
