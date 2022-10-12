@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "../../../interfaces/IUniswapV2Router.sol";
+import "../../interfaces/IUniswapV2Router.sol";
 import "../../interfaces/ISpotFactory.sol";
 import "../../interfaces/ISpotHouse.sol";
 import "../../interfaces/IUniswapV2Router.sol";

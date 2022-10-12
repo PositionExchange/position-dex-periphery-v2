@@ -2,81 +2,12 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../spot-exchange/libraries/types/PairManagerStorage.sol";
-import "../spot-exchange/libraries/liquidity/Grid.sol";
-import "../spot-exchange/libraries/liquidity/PoolLiquidity.sol";
+
+//import "../libraries/types/PairManagerStorage.sol";
+//import "../spot-exchange/libraries/liquidity/Grid.sol";
+//import "../spot-exchange/libraries/liquidity/PoolLiquidity.sol";
 
 interface IPairManager {
-    event MarketFilled(
-        bool isBuy,
-        uint256 indexed amount,
-        uint128 toPip,
-        uint256 startPip,
-        uint128 remainingLiquidity,
-        uint64 filledIndex
-    );
-    event LimitOrderCreated(
-        uint64 orderId,
-        uint128 pip,
-        uint128 size,
-        bool isBuy
-    );
-
-    event PairManagerInitialized(
-        address quoteAsset,
-        address baseAsset,
-        address counterParty,
-        uint256 basisPoint,
-        uint256 BASE_BASIC_POINT,
-        uint128 maxFindingWordsIndex,
-        uint128 initialPip,
-        uint64 expireTime,
-        address owner
-    );
-    event LimitOrderCancelled(
-        bool isBuy,
-        uint64 orderId,
-        uint128 pip,
-        uint256 size
-    );
-
-    event UpdateMaxFindingWordsIndex(
-        address spotManager,
-        uint128 newMaxFindingWordsIndex
-    );
-
-    event MaxWordRangeForLimitOrderUpdated(
-        uint128 newMaxWordRangeForLimitOrder
-    );
-    event MaxWordRangeForMarketOrderUpdated(
-        uint128 newMaxWordRangeForMarketOrder
-    );
-    event UpdateBasisPoint(address spotManager, uint256 newBasicPoint);
-    event UpdateBaseBasicPoint(address spotManager, uint256 newBaseBasisPoint);
-    event ReserveSnapshotted(uint128 pip, uint256 timestamp);
-    event LimitOrderUpdated(
-        address spotManager,
-        uint64 orderId,
-        uint128 pip,
-        uint256 size
-    );
-    event UpdateExpireTime(address spotManager, uint64 newExpireTime);
-    event UpdateCounterParty(address spotManager, address newCounterParty);
-    event LiquidityPoolAllowanceUpdate(address liquidityPool, bool value);
-    //    event Swap(
-    //        address account,
-    //        uint256 indexed amountIn,
-    //        uint256 indexed amountOut
-    //    );
-
-    event Swap(
-        address indexed sender,
-        uint256 amount0In,
-        uint256 amount1In,
-        uint256 amount0Out,
-        uint256 amount1Out,
-        address indexed to
-    );
     struct ExchangedData {
         uint256 baseAmount;
         uint256 quoteAmount;
@@ -96,50 +27,6 @@ interface IPairManager {
         //        // cumulative quantity
         //        uint128 cumQ;
     }
-
-    function initializeFactory(
-        address _quoteAsset,
-        address _baseAsset,
-        address _counterParty,
-        uint256 _basisPoint,
-        uint256 _BASE_BASIC_POINT,
-        uint128 _maxFindingWordsIndex,
-        uint128 _initialPip,
-        uint64 _expireTime,
-        address _owner,
-        address _liquidityPool
-    ) external;
-
-    /// @notice Supply Grid order to the pair
-    /// @dev drop order that equals the currentPip
-    /// @param orders the grid orders
-    /// returns baseAmountUsed, quoteAmountUsed, the amount base,quote actually used
-    /// due to the skip order, partially amount may not use
-    // currently no fee required for supply grid
-    function supplyGridOrder(
-        Grid.GridOrderData[] memory orders,
-        address user,
-        bytes memory data,
-        bytes32 poolId
-    )
-        external
-        returns (
-            uint256 baseAmountUsed,
-            uint256 quoteAmountUsed,
-            bytes32[] memory orderIds
-        );
-
-    /// @notice Cancel Grid order
-    /// @param _orderIds the order ids to cancel
-    /// return the total amount cancelled in quote and base
-    /// and transfer back the liquidity the amount
-    function cancelGridOrders(bytes32[] memory _orderIds)
-        external
-        returns (uint256 base, uint256 quote);
-
-    //    function removeGridOrder()
-    //        external
-    //        returns (uint256 baseOut, uint256 quoteOut);
 
     function openLimit(
         uint128 pip,
@@ -203,27 +90,8 @@ interface IPairManager {
 
     function hasLiquidity(uint128 pip) external view returns (bool);
 
-    function getLiquidityInPipRange(
-        uint128 fromPip,
-        uint256 dataLength,
-        bool toHigher
-    )
-        external
-        view
-        returns (PairManagerStorage.LiquidityOfEachPip[] memory, uint128);
-
-    //    function pause() external;
-    //
-    //    function unpause() external;
-
     function updateMaxFindingWordsIndex(uint128 _newMaxFindingWordsIndex)
         external;
-
-    //    function updateBasisPoint(uint256 _newBasisPoint) external;
-    //
-    //    function updateBaseBasicPoint(uint256 _newBaseBasisPoint) external;
-
-    //    function updateExpireTime(uint64 _expireTime) external;
 
     function openMarket(
         uint256 size,
@@ -283,12 +151,6 @@ interface IPairManager {
         uint128 feeBasis
     ) external returns (IPairManager.ExchangedData memory, bool isFilled);
 
-    //    function claimAmountFromLiquidityPool(
-    //        uint256 quoteAmount,
-    //        uint256 baseAmount,
-    //        address user
-    //    ) external;
-
     function collectFund(
         IERC20 token,
         address to,
@@ -302,7 +164,4 @@ interface IPairManager {
         bool isBuy,
         bool isBase
     ) external view returns (uint256 sizeOut, uint256 openOtherSide);
-    //
-    //    function receiveBNB() external payable ;
-    //    function withdrawBNB(address recipient, uint256 amount) external payable;
 }

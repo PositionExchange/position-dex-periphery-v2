@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../../interfaces/IPairManager.sol";
 
 contract SpotFactoryStorage {
     address public spotHouse;
