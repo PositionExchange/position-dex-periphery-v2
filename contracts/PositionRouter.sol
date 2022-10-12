@@ -6,15 +6,14 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../interfaces/IPositionRouter.sol";
-import "../interfaces/ISpotFactory.sol";
-import "../interfaces/IWBNB.sol";
-import "../interfaces/ISpotHouse.sol";
+import "./interfaces/ISpotFactory.sol";
+import "./interfaces/IWBNB.sol";
+import "./interfaces/ISpotHouse.sol";
 import "./libraries/types/SpotHouseStorage.sol";
 import "./libraries/types/SpotFactoryStorage.sol";
-import "../interfaces/IUniswapV2Router.sol";
-import "../interfaces/IUniswapV2Factory.sol";
-import "../interfaces/IUniswapV2Pair.sol";
+import "./interfaces/IUniswapV2Router.sol";
+import "./interfaces/IUniswapV2Factory.sol";
+import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/types/PositionRouterStorage.sol";
 import "./interfaces/IPositionRouter.sol";
 

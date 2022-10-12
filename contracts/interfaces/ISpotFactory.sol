@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "../spot-exchange/libraries/types/SpotFactoryStorage.sol";
+import "../libraries/types/SpotFactoryStorage.sol";
 
 interface ISpotFactory {
     event PairManagerCreated(address pairManager);
