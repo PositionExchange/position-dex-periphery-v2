@@ -14,7 +14,6 @@ import {TransferHelper} from "./libraries/helper/TransferHelper.sol";
 
 import "hardhat/console.sol";
 import "./libraries/helper/Convert.sol";
-//import "./libraries/helper/SpotHouseHelper.sol";
 import "./interfaces/ISpotHouse.sol";
 import "./libraries/types/SpotHouseStorage.sol";
 import "./implement/SpotDex.sol";
@@ -151,6 +150,31 @@ contract SpotHouse is
         super.claimAsset(_pairManager);
     }
 
+    function addLiquidity(AddLiquidityParams calldata params)
+        public
+        payable
+        override(ConcentratedLiquidity)
+        nonReentrant
+    {
+        super.addLiquidity(params);
+    }
+
+    function removeLiquidity(uint256 tokenId)
+        public
+        override(ConcentratedLiquidity)
+        nonReentrant
+    {
+        super.removeLiquidity(tokenId);
+    }
+
+    function modifyLiquidity(ModifyLiquidityParams calldata params)
+        public
+        override(ConcentratedLiquidity)
+        nonReentrant
+    {
+        super.modifyLiquidity(params);
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -231,7 +255,7 @@ contract SpotHouse is
     function _msgSender()
         internal
         view
-        override(ContextUpgradeable, SpotDex)
+        override(ContextUpgradeable, SpotDex, ConcentratedLiquidity)
         returns (address)
     {
         return msg.sender;

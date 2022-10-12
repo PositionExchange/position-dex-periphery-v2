@@ -1,6 +1,7 @@
 /**
  * @author Musket
  */
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
 import "../libraries/types/SpotHouseStorage.sol";
@@ -40,24 +41,6 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         require(side == Side.BUY, "!B");
         address trader = _msgSender();
         _openBuyLimitOrderExactInput(pairManager, quantity, pip, trader);
-    }
-
-    function openLimitOrderWithQuote(
-        IPairManager _pairManager,
-        Side _side,
-        uint256 _quoteAmount,
-        uint128 _pip
-    ) public payable virtual {
-        revert("not supported");
-        //        address _trader = _msgSender();
-        //
-        //        _openLimitOrder(
-        //            _pairManager,
-        //            (_quoteAmount * _pairManager.getBasisPoint()) / _pip,
-        //            _pip,
-        //            _trader,
-        //            _side
-        //        );
     }
 
     function openMarketOrder(
