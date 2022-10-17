@@ -15,7 +15,6 @@ import {TransferHelper} from "./libraries/helper/TransferHelper.sol";
 import "hardhat/console.sol";
 import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
-import "./libraries/types/SpotHouseStorage.sol";
 import "./implement/SpotDex.sol";
 import "./implement/ConcentratedLiquidity.sol";
 
@@ -172,8 +171,10 @@ contract SpotHouse is
         override(ConcentratedLiquidity)
         nonReentrant
     {
+
         super.modifyLiquidity(params);
     }
+
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
@@ -281,6 +282,14 @@ contract SpotHouse is
             _amount
         );
         withdrawBNB.withdraw(_trader, _amount);
+    }
+
+    function depositLiquidity(
+        IPairManager _pairManager,
+        address _payer,
+        Asset _asset,
+        uint256 _amount) internal override(ConcentratedLiquidity) {
+        _deposit(_pairManager, _payer, _asset, _amount);
     }
 
     function _deposit(
