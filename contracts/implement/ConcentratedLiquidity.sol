@@ -18,16 +18,16 @@ abstract contract ConcentratedLiquidity {
         DECREASE
     }
 
-    mapping(address => Liquidity.Data) public concentratedLiquidity;
+    mapping(uint256 => Liquidity.Data) public concentratedLiquidity;
 
     function _initializeConcentratedLiquidity(address _positionDexNft)
-    internal
+        internal
     {
         positionDexNft = _positionDexNft;
     }
 
     struct AddLiquidityParams {
-        address pool;
+        IMatchingEngineAMM pool;
         uint128 amountBaseVirtual;
         uint128 amountQuoteVirtual;
         uint32 indexedPipRange;
@@ -37,37 +37,54 @@ abstract contract ConcentratedLiquidity {
     // 1.2 Mint an NFT
     // 1.3 Store Liquidity Info to storate
     // 1.4 Transfer ..
-    function addLiquidity(
-        IPairManager _pairManager,
-        AddLiquidityParams calldata params
-    )
+    function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
         virtual
     {
-        (uint128 baseAmountAdded, uint128 quoteAmountAdded, uint32 liquidity) = IMatchingEngineAMM.addLiquidity(
-            AddLiquidityParams.amountBaseVirtual,
-            AddLiquidityParams.amountQuoteVirtual,
-            AddLiquidityParams.indexedPipRange);
+        (
+            uint128 baseAmountAdded,
+            uint128 quoteAmountAdded,
+            uint128 liquidity
+        ) = params.pool.addLiquidity(
+                params.amountBaseVirtual,
+                params.amountQuoteVirtual,
+                params.indexedPipRange
+            );
 
-        uint256 NftTokenId = INonfungiblePositionLiquidityPool(positionDexNft).mint(msg.sender);
+        uint256 nftTokenId = INonfungiblePositionLiquidityPool(positionDexNft)
+            .mint(msg.sender);
 
-        concentratedLiquidity[NftTokenId] = Liquidity.Data({
-        baseVirtual : baseAmountAdded,
-        quoteVirtual : quoteAmountAdded,
-        liquidity : liquidity
+        concentratedLiquidity[nftTokenId] = Liquidity.Data({
+            baseVirtual: baseAmountAdded,
+            quoteVirtual: quoteAmountAdded,
+            liquidity: liquidity,
+            indexedPipRange: 0,
+            feeGrowthBase: 0,
+            feeGrowthQuote: 0,
+            pool: address(params.pool)
         });
 
-        depositLiquidity(_pairManager, msg.sender, SpotHouseStorage.Asset.Base, baseAmountAdded);
-        depositLiquidity(_pairManager, msg.sender, SpotHouseStorage.Asset.Quote, quoteAmountAdded);
+        depositLiquidity(
+            params.pool,
+            msg.sender,
+            SpotHouseStorage.Asset.Base,
+            baseAmountAdded
+        );
+        depositLiquidity(
+            params.pool,
+            msg.sender,
+            SpotHouseStorage.Asset.Quote,
+            quoteAmountAdded
+        );
     }
 
     function depositLiquidity(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _payer,
         SpotHouseStorage.Asset _asset,
-        uint256 _amount) internal virtual {
-    }
+        uint256 _amount
+    ) internal virtual {}
 
     function removeLiquidity(uint256 tokenId) public virtual {}
 
@@ -89,13 +106,13 @@ abstract contract ConcentratedLiquidity {
         public
         view
         returns (
-        uint128 baseVirtual,
-        uint128 quoteVirtual,
-        uint128 liquidity,
-        uint256 feeBasePending,
-        uint256 feeQuotePending,
-        address pool
-    )
+            uint128 baseVirtual,
+            uint128 quoteVirtual,
+            uint128 liquidity,
+            uint256 feeBasePending,
+            uint256 feeQuotePending,
+            address pool
+        )
     {
         return (0, 0, 0, 0, 0, address(0x00000));
     }

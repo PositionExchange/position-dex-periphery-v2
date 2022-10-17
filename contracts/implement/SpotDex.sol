@@ -5,33 +5,32 @@
 pragma solidity ^0.8.9;
 
 import "../libraries/types/SpotHouseStorage.sol";
-import "../interfaces/IPairManager.sol";
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
-import "../interfaces/ISpotHouse.sol";
 import "../libraries/helper/Convert.sol";
+import "../interfaces/ISpotDex.sol";
 
-abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
+abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
 
     /**
      * @dev see {ISpotHouse-openLimitOrder}
      */
     function openLimitOrder(
-        IPairManager pairManager,
+        IMatchingEngineAMM pairManager,
         Side side,
         uint256 quantity,
         uint128 pip
-    ) public payable virtual override {
-        //        require(!_pairManager.isExpired(), Errors.VL_EXPIRED);
+    ) public payable virtual {
         address trader = _msgSender();
 
         _openLimitOrder(pairManager, quantity, pip, trader, side);
     }
 
     function openBuyLimitOrderExactInput(
-        IPairManager pairManager,
+        IMatchingEngineAMM pairManager,
         Side side,
         uint256 quantity,
         uint128 pip
@@ -42,7 +41,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function openMarketOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quantity
     ) public payable virtual {
@@ -55,7 +54,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function openMarketOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quantity,
         address _payer,
@@ -72,7 +71,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function openMarketOrderWithQuote(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quoteAmount
     ) public payable virtual {
@@ -88,7 +87,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function openMarketOrderWithQuote(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quoteAmount,
         address _payer,
@@ -104,7 +103,10 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
             );
     }
 
-    function cancelAllLimitOrder(IPairManager _pairManager) public virtual {
+    function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
+        public
+        virtual
+    {
         address _trader = _msgSender();
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
@@ -192,7 +194,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function cancelLimitOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         uint64 _orderIdx,
         uint128 _pip
     ) public virtual {
@@ -261,7 +263,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         );
     }
 
-    function claimAsset(IPairManager _pairManager) public virtual {
+    function claimAsset(IMatchingEngineAMM _pairManager) public virtual {
         address _trader = _msgSender();
 
         (uint256 quoteAmount, uint256 baseAmount) = getAmountClaimable(
@@ -280,12 +282,10 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         emit AssetClaimed(_trader, _pairManager, quoteAmount, baseAmount);
     }
 
-    function getAmountClaimable(IPairManager _pairManager, address _trader)
-        public
-        view
-        virtual
-        returns (uint256 quoteAmount, uint256 baseAmount)
-    {
+    function getAmountClaimable(
+        IMatchingEngineAMM _pairManager,
+        address _trader
+    ) public view virtual returns (uint256 quoteAmount, uint256 baseAmount) {
         address _pairManagerAddress = address(_pairManager);
 
         SpotLimitOrder.Data[] memory listLimitOrder = limitOrders[
@@ -294,12 +294,13 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         uint256 i = 0;
         uint256 _basisPoint = _pairManager.getBasisPoint();
         uint128 _feeBasis = feeBasis;
-        IPairManager.ExchangedData memory exData = IPairManager.ExchangedData({
-            baseAmount: 0,
-            quoteAmount: 0,
-            feeQuoteAmount: 0,
-            feeBaseAmount: 0
-        });
+        IMatchingEngineAMM.ExchangedData memory exData = IMatchingEngineAMM
+            .ExchangedData({
+                baseAmount: 0,
+                quoteAmount: 0,
+                feeQuoteAmount: 0,
+                feeBaseAmount: 0
+            });
         for (i; i < listLimitOrder.length; i++) {
             if (listLimitOrder[i].pip == 0 && listLimitOrder[i].orderId == 0)
                 continue;
@@ -315,12 +316,10 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         return (exData.quoteAmount, exData.baseAmount);
     }
 
-    function getPendingLimitOrders(IPairManager _pairManager, address _trader)
-        public
-        view
-        virtual
-        returns (PendingLimitOrder[] memory)
-    {
+    function getPendingLimitOrders(
+        IMatchingEngineAMM _pairManager,
+        address _trader
+    ) public view virtual returns (PendingLimitOrder[] memory) {
         address _pairManagerAddress = address(_pairManager);
         SpotLimitOrder.Data[] storage listLimitOrder = limitOrders[
             _pairManagerAddress
@@ -363,7 +362,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         return blankListPendingOrderData;
     }
 
-    function _getQuoteAndBase(IPairManager _managerAddress)
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
         virtual
@@ -380,7 +379,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function _openLimitOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         uint256 _quantity,
         uint128 _pip,
         address _trader,
@@ -473,7 +472,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function _openBuyLimitOrderExactInput(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         uint256 _quantity,
         uint128 _pip,
         address _trader
@@ -560,7 +559,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function _openMarketOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quantity,
         address _payer,
@@ -625,7 +624,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function _openMarketOrderWithQuote(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quoteAmount,
         address _payer,
@@ -699,7 +698,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
         if (limitOrders[_pairManagerAddress][_trader].length > 0) {
             SpotLimitOrder.Data[]
                 memory subListLimitOrder = _clearAllFilledOrder(
-                    IPairManager(_pairManagerAddress),
+                    IMatchingEngineAMM(_pairManagerAddress),
                     limitOrders[_pairManagerAddress][_trader]
                 );
             delete limitOrders[_pairManagerAddress][_trader];
@@ -715,7 +714,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     }
 
     function _clearAllFilledOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         SpotLimitOrder.Data[] memory listLimitOrder
     ) internal returns (SpotLimitOrder.Data[] memory) {
         SpotLimitOrder.Data[]
@@ -788,7 +787,7 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     ) internal virtual {}
 
     function _withdraw(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset asset,
         uint256 _amount,
@@ -796,14 +795,14 @@ abstract contract SpotDex is Block, ISpotHouse, SpotHouseStorage {
     ) internal virtual {}
 
     function _deposit(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _payer,
         Asset _asset,
         uint256 _amount
     ) internal virtual returns (uint256) {}
 
     function _withdrawCancelAll(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset asset,
         uint256 _amountRefund,

@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "./TradeConvert.sol";
 import "./Convert.sol";
-import "../../interfaces/IPairManager.sol";
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 
 library SpotHouseHelper {
     using TradeConvert for uint256;
@@ -35,7 +35,7 @@ library SpotHouseHelper {
             int128
         )
     {
-        IPairManager _pairManager = IPairManager(_pairAddress);
+        IMatchingEngineAMM _pairManager = IMatchingEngineAMM(_pairAddress);
         (
             bool isFilled,
             bool isBuy,

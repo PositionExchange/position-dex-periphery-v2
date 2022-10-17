@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 
 import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
@@ -43,7 +44,7 @@ contract SpotHouse is
     }
 
     function openLimitOrder(
-        IPairManager pairManager,
+        IMatchingEngineAMM pairManager,
         Side side,
         uint256 quantity,
         uint128 pip
@@ -52,7 +53,7 @@ contract SpotHouse is
     }
 
     function openBuyLimitOrderExactInput(
-        IPairManager pairManager,
+        IMatchingEngineAMM pairManager,
         Side side,
         uint256 quantity,
         uint128 pip
@@ -61,7 +62,7 @@ contract SpotHouse is
     }
 
     function openMarketOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quantity
     ) public payable override(SpotDex) nonReentrant {
@@ -69,7 +70,7 @@ contract SpotHouse is
     }
 
     function openMarketOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quantity,
         address _payer,
@@ -94,7 +95,7 @@ contract SpotHouse is
     }
 
     function openMarketOrderWithQuote(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quoteAmount
     ) public payable override(SpotDex) nonReentrant {
@@ -102,7 +103,7 @@ contract SpotHouse is
     }
 
     function openMarketOrderWithQuote(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         Side _side,
         uint256 _quoteAmount,
         address _payer,
@@ -125,7 +126,7 @@ contract SpotHouse is
             );
     }
 
-    function cancelAllLimitOrder(IPairManager _pairManager)
+    function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
         public
         override(SpotDex)
         nonReentrant
@@ -134,14 +135,14 @@ contract SpotHouse is
     }
 
     function cancelLimitOrder(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         uint64 _orderIdx,
         uint128 _pip
     ) public override(SpotDex) nonReentrant {
         super.cancelLimitOrder(_pairManager, _orderIdx, _pip);
     }
 
-    function claimAsset(IPairManager _pairManager)
+    function claimAsset(IMatchingEngineAMM _pairManager)
         public
         override(SpotDex)
         nonReentrant
@@ -171,10 +172,8 @@ contract SpotHouse is
         override(ConcentratedLiquidity)
         nonReentrant
     {
-
         super.modifyLiquidity(params);
     }
-
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
@@ -212,7 +211,7 @@ contract SpotHouse is
     }
 
     function claimFee(
-        IPairManager pairManager,
+        IMatchingEngineAMM pairManager,
         uint256 feeBase,
         uint256 feeQuote,
         address recipient
@@ -285,15 +284,16 @@ contract SpotHouse is
     }
 
     function depositLiquidity(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _payer,
         Asset _asset,
-        uint256 _amount) internal override(ConcentratedLiquidity) {
+        uint256 _amount
+    ) internal override(ConcentratedLiquidity) {
         _deposit(_pairManager, _payer, _asset, _amount);
     }
 
     function _deposit(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _payer,
         Asset _asset,
         uint256 _amount
@@ -346,7 +346,7 @@ contract SpotHouse is
     }
 
     function _withdraw(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset asset,
         uint256 _amount,
@@ -389,7 +389,7 @@ contract SpotHouse is
     }
 
     function _withdrawCancelAll(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset asset,
         uint256 _amountRefund,
@@ -423,7 +423,7 @@ contract SpotHouse is
     }
 
     function _increaseFee(
-        IPairManager _pairManager,
+        IMatchingEngineAMM _pairManager,
         uint256 _fee,
         Asset asset
     ) internal {
