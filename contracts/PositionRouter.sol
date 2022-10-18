@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 
 import "./interfaces/ISpotFactory.sol";
 import "./interfaces/IWBNB.sol";
@@ -81,7 +82,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountIn),
                     msg.sender,
@@ -89,7 +90,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountIn),
                     msg.sender,
@@ -132,7 +133,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountOut),
                     msg.sender,
@@ -140,7 +141,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountOut),
                     msg.sender,
@@ -182,7 +183,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrderWithQuote{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(msg.value),
                     msg.sender,
@@ -190,7 +191,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrder{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(msg.value),
                     msg.sender,
@@ -235,7 +236,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountOut,
                     msg.sender,
@@ -243,7 +244,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountOut,
                     msg.sender,
@@ -289,7 +290,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountIn,
                     msg.sender,
@@ -297,7 +298,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountIn,
                     msg.sender,
@@ -338,7 +339,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 amounts = spotHouse.openMarketOrder{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountOut,
                     msg.sender,
@@ -346,7 +347,7 @@ contract PositionRouter is
                 );
             } else {
                 amounts = spotHouse.openMarketOrderWithQuote{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(msg.value),
                     msg.sender,
@@ -386,7 +387,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountIn),
                     msg.sender,
@@ -394,7 +395,7 @@ contract PositionRouter is
                 );
             } else {
                 spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(amountIn),
                     msg.sender,
@@ -426,7 +427,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 spotHouse.openMarketOrderWithQuote{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(msg.value),
                     msg.sender,
@@ -434,7 +435,7 @@ contract PositionRouter is
                 );
             } else {
                 spotHouse.openMarketOrder{value: msg.value}(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     uint256(msg.value),
                     msg.sender,
@@ -475,7 +476,7 @@ contract PositionRouter is
         } else {
             if (side == SpotHouseStorage.Side.BUY) {
                 spotHouse.openMarketOrderWithQuote(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountIn,
                     msg.sender,
@@ -483,7 +484,7 @@ contract PositionRouter is
                 );
             } else {
                 spotHouse.openMarketOrder(
-                    IPairManager(pairManager),
+                    IMatchingEngineAMM(pairManager),
                     side,
                     amountIn,
                     msg.sender,
@@ -604,7 +605,9 @@ contract PositionRouter is
         uint256 openOtherSide;
 
         if (pairManagerAddress != address(0)) {
-            IPairManager pairManager = IPairManager(pairManagerAddress);
+            IMatchingEngineAMM pairManager = IMatchingEngineAMM(
+                pairManagerAddress
+            );
             amounts = new uint256[](2);
             if (side == SpotHouseStorage.Side.BUY) {
                 // quote
@@ -644,7 +647,9 @@ contract PositionRouter is
         uint256 openOtherSide;
 
         if (pairManagerAddress != address(0)) {
-            IPairManager pairManager = IPairManager(pairManagerAddress);
+            IMatchingEngineAMM pairManager = IMatchingEngineAMM(
+                pairManagerAddress
+            );
             amounts = new uint256[](2);
 
             if (side == SpotHouseStorage.Side.BUY) {
