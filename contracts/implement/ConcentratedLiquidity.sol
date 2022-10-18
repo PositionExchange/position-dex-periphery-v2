@@ -11,7 +11,7 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 
 abstract contract ConcentratedLiquidity {
     using Liquidity for Liquidity.Data;
-    address public positionDexNft;
+    INonfungiblePositionLiquidityPool public positionDexNft;
 
     enum ModifyType {
         INCREASE,
@@ -23,7 +23,7 @@ abstract contract ConcentratedLiquidity {
     function _initializeConcentratedLiquidity(address _positionDexNft)
         internal
     {
-        positionDexNft = _positionDexNft;
+        positionDexNft = INonfungiblePositionLiquidityPool(_positionDexNft);
     }
 
     struct AddLiquidityParams {
@@ -42,6 +42,7 @@ abstract contract ConcentratedLiquidity {
         payable
         virtual
     {
+        address user = _msgSender();
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
@@ -52,14 +53,13 @@ abstract contract ConcentratedLiquidity {
                 params.indexedPipRange
             );
 
-        uint256 nftTokenId = INonfungiblePositionLiquidityPool(positionDexNft)
-            .mint(msg.sender);
+        uint256 nftTokenId = positionDexNft.mint(user);
 
         concentratedLiquidity[nftTokenId] = Liquidity.Data({
             baseVirtual: baseAmountAdded,
             quoteVirtual: quoteAmountAdded,
             liquidity: liquidity,
-            indexedPipRange: 0,
+            indexedPipRange: params.indexedPipRange,
             feeGrowthBase: 0,
             feeGrowthQuote: 0,
             pool: address(params.pool)
@@ -67,13 +67,13 @@ abstract contract ConcentratedLiquidity {
 
         depositLiquidity(
             params.pool,
-            msg.sender,
+            user,
             SpotHouseStorage.Asset.Base,
             baseAmountAdded
         );
         depositLiquidity(
             params.pool,
-            msg.sender,
+            user,
             SpotHouseStorage.Asset.Quote,
             quoteAmountAdded
         );
@@ -86,7 +86,10 @@ abstract contract ConcentratedLiquidity {
         uint256 _amount
     ) internal virtual {}
 
-    function removeLiquidity(uint256 tokenId) public virtual {}
+    function removeLiquidity(uint256 tokenId) public virtual {
+        address owner = _msgSender();
+        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+    }
 
     struct ModifyLiquidityParams {
         uint256 tokenId;
@@ -98,9 +101,15 @@ abstract contract ConcentratedLiquidity {
     function modifyLiquidity(ModifyLiquidityParams calldata params)
         public
         virtual
-    {}
+    {
+        address owner = _msgSender();
+        require(owner == positionDexNft.ownerOf(params.tokenId), "!Owner");
+    }
 
-    function collectFee(uint256 tokenId) public virtual {}
+    function collectFee(uint256 tokenId) public virtual {
+        address owner = _msgSender();
+        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+    }
 
     function liquidity(uint256 tokenId)
         public
