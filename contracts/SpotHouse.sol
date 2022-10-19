@@ -167,7 +167,10 @@ contract SpotHouse is
         super.removeLiquidity(tokenId);
     }
 
-    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 liquidity
+    )
         public
         override(ConcentratedLiquidity)
         nonReentrant
@@ -299,6 +302,15 @@ contract SpotHouse is
         uint256 _amount
     ) internal override(ConcentratedLiquidity) {
         _deposit(_pairManager, _payer, _asset, _amount);
+    }
+
+    function withdrawLiquidity(
+        IMatchingEngineAMM _pairManager,
+        address _recipient,
+        Asset _asset,
+        uint256 _amount
+    ) internal override(ConcentratedLiquidity) {
+        _withdraw(_pairManager, _recipient, _asset, _amount, false);
     }
 
     function _deposit(
