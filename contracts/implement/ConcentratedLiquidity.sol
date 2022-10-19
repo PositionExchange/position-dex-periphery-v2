@@ -50,9 +50,11 @@ abstract contract ConcentratedLiquidity {
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         ) = params.pool.addLiquidity(
-                params.amountBaseVirtual,
-                params.amountQuoteVirtual,
-                params.indexedPipRange
+                IAutoMarketMakerCore.AddLiquidity({
+                    baseAmount: params.amountBaseVirtual,
+                    quoteAmount: params.amountQuoteVirtual,
+                    indexedPipRange: params.indexedPipRange
+                })
             );
 
         uint256 nftTokenId = positionDexNft.mint(user);
@@ -128,7 +130,31 @@ abstract contract ConcentratedLiquidity {
         uint128 amountBaseModify,
         uint128 amountQuoteModify
     ) public payable virtual {
-        // TODO implement
+        address owner = _msgSender();
+        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+
+        (
+        uint128 baseAmountAdded,
+        uint128 quoteAmountAdded,
+        uint128 liquidity,
+        uint256 feeGrowthBase,
+        uint256 feeGrowthQuote
+        ) = liquidityData
+        .pool
+        .addLiquidity(
+            IAutoMarketMakerCore.AddLiquidity({
+                baseAmount: amountBaseModify,
+                quoteAmount: amountQuoteModify,
+                indexedPipRange: liquidityData.indexedPipRange
+            })
+        );
+
+        concentratedLiquidity[tokenId].updateLiquidity(
+            liquidityData.liquidity + liquidity,
+            liquidityData.baseVirtual + baseAmountAdded,
+            liquidityData.quoteVirtual + quoteAmountAdded
+        );
     }
 
     function collectFee(uint256 tokenId) public virtual {
