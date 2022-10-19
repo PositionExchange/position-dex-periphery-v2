@@ -167,13 +167,22 @@ contract SpotHouse is
         super.removeLiquidity(tokenId);
     }
 
-    function modifyLiquidity(ModifyLiquidityParams calldata params)
+    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
         public
         override(ConcentratedLiquidity)
         nonReentrant
     {
-        super.modifyLiquidity(params);
+        super.decreaseLiquidity(tokenId, liquidity);
     }
+
+    function increaseLiquidity(
+        uint256 tokenId,
+        uint128 amountBaseModify,
+        uint128 amountQuoteModify
+    ) public payable override(ConcentratedLiquidity) nonReentrant {
+        super.increaseLiquidity(tokenId, amountBaseModify, amountQuoteModify);
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS

@@ -46,7 +46,9 @@ abstract contract ConcentratedLiquidity {
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
-            uint128 liquidity
+            uint128 liquidity,
+            uint256 feeGrowthBase,
+            uint256 feeGrowthQuote
         ) = params.pool.addLiquidity(
                 params.amountBaseVirtual,
                 params.amountQuoteVirtual,
@@ -60,9 +62,9 @@ abstract contract ConcentratedLiquidity {
             quoteVirtual: quoteAmountAdded,
             liquidity: liquidity,
             indexedPipRange: params.indexedPipRange,
-            feeGrowthBase: 0,
-            feeGrowthQuote: 0,
-            pool: address(params.pool)
+            feeGrowthBase: feeGrowthBase,
+            feeGrowthQuote: feeGrowthQuote,
+            pool: params.pool
         });
 
         depositLiquidity(
@@ -89,21 +91,44 @@ abstract contract ConcentratedLiquidity {
     function removeLiquidity(uint256 tokenId) public virtual {
         address owner = _msgSender();
         require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+        // TODO removeLiquidity and get fee reward
     }
 
-    struct ModifyLiquidityParams {
-        uint256 tokenId;
-        uint128 amountBaseModify;
-        uint128 amountQuoteModify;
-        ModifyType modifyType;
-    }
-
-    function modifyLiquidity(ModifyLiquidityParams calldata params)
+    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
         public
         virtual
     {
         address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(params.tokenId), "!Owner");
+        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+
+        require(liquidityData.liquidity >= liquidity, "!Liquidity");
+
+        (uint128 baseAmount, uint128 quoteAmount) = liquidityData
+            .pool
+            .removeLiquidity(
+                IAutoMarketMakerCore.RemoveLiquidity({
+                    liquidity: liquidity,
+                    indexedPipRange: liquidityData.indexedPipRange,
+                    feeGrowthBase: liquidityData.feeGrowthBase,
+                    feeGrowthQuote: liquidityData.feeGrowthQuote
+                })
+            );
+
+        concentratedLiquidity[tokenId].updateLiquidity(
+            liquidityData.liquidity - liquidity,
+            liquidityData.baseVirtual - baseAmount,
+            liquidityData.quoteVirtual - quoteAmount
+        );
+        // TODO withdraw asset
+    }
+
+    function increaseLiquidity(
+        uint256 tokenId,
+        uint128 amountBaseModify,
+        uint128 amountQuoteModify
+    ) public payable virtual {
+        // TODO implement
     }
 
     function collectFee(uint256 tokenId) public virtual {
