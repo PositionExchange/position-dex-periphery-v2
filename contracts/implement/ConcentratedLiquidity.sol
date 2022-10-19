@@ -98,10 +98,35 @@ abstract contract ConcentratedLiquidity {
         uint256 _amount
         ) internal virtual {}
 
+    // 1. Burn NFT
+    // 2. Update liquidity data
+    // 3. Transfer assets
+    // 4. Get fee reward
+    // 5. transfer fee reward
     function removeLiquidity(uint256 tokenId) public virtual {
         address owner = _msgSender();
         require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
-        // TODO removeLiquidity and get fee reward
+
+        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+
+        positionDexNft.burn(tokenId);
+        delete concentratedLiquidity[tokenId];
+
+        withdrawLiquidity(
+            liquidityData.pool,
+            owner,
+            SpotHouseStorage.Asset.Base,
+            uint256(liquidityData.baseVirtual)
+        );
+
+        withdrawLiquidity(
+            liquidityData.pool,
+            owner,
+            SpotHouseStorage.Asset.Quote,
+            uint256(liquidityData.quoteVirtual)
+        );
+
+        // TODO get fee reward
     }
 
     function decreaseLiquidity(
@@ -134,17 +159,15 @@ abstract contract ConcentratedLiquidity {
             liquidityData.quoteVirtual - quoteAmount
         );
 
-        IMatchingEngineAMM poolAddress = concentratedLiquidity[tokenId].pool;
-
         withdrawLiquidity(
-            poolAddress,
+            liquidityData.pool,
             owner,
             SpotHouseStorage.Asset.Base,
             baseAmount
         );
 
         withdrawLiquidity(
-            poolAddress,
+            liquidityData.pool,
             owner,
             SpotHouseStorage.Asset.Quote,
             quoteAmount
@@ -182,17 +205,15 @@ abstract contract ConcentratedLiquidity {
             liquidityData.quoteVirtual + quoteAmountAdded
         );
 
-        IMatchingEngineAMM poolAddress = concentratedLiquidity[tokenId].pool;
-
         depositLiquidity(
-            poolAddress,
+            liquidityData.pool,
             owner,
             SpotHouseStorage.Asset.Base,
             baseAmountAdded
         );
 
         depositLiquidity(
-            poolAddress,
+            liquidityData.pool,
             owner,
             SpotHouseStorage.Asset.Quote,
             quoteAmountAdded
