@@ -163,17 +163,16 @@ contract SpotHouse is
         public
         override(ConcentratedLiquidity)
         nonReentrant
+        nftOwner(tokenId)
     {
         super.removeLiquidity(tokenId);
     }
 
-    function decreaseLiquidity(
-        uint256 tokenId,
-        uint128 liquidity
-    )
+    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
         public
         override(ConcentratedLiquidity)
         nonReentrant
+        nftOwner(tokenId)
     {
         super.decreaseLiquidity(tokenId, liquidity);
     }
@@ -182,10 +181,15 @@ contract SpotHouse is
         uint256 tokenId,
         uint128 amountBaseModify,
         uint128 amountQuoteModify
-    ) public payable override(ConcentratedLiquidity) nonReentrant {
+    )
+        public
+        payable
+        override(ConcentratedLiquidity)
+        nonReentrant
+        nftOwner(tokenId)
+    {
         super.increaseLiquidity(tokenId, amountBaseModify, amountQuoteModify);
     }
-
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS

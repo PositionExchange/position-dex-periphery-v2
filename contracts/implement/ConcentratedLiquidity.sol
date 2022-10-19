@@ -13,6 +13,11 @@ abstract contract ConcentratedLiquidity {
     using Liquidity for Liquidity.Data;
     INonfungiblePositionLiquidityPool public positionDexNft;
 
+    modifier nftOwner(uint256 nftId) {
+        require(_msgSender() == positionDexNft.ownerOf(nftId), "!Owner");
+        _;
+    }
+
     enum ModifyType {
         INCREASE,
         DECREASE
@@ -42,20 +47,20 @@ abstract contract ConcentratedLiquidity {
         payable
         virtual
     {
-        address user = _msgSender();
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
             uint128 liquidity,
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
-        ) = params.pool.addLiquidity(
-                IAutoMarketMakerCore.AddLiquidity({
-                    baseAmount: params.amountBaseVirtual,
-                    quoteAmount: params.amountQuoteVirtual,
-                    indexedPipRange: params.indexedPipRange
-                })
+        ) = _addLiquidity(
+                params.amountBaseVirtual,
+                params.amountQuoteVirtual,
+                params.indexedPipRange,
+                params.pool
             );
+
+        address user = _msgSender();
 
         uint256 nftTokenId = positionDexNft.mint(user);
 
@@ -90,13 +95,12 @@ abstract contract ConcentratedLiquidity {
         uint256 _amount
     ) internal virtual {}
 
-
     function withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
         address _recipient,
         SpotHouseStorage.Asset _asset,
         uint256 _amount
-        ) internal virtual {}
+    ) internal virtual {}
 
     // 1. Burn NFT
     // 2. Update liquidity data
@@ -104,54 +108,46 @@ abstract contract ConcentratedLiquidity {
     // 4. Get fee reward
     // 5. transfer fee reward
     function removeLiquidity(uint256 tokenId) public virtual {
-        address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
-
         Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
 
         positionDexNft.burn(tokenId);
         delete concentratedLiquidity[tokenId];
 
+        (uint128 baseAmount, uint128 quoteAmount) = _removeLiquidity(
+            liquidityData,
+            liquidityData.liquidity
+        );
+
+        address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Base,
-            uint256(liquidityData.baseVirtual)
+            baseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Quote,
-            uint256(liquidityData.quoteVirtual)
+            quoteAmount
         );
 
         // TODO get fee reward
     }
 
-    function decreaseLiquidity(
-        uint256 tokenId,
-        uint128 liquidity
-    )
+    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
         public
         virtual
     {
-        address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
         Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
 
         require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
-        (uint128 baseAmount, uint128 quoteAmount) = liquidityData
-            .pool
-            .removeLiquidity(
-                IAutoMarketMakerCore.RemoveLiquidity({
-                    liquidity: liquidity,
-                    indexedPipRange: liquidityData.indexedPipRange,
-                    feeGrowthBase: liquidityData.feeGrowthBase,
-                    feeGrowthQuote: liquidityData.feeGrowthQuote
-                })
-            );
+        (uint128 baseAmount, uint128 quoteAmount) = _removeLiquidity(
+            liquidityData,
+            liquidity
+        );
 
         concentratedLiquidity[tokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
@@ -159,16 +155,17 @@ abstract contract ConcentratedLiquidity {
             liquidityData.quoteVirtual - quoteAmount
         );
 
+        address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Base,
             baseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Quote,
             quoteAmount
         );
@@ -179,25 +176,20 @@ abstract contract ConcentratedLiquidity {
         uint128 amountBaseModify,
         uint128 amountQuoteModify
     ) public payable virtual {
-        address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
         Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
 
         (
-        uint128 baseAmountAdded,
-        uint128 quoteAmountAdded,
-        uint128 liquidity,
-        uint256 feeGrowthBase,
-        uint256 feeGrowthQuote
-        ) = liquidityData
-        .pool
-        .addLiquidity(
-            IAutoMarketMakerCore.AddLiquidity({
-                baseAmount: amountBaseModify,
-                quoteAmount: amountQuoteModify,
-                indexedPipRange: liquidityData.indexedPipRange
-            })
-        );
+            uint128 baseAmountAdded,
+            uint128 quoteAmountAdded,
+            uint128 liquidity,
+            uint256 feeGrowthBase,
+            uint256 feeGrowthQuote
+        ) = _addLiquidity(
+                amountBaseModify,
+                amountQuoteModify,
+                liquidityData.indexedPipRange,
+                liquidityData.pool
+            );
 
         concentratedLiquidity[tokenId].updateLiquidity(
             liquidityData.liquidity + liquidity,
@@ -205,16 +197,17 @@ abstract contract ConcentratedLiquidity {
             liquidityData.quoteVirtual + quoteAmountAdded
         );
 
+        address user = _msgSender();
         depositLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Base,
             baseAmountAdded
         );
 
         depositLiquidity(
             liquidityData.pool,
-            owner,
+            user,
             SpotHouseStorage.Asset.Quote,
             quoteAmountAdded
         );
@@ -240,5 +233,49 @@ abstract contract ConcentratedLiquidity {
         return (0, 0, 0, 0, 0, address(0x00000));
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // INTERNAL FUNCTIONS
+    //------------------------------------------------------------------------------------------------------------------
+
     function _msgSender() internal view virtual returns (address) {}
+
+    function _addLiquidity(
+        uint128 amountBaseModify,
+        uint128 amountQuoteModify,
+        uint32 indexedPipRange,
+        IMatchingEngineAMM pool
+    )
+        internal
+        returns (
+            uint128 baseAmountAdded,
+            uint128 quoteAmountAdded,
+            uint128 liquidity,
+            uint256 feeGrowthBase,
+            uint256 feeGrowthQuote
+        )
+    {
+        return
+            pool.addLiquidity(
+                IAutoMarketMakerCore.AddLiquidity({
+                    baseAmount: amountBaseModify,
+                    quoteAmount: amountQuoteModify,
+                    indexedPipRange: indexedPipRange
+                })
+            );
+    }
+
+    function _removeLiquidity(
+        Liquidity.Data memory liquidityData,
+        uint128 liquidity
+    ) internal returns (uint128 baseAmount, uint128 quoteAmount) {
+        return
+            liquidityData.pool.removeLiquidity(
+                IAutoMarketMakerCore.RemoveLiquidity({
+                    liquidity: liquidity,
+                    indexedPipRange: liquidityData.indexedPipRange,
+                    feeGrowthBase: liquidityData.feeGrowthBase,
+                    feeGrowthQuote: liquidityData.feeGrowthQuote
+                })
+            );
+    }
 }
