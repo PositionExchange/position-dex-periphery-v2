@@ -90,13 +90,24 @@ abstract contract ConcentratedLiquidity {
         uint256 _amount
     ) internal virtual {}
 
+
+    function withdrawLiquidity(
+        IMatchingEngineAMM _pairManager,
+        address _recipient,
+        SpotHouseStorage.Asset _asset,
+        uint256 _amount
+        ) internal virtual {}
+
     function removeLiquidity(uint256 tokenId) public virtual {
         address owner = _msgSender();
         require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
         // TODO removeLiquidity and get fee reward
     }
 
-    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
+    function decreaseLiquidity(
+        uint256 tokenId,
+        uint128 liquidity
+    )
         public
         virtual
     {
@@ -122,7 +133,22 @@ abstract contract ConcentratedLiquidity {
             liquidityData.baseVirtual - baseAmount,
             liquidityData.quoteVirtual - quoteAmount
         );
-        // TODO withdraw asset
+
+        IMatchingEngineAMM poolAddress = concentratedLiquidity[tokenId].pool;
+
+        withdrawLiquidity(
+            poolAddress,
+            owner,
+            SpotHouseStorage.Asset.Base,
+            baseAmount
+        );
+
+        withdrawLiquidity(
+            poolAddress,
+            owner,
+            SpotHouseStorage.Asset.Quote,
+            quoteAmount
+        );
     }
 
     function increaseLiquidity(
@@ -154,6 +180,22 @@ abstract contract ConcentratedLiquidity {
             liquidityData.liquidity + liquidity,
             liquidityData.baseVirtual + baseAmountAdded,
             liquidityData.quoteVirtual + quoteAmountAdded
+        );
+
+        IMatchingEngineAMM poolAddress = concentratedLiquidity[tokenId].pool;
+
+        depositLiquidity(
+            poolAddress,
+            owner,
+            SpotHouseStorage.Asset.Base,
+            baseAmountAdded
+        );
+
+        depositLiquidity(
+            poolAddress,
+            owner,
+            SpotHouseStorage.Asset.Quote,
+            quoteAmountAdded
         );
     }
 
