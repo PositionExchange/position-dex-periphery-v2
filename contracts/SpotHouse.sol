@@ -33,10 +33,11 @@ contract SpotHouse is
         _;
     }
 
-    function initialize() public initializer {
+    function initialize(address _positionDexNft) public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
+        _initializeConcentratedLiquidity(_positionDexNft);
 
         feeBasis = 10000;
         fee = 20;
