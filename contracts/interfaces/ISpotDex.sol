@@ -8,6 +8,10 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 
 interface ISpotDex {
+    //------------------------------------------------------------------------------------------------------------------
+    // EVENTS
+    //------------------------------------------------------------------------------------------------------------------
+
     event SpotHouseInitialized(address owner);
 
     event MarketOrderOpened(
@@ -52,6 +56,10 @@ interface ISpotDex {
         uint256 quoteAmount,
         uint256 baseAmount
     );
+
+    //------------------------------------------------------------------------------------------------------------------
+    // FUNCTIONS
+    //------------------------------------------------------------------------------------------------------------------
 
     function openLimitOrder(
         IMatchingEngineAMM _spotManager,

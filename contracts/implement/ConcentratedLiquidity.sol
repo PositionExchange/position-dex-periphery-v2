@@ -8,19 +8,15 @@ import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../interfaces/INonfungiblePositionLiquidityPool.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "../interfaces/IConcentratedLiquidity.sol";
 
-abstract contract ConcentratedLiquidity {
+abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using Liquidity for Liquidity.Data;
     INonfungiblePositionLiquidityPool public positionDexNft;
 
     modifier nftOwner(uint256 nftId) {
         require(_msgSender() == positionDexNft.ownerOf(nftId), "!Owner");
         _;
-    }
-
-    enum ModifyType {
-        INCREASE,
-        DECREASE
     }
 
     mapping(uint256 => Liquidity.Data) public concentratedLiquidity;
@@ -41,7 +37,8 @@ abstract contract ConcentratedLiquidity {
     // 1.1 Add Liquidity
     // 1.2 Mint an NFT
     // 1.3 Store Liquidity Info to storate
-    // 1.4 Transfer ..
+    // 1.4 Transfer assets
+    // 1.5 Emit Event
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
@@ -86,6 +83,14 @@ abstract contract ConcentratedLiquidity {
             SpotHouseStorage.Asset.Quote,
             quoteAmountAdded
         );
+        emit LiquidityAdded(
+            user,
+            address(params.pool),
+            baseAmountAdded,
+            quoteAmountAdded,
+            params.indexedPipRange,
+            nftTokenId
+        );
     }
 
     function depositLiquidity(
@@ -106,34 +111,42 @@ abstract contract ConcentratedLiquidity {
     // 2. Update liquidity data
     // 3. Transfer assets
     // 4. Get fee reward
-    // 5. transfer fee reward
+    // 5. Transfer fee reward
+    // 6. Emit Event
     function removeLiquidity(uint256 tokenId) public virtual {
         Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
 
         positionDexNft.burn(tokenId);
         delete concentratedLiquidity[tokenId];
 
-        (uint128 baseAmount, uint128 quoteAmount) = _removeLiquidity(
-            liquidityData,
-            liquidityData.liquidity
-        );
+        (
+            uint128 baseAmountRemoved,
+            uint128 quoteAmountRemoved
+        ) = _removeLiquidity(liquidityData, liquidityData.liquidity);
 
         address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Base,
-            baseAmount
+            baseAmountRemoved
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Quote,
-            quoteAmount
+            quoteAmountRemoved
         );
 
         // TODO get fee reward
+        emit LiquidityRemoved(
+            user,
+            address(liquidityData.pool),
+            baseAmountRemoved,
+            quoteAmountRemoved,
+            liquidityData.indexedPipRange
+        );
     }
 
     function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
@@ -144,15 +157,15 @@ abstract contract ConcentratedLiquidity {
 
         require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
-        (uint128 baseAmount, uint128 quoteAmount) = _removeLiquidity(
-            liquidityData,
-            liquidity
-        );
+        (
+            uint128 baseAmountRemoved,
+            uint128 quoteAmountRemoved
+        ) = _removeLiquidity(liquidityData, liquidity);
 
         concentratedLiquidity[tokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
-            liquidityData.baseVirtual - baseAmount,
-            liquidityData.quoteVirtual - quoteAmount
+            liquidityData.baseVirtual - baseAmountRemoved,
+            liquidityData.quoteVirtual - quoteAmountRemoved
         );
 
         address user = _msgSender();
@@ -160,14 +173,23 @@ abstract contract ConcentratedLiquidity {
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Base,
-            baseAmount
+            baseAmountRemoved
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Quote,
-            quoteAmount
+            quoteAmountRemoved
+        );
+
+        emit LiquidityModified(
+            user,
+            address(liquidityData.pool),
+            baseAmountRemoved,
+            quoteAmountRemoved,
+            ModifyType.DECREASE,
+            liquidityData.indexedPipRange
         );
     }
 
@@ -211,6 +233,15 @@ abstract contract ConcentratedLiquidity {
             SpotHouseStorage.Asset.Quote,
             quoteAmountAdded
         );
+
+        emit LiquidityModified(
+            user,
+            address(liquidityData.pool),
+            baseAmountAdded,
+            quoteAmountAdded,
+            ModifyType.INCREASE,
+            liquidityData.indexedPipRange
+        );
     }
 
     function collectFee(uint256 tokenId) public virtual {
@@ -231,6 +262,24 @@ abstract contract ConcentratedLiquidity {
         )
     {
         return (0, 0, 0, 0, 0, address(0x00000));
+    }
+
+    function getDataNonfungibleToken(uint256 tokenId)
+        external
+        view
+        returns (Liquidity.Data memory)
+    {
+        Liquidity.Data memory LiquidityData;
+        return LiquidityData;
+    }
+
+    function getAllDataTokens(uint256[] memory tokens)
+        external
+        view
+        returns (Liquidity.Data[] memory)
+    {
+        Liquidity.Data[] memory LiquidityData;
+        return LiquidityData;
     }
 
     //------------------------------------------------------------------------------------------------------------------

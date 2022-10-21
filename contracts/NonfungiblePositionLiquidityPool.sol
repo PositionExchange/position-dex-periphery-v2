@@ -114,7 +114,7 @@ contract NonfungiblePositionLiquidityPool is
         counterParties[_newCounterParty] = true;
     }
 
-    function rebokeCounterParty(address _account) external onlyOwner {
+    function revokeCounterParty(address _account) external onlyOwner {
         counterParties[_account] = false;
     }
 }
