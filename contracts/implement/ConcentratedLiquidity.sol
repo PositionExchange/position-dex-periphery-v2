@@ -29,8 +29,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
     struct AddLiquidityParams {
         IMatchingEngineAMM pool;
-        uint128 amountBaseVirtual;
-        uint128 amountQuoteVirtual;
+        uint128 amountVirtual;
+        SpotHouseStorage.Asset asset;
         uint32 indexedPipRange;
     }
 
@@ -44,6 +44,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
+        // TODO check base or quote
+        // TODO check native coin
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
