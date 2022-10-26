@@ -1,5 +1,6 @@
 /**
  * @author Musket
+ * @author NiKa
  */
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
@@ -9,6 +10,7 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "../interfaces/INonfungiblePositionLiquidityPool.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
+import "../libraries/helper/LiquidityHelper.sol";
 
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using Liquidity for Liquidity.Data;
@@ -29,14 +31,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
     struct AddLiquidityParams {
         IMatchingEngineAMM pool;
-        uint128 amountBaseVirtual;
-        uint128 amountQuoteVirtual;
+        uint128 amountVirtual;
+        bool isBase;
         uint32 indexedPipRange;
     }
 
     // 1.1 Add Liquidity
+    // 1.1.1 Add Liquidity for token
+    // 1.1.2 Add liquidity for native coin
     // 1.2 Mint an NFT
-    // 1.3 Store Liquidity Info to storate
+    // 1.3 Store Liquidity Info to storage
     // 1.4 Transfer assets
     // 1.5 Emit Event
     function addLiquidity(AddLiquidityParams calldata params)
@@ -51,8 +55,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         ) = _addLiquidity(
-                params.amountBaseVirtual,
-                params.amountQuoteVirtual,
+                params.amountVirtual,
+                params.isBase,
                 params.indexedPipRange,
                 params.pool
             );
@@ -106,6 +110,24 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         SpotHouseStorage.Asset _asset,
         uint256 _amount
     ) internal virtual {}
+
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        virtual
+        returns (SpotFactoryStorage.Pair memory pair)
+    {}
+
+    function _getQuoteAndBase(address pairManager)
+        internal
+        view
+        virtual
+        returns (SpotFactoryStorage.Pair memory)
+    {}
+
+
+    function _getWBNBAddress() internal virtual view returns (address){
+    }
 
     // 1. Burn NFT
     // 2. Update liquidity data
@@ -195,11 +217,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
     function increaseLiquidity(
         uint256 tokenId,
-        uint128 amountBaseModify,
-        uint128 amountQuoteModify
+        uint128 amountModify,
+        bool isBase
     ) public payable virtual {
         Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
-
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
@@ -207,8 +228,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         ) = _addLiquidity(
-                amountBaseModify,
-                amountQuoteModify,
+                amountModify,
+                isBase,
                 liquidityData.indexedPipRange,
                 liquidityData.pool
             );
@@ -289,8 +310,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     function _msgSender() internal view virtual returns (address) {}
 
     function _addLiquidity(
-        uint128 amountBaseModify,
-        uint128 amountQuoteModify,
+        uint128 amountModify,
+        bool isBase,
         uint32 indexedPipRange,
         IMatchingEngineAMM pool
     )
@@ -303,11 +324,48 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint256 feeGrowthQuote
         )
     {
+        uint128 baseAmountModify;
+        uint128 quoteAmountModify;
+        uint128 pipRange = _getPipRange(pool);
+
+        // Require input is BNB if base or quote is BNB
+
+        SpotFactoryStorage.Pair memory _pair = _getQuoteAndBase(
+            address(pool)
+        );
+
+        address WBNBAddress = _getWBNBAddress();
+
+        require(
+            (_pair.QuoteAsset == WBNBAddress && !isBase) ||
+                (_pair.BaseAsset == WBNBAddress && isBase),
+            "not support"
+        );
+
+        if (isBase) {
+            baseAmountModify = amountModify;
+            quoteAmountModify = LiquidityHelper
+                .calculateQuoteVirtualAmountFromBaseVirtualAmount(
+                    amountModify,
+                    pool,
+                    indexedPipRange,
+                    pipRange
+                );
+        } else {
+            baseAmountModify = amountModify;
+            quoteAmountModify = LiquidityHelper
+                .calculateBaseVirtualAmountFromQuoteVirtualAmount(
+                    amountModify,
+                    pool,
+                    indexedPipRange,
+                    pipRange
+                );
+        }
         return
             pool.addLiquidity(
                 IAutoMarketMakerCore.AddLiquidity({
-                    baseAmount: amountBaseModify,
-                    quoteAmount: amountQuoteModify,
+                    baseAmount: baseAmountModify,
+                    quoteAmount: quoteAmountModify,
                     indexedPipRange: indexedPipRange
                 })
             );
@@ -326,5 +384,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                     feeGrowthQuote: liquidityData.feeGrowthQuote
                 })
             );
+    }
+
+    function _getPipRange(IMatchingEngineAMM pool)
+        internal
+        returns (uint128 pipRange)
+    {
+        return pool.getPipRange();
     }
 }

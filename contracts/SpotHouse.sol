@@ -1,4 +1,9 @@
+/**
+ * @author Musket
+ * @author NiKa
+ */
 // SPDX-License-Identifier: BUSL-1.1
+
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -169,6 +174,25 @@ contract SpotHouse is
         super.removeLiquidity(tokenId);
     }
 
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        override(SpotDex, ConcentratedLiquidity)
+        returns (SpotFactoryStorage.Pair memory pair)
+    {
+        pair = spotFactory.getQuoteAndBase(address(_managerAddress));
+        require(pair.BaseAsset != address(0), "!0x");
+    }
+
+    function _getWBNBAddress()
+    internal
+    view
+    override(ConcentratedLiquidity)
+    returns (address)
+    {
+        return WBNB;
+    }
+
     function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
         public
         override(ConcentratedLiquidity)
@@ -180,8 +204,8 @@ contract SpotHouse is
 
     function increaseLiquidity(
         uint256 tokenId,
-        uint128 amountBaseModify,
-        uint128 amountQuoteModify
+        uint128 amountModify,
+        bool isBase
     )
         public
         payable
@@ -189,7 +213,7 @@ contract SpotHouse is
         nonReentrant
         nftOwner(tokenId)
     {
-        super.increaseLiquidity(tokenId, amountBaseModify, amountQuoteModify);
+        super.increaseLiquidity(tokenId, amountModify, isBase);
     }
 
     //------------------------------------------------------------------------------------------------------------------

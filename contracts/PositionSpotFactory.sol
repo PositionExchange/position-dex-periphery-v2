@@ -24,7 +24,6 @@ contract PositionSpotFactory is
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable
 {
-
     function initialize() public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
@@ -55,13 +54,13 @@ contract PositionSpotFactory is
             Errors.VL_SPOT_MANGER_EXITS
         );
 
-        require (
+        require(
             basisPoint > 0 &&
-            baseBasisPoint > 0 &&
-            maxFindingWordsIndex >0 &&
-            initialPip > 0 &&
-            pipRange > 0 &&
-            tickSpace >0,
+                baseBasisPoint > 0 &&
+                maxFindingWordsIndex > 0 &&
+                initialPip > 0 &&
+                pipRange > 0 &&
+                tickSpace > 0,
             Errors.VL_INVALID_PAIR_INFO
         );
 

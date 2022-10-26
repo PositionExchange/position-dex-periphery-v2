@@ -367,10 +367,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         view
         virtual
         returns (SpotFactoryStorage.Pair memory pair)
-    {
-        pair = spotFactory.getQuoteAndBase(address(_managerAddress));
-        require(pair.BaseAsset != address(0), "!0x");
-    }
+    {}
 
     struct OpenLimitOrderState {
         uint64 orderId;
