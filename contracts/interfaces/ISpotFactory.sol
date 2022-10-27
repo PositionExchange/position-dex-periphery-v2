@@ -4,17 +4,16 @@ pragma solidity ^0.8.9;
 import "../libraries/types/SpotFactoryStorage.sol";
 
 interface ISpotFactory {
-    event PairManagerCreated(address pairManager);
-
-    //    function createPairManager(
-    //        address quoteAsset,
-    //        address baseAsset,
-    //        uint256 basisPoint,
-    //        uint256 BASE_BASIC_POINT,
-    //        uint128 maxFindingWordsIndex,
-    //        uint128 initialPip,
-    //        uint64 expireTime
-    //    ) external;
+    function createPairManager(
+        address quoteAsset,
+        address baseAsset,
+        uint256 basisPoint,
+        uint256 baseBasisPoint,
+        uint128 maxFindingWordsIndex,
+        uint128 initialPip,
+        uint128 pipRange,
+        uint32 tickSpace
+    ) external;
 
     function getPairManager(address quoteAsset, address baseAsset)
         external

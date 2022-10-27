@@ -47,7 +47,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
-            uint128 liquidity,
+            uint256 liquidity,
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         ) = _addLiquidity(
@@ -64,7 +64,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         concentratedLiquidity[nftTokenId] = Liquidity.Data({
             baseVirtual: baseAmountAdded,
             quoteVirtual: quoteAmountAdded,
-            liquidity: liquidity,
+            liquidity: uint128(liquidity),
             indexedPipRange: params.indexedPipRange,
             feeGrowthBase: feeGrowthBase,
             feeGrowthQuote: feeGrowthQuote,
@@ -203,7 +203,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
-            uint128 liquidity,
+            uint256 liquidity,
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         ) = _addLiquidity(
@@ -214,7 +214,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
 
         concentratedLiquidity[tokenId].updateLiquidity(
-            liquidityData.liquidity + liquidity,
+            liquidityData.liquidity + uint128(liquidity),
             liquidityData.baseVirtual + baseAmountAdded,
             liquidityData.quoteVirtual + quoteAmountAdded
         );
@@ -298,7 +298,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         returns (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
-            uint128 liquidity,
+            uint256 liquidity,
             uint256 feeGrowthBase,
             uint256 feeGrowthQuote
         )

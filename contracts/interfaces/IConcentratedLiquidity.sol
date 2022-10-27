@@ -7,7 +7,6 @@ import "../libraries/liquidity/Liquidity.sol";
 //import "../spot-exchange/libraries/liquidity/LiquidityInfo.sol";
 
 interface IConcentratedLiquidity {
-
     enum ModifyType {
         INCREASE,
         DECREASE
