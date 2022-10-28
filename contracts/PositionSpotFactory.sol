@@ -1,3 +1,8 @@
+/**
+ * @author NiKa
+ */
+// SPDX-License-Identifier: BUSL-1.1
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -19,16 +24,14 @@ contract PositionSpotFactory is
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable
 {
+
+    function initialize() public initializer {
+        __ReentrancyGuard_init();
+        __Ownable_init();
+        __Pausable_init();
+    }
+
     address public templatePair;
-
-    //address public owner;
-
-    //    modifier onlyOwner() {
-    //        require(owner == msg.sender, Errors.VL_ONLY_OWNER);
-    //        _;
-    //    }
-
-    constructor() {}
 
     function createPairManager(
         address quoteAsset,
@@ -41,7 +44,26 @@ contract PositionSpotFactory is
         uint32 tickSpace
     ) external nonReentrant {
         address creator = msg.sender;
-        // ToDo validate pair info
+
+        require(
+            quoteAsset != address(0) && baseAsset != address(0),
+            Errors.VL_EMPTY_ADDRESS
+        );
+        require(quoteAsset != baseAsset, Errors.VL_MUST_IDENTICAL_ADDRESSES);
+        require(
+            pathPairManagers[baseAsset][quoteAsset] == address(0),
+            Errors.VL_SPOT_MANGER_EXITS
+        );
+
+        require (
+            basisPoint > 0 &&
+            baseBasisPoint > 0 &&
+            maxFindingWordsIndex >0 &&
+            initialPip > 0 &&
+            pipRange > 0 &&
+            tickSpace >0,
+            Errors.VL_INVALID_PAIR_INFO
+        );
 
         address pair;
 
@@ -154,6 +176,10 @@ contract PositionSpotFactory is
             BaseAsset: _baseAsset,
             QuoteAsset: _quoteAsset
         });
+    }
+
+    function updateTemplatePair(address templatePair_) public onlyOwner {
+        templatePair = templatePair_;
     }
 
     // IMPORTANT
