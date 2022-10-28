@@ -125,9 +125,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         returns (SpotFactoryStorage.Pair memory)
     {}
 
-
-    function _getWBNBAddress() internal virtual view returns (address){
-    }
+    function _getWBNBAddress() internal view virtual returns (address) {}
 
     // 1. Burn NFT
     // 2. Update liquidity data
@@ -330,9 +328,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         // Require input is BNB if base or quote is BNB
 
-        SpotFactoryStorage.Pair memory _pair = _getQuoteAndBase(
-            address(pool)
-        );
+        SpotFactoryStorage.Pair memory _pair = _getQuoteAndBase(address(pool));
 
         address WBNBAddress = _getWBNBAddress();
 
