@@ -1,0 +1,127 @@
+-S0: SetCurrentPrice
+  Action:
+    Price: 100
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    Asset: base
+    AmountVirtual: 100
+  Expect:
+    Pool:
+      Liquidity: 100
+      BaseVirtual: 100
+      QuoteVirtual: 100
+      BaseReal: 100
+      QuoteReal: 100
+      IndexPipRange: 1 # Optional
+      MaxPip: 1 # Optional
+      MinPip: 1 # Optional
+      FeeGrowthBase: 100 # Optional
+      FeeGrowthQuote: 100 # Optional
+    User:
+      Id: 1
+      TokenId: 1
+      Liquidity: 100
+      FeeGrowthBase: 100 # Optional
+      FeeGrowthQuote: 100 # Optional
+      BaseVirtual: 100
+      QuoteVirtual: 100
+      BalanceBase: 100
+      BalanceQuote: 100
+
+- S2: RemoveLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+  Expect:
+    Pool:
+      Liquidity: 100
+      BaseVirtual: 100
+      QuoteVirtual: 100
+      BaseReal: 100
+      QuoteReal: 100
+      IndexPipRange: 1 # Optional
+      MaxPip: 1 # Optional
+      MinPip: 1 # Optional
+    User:
+      Id: 1
+      TokenId: 1
+      Liquidity: 100
+      FeeGrowthBase: 100 # Optional
+      FeeGrowthQuote: 100 # Optional
+      BalanceBase: 100
+      BalanceQuote: 100
+
+- S3: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 20
+    Price: 5
+  Expect:
+    PendingOrder:
+      OrderId: 1
+      Price: 5
+      Size : 20
+      Side: 0
+    User:
+      Id: 1
+      BalanceBase: 100
+      BalanceQuote: 100
+- S4: OpenMarket
+  Action:
+    Id: 2
+    asset: base
+    Side: 1
+    Quantity: 10
+  Expect:
+    Pool:
+      Liquidity: 100
+      BaseVirtual: 100
+      QuoteVirtual: 100
+      BaseReal: 100
+      QuoteReal: 100
+      IndexPipRange: 1 # Optional
+      MaxPip: 1 # Optional
+      MinPip: 1 # Optional
+      FeeGrowthBase: 100 # Optional
+      FeeGrowthQuote: 100 # Optional
+- S5: Expect
+  Pool:
+    Liquidity: 100
+    BaseVirtual: 100
+    QuoteVirtual: 100
+    BaseReal: 100
+    QuoteReal: 100
+    IndexPipRange: 1 # Optional
+    MaxPip: 1 # Optional
+    MinPip: 1 # Optional
+    FeeGrowthBase: 100 # Optional
+    FeeGrowthQuote: 100 # Optional
+
+-S6: IncreaseLiquidity
+  Action:
+    Id: 1
+    TokenId:
+    Asset: Base
+    AmountVirtual: 0
+  Expect:
+    User:
+      Id: 1
+      BalanceBase: 100
+      BalanceQuote: 100
+  -S6: DecreaseLiquidity
+    Action:
+      Id: 1
+      IndexPipRange: 1
+      Liquidity: 100
+    Expect:
+      User:
+        Id: 1
+        BalanceBase: 100
+        BalanceQuote: 100
+-S7 ShiftRange
+
+

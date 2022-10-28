@@ -1,0 +1,46 @@
+pragma solidity ^0.8.0;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MockToken is ERC20 {
+    address public owner;
+    modifier onlyOwner() {
+        require(msg.sender == owner, "!O");
+        _;
+    }
+
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+        _mint(msg.sender, 1000000000 * 10**18);
+        owner = msg.sender;
+    }
+
+    function mint(address recipient, uint256 amount) public onlyOwner {
+        _mint(recipient, amount);
+    }
+
+    function setOwner(address _owner) public onlyOwner {
+        owner = _owner;
+    }
+}
+//pragma solidity ^0.8.0;
+//import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+//
+//contract MockToken is ERC20 {
+//
+//    address public owner;
+//    modifier onlyOwner() {
+//        require( msg.sender == owner, "!O");
+//        _;
+//    }
+//    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+//        _mint(msg.sender, 10000 * 10**18);
+//        owner = msg.sender;
+//    }
+//
+//    function mint(address recipient, uint256 amount) public  onlyOwner {
+//        _mint(recipient, amount);
+//    }
+//
+//    function setOwner(address _owner)  public onlyOwner{
+//        owner =_owner;
+//    }
+//}

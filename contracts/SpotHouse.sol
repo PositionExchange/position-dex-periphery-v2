@@ -185,10 +185,10 @@ contract SpotHouse is
     }
 
     function _getWBNBAddress()
-    internal
-    view
-    override(ConcentratedLiquidity)
-    returns (address)
+        internal
+        view
+        override(ConcentratedLiquidity)
+        returns (address)
     {
         return WBNB;
     }
