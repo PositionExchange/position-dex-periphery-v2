@@ -83,6 +83,19 @@ contract PositionSpotFactory is
             tickSpace,
             creator
         );
+
+        emit PairManagerInitialized(
+            quoteAsset,
+            baseAsset,
+            basisPoint,
+            baseBasisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            creator,
+            pair,
+            pipRange,
+            tickSpace
+        );
     }
 
     function getPairManager(address quoteAsset, address baseAsset)
