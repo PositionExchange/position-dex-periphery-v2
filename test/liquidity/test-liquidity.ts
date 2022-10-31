@@ -62,6 +62,18 @@ export interface ExpectedPoolData {
     FeeGrowthQuote? : SNumber;
     K? : SNumber;
 }
+
+export  interface ExpectUser {
+    BalanceQuote? : SNumber,
+    BalanceBase? :SNumber,
+    TokenId?: SNumber,
+    Liquidity?: SNumber,
+    FeeGrowthBase?: SNumber,
+    FeeGrowthQuote?: SNumber,
+    BaseVirtual?: SNumber,
+    QuoteVirtual ?: SNumber,
+    Id: number
+}
 export interface ExpectAddLiquidityResult extends ExpectedPoolData {
     userDebt?: StringOrNumber;
 }
@@ -224,32 +236,44 @@ export class TestLiquidity {
         await this.mockMatching.setCurrentPip(price);
     }
 
-    async addLiquidity(baseVirtual: StringOrNumber, quoteVirtual: StringOrNumber, indexPip : StringOrNumber, opts: CallOptions = {}): Promise<number> {
+    async addLiquidity(amountVirtual: StringOrNumber, indexPip : StringOrNumber, asset : string, idSender : number ,opts: CallOptions = {}): Promise<number> {
 
         console.group(`AddLiquidity`);
-        // console.l
-
-        // TODO call add liquidity in spotHouse
+        await this.mockSpotHouse.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :amountVirtual, indexedPipRange :indexPip, isBase : asset == "base" });
         return 0;
     }
 
 
-    async removeLiquidity(indexPip: SNumber, liquidity : SNumber, opts: CallOptions = {}) {
+    async removeLiquidity(tokenId: SNumber,  idSender : number, opts: CallOptions = {}) {
         console.group(`RemoveLiquidity`);
-
-        // TODO call add remove liquidity in spotHouse
-
+        await this.mockSpotHouse.connect(this.users[idSender]).removeLiquidity(tokenId)
         console.groupEnd();
     }
 
-    async increaseLiquidity(tokenId : SNumber, asset: string, amountVirtual: SNumber, opts?: CallOptions) {
-
-        // TODO implement increaseLiquidity
+    async increaseLiquidity(tokenId : SNumber, amountVirtual: SNumber, asset: string, idSender : number , opts?: CallOptions) {
+        console.group(`IncreaseLiquidity`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).increaseLiquidity(tokenId, amountVirtual, asset == "base");
+        console.groupEnd();
 
     }
 
-    async decreaseLiquidity(){
-        // TODO implement decreaseLiquidity
+    async decreaseLiquidity(tokenId : SNumber, liquidity: SNumber, asset: string, idSender : number , opts?: CallOptions){
+        console.group(`DecreaseLiquidity`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).decreaseLiquidity(tokenId, liquidity);
+        console.groupEnd();
+    }
+
+
+    async openLimitOrder(pip: number, side: number, size: number,idSender : number, opts?: CallOptions) {
+        console.group(`OpenLimitOrder`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
+        console.groupEnd();
+    }
+
+    async openMarketOrder( side: number, size: number, asset : String, idSender : number,opts?: CallOptions) {
+        console.group(`OpenMarketOrder`);
+        await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
+        console.groupEnd();
     }
 
 
@@ -270,6 +294,10 @@ export class TestLiquidity {
         if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.01)).to.equal(true, "QuoteReal");
         if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.01)).to.equal(true, "K");
 
+    }
+
+    async expectUser() {
+        // TODO implement
     }
 
 
@@ -311,15 +339,6 @@ export class TestLiquidity {
 
 
 
-    async openLimitOrder(pip: number, side: number, size: number,id : number, opts?: CallOptions) {
-        // const pip = price2Pip(price)
-
-        // TODO implement
-
-    }
-
-    async openMarketOrder( side: number, size: number, asset : String, opts?: CallOptions) {
-    }
 
     async  expectPending(orderId : number, price : number, side : any, _size : number){
 
@@ -337,9 +356,25 @@ export class TestLiquidity {
 
     }
 
-    async expectUserLiquidity(){
-        // TODO implement
 
+    async expectUserLiquidity( expectData:ExpectUser){
+
+        if (expectData.TokenId) {
+            expect(await this.dexNFT.ownerOf(expectData.TokenId)).to.be.equal(this.users[expectData.Id].address);
+
+            const liquidityInfo = await this.mockSpotHouse.concentratedLiquidity(expectData.TokenId);
+
+            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
+            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
+            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.01)).to.equal(true, "Liquidity user");
+            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
+            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
+
+        }
+        if ( expectData.BalanceBase) {
+            expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
+            expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
+        }
     }
 
 
