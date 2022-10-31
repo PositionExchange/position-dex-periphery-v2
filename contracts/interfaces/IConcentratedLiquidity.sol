@@ -17,7 +17,7 @@ interface IConcentratedLiquidity {
     //------------------------------------------------------------------------------------------------------------------
 
     // @dev get data of nft
-    function getDataNonfungibleToken(uint256 tokenId)
+    function getDataNonfungibleToken(uint256 nftTokenId)
         external
         view
         returns (Liquidity.Data memory);

@@ -165,13 +165,13 @@ contract SpotHouse is
         super.addLiquidity(params);
     }
 
-    function removeLiquidity(uint256 tokenId)
+    function removeLiquidity(uint256 nftTokenId)
         public
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(tokenId)
+        nftOwner(nftTokenId)
     {
-        super.removeLiquidity(tokenId);
+        super.removeLiquidity(nftTokenId);
     }
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
@@ -193,17 +193,17 @@ contract SpotHouse is
         return WBNB;
     }
 
-    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
         public
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(tokenId)
+        nftOwner(nftTokenId)
     {
-        super.decreaseLiquidity(tokenId, liquidity);
+        super.decreaseLiquidity(nftTokenId, liquidity);
     }
 
     function increaseLiquidity(
-        uint256 tokenId,
+        uint256 nftTokenId,
         uint128 amountModify,
         bool isBase
     )
@@ -211,9 +211,9 @@ contract SpotHouse is
         payable
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(tokenId)
+        nftOwner(nftTokenId)
     {
-        super.increaseLiquidity(tokenId, amountModify, isBase);
+        super.increaseLiquidity(nftTokenId, amountModify, isBase);
     }
 
     function shiftRange(uint256 nftTokenId, uint32 targetIndex)

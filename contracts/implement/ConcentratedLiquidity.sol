@@ -133,11 +133,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     // 4. Get fee reward
     // 5. Transfer fee reward
     // 6. Emit Event
-    function removeLiquidity(uint256 tokenId) public virtual {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+    function removeLiquidity(uint256 nftTokenId) public virtual {
+        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
 
-        positionDexNft.burn(tokenId);
-        delete concentratedLiquidity[tokenId];
+        positionDexNft.burn(nftTokenId);
+        delete concentratedLiquidity[nftTokenId];
 
         (
             uint128 baseAmountRemoved,
@@ -169,11 +169,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    function decreaseLiquidity(uint256 tokenId, uint128 liquidity)
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
         public
         virtual
     {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
 
         require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
@@ -182,7 +182,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        concentratedLiquidity[tokenId].updateLiquidity(
+        concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
             liquidityData.baseVirtual - baseAmountRemoved,
             liquidityData.quoteVirtual - quoteAmountRemoved
@@ -214,11 +214,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     }
 
     function increaseLiquidity(
-        uint256 tokenId,
+        uint256 nftTokenId,
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[tokenId];
+        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
@@ -232,7 +232,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 liquidityData.pool
             );
 
-        concentratedLiquidity[tokenId].updateLiquidity(
+        concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity + uint128(liquidity),
             liquidityData.baseVirtual + baseAmountAdded,
             liquidityData.quoteVirtual + quoteAmountAdded
@@ -347,12 +347,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         // TODO Update farm/pool
     }
 
-    function collectFee(uint256 tokenId) public virtual {
+    function collectFee(uint256 nftTokenId) public virtual {
         address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(tokenId), "!Owner");
+        require(owner == positionDexNft.ownerOf(nftTokenId), "!Owner");
     }
 
-    function liquidity(uint256 tokenId)
+    function liquidity(uint256 nftTokenId)
         public
         view
         returns (
@@ -367,7 +367,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         return (0, 0, 0, 0, 0, address(0x00000));
     }
 
-    function getDataNonfungibleToken(uint256 tokenId)
+    function getDataNonfungibleToken(uint256 nftTokenId)
         external
         view
         returns (Liquidity.Data memory)
