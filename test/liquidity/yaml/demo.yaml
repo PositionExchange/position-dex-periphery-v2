@@ -33,7 +33,7 @@
 - S2: RemoveLiquidity
   Action:
     Id: 1
-    IndexPipRange: 1
+    TokenId: 1
   Expect:
     Pool:
       Liquidity: 100
@@ -104,7 +104,7 @@
 -S6: IncreaseLiquidity
   Action:
     Id: 1
-    TokenId:
+    TokenId: 1
     Asset: Base
     AmountVirtual: 0
   Expect:

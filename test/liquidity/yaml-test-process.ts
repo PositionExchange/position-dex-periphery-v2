@@ -1,5 +1,5 @@
 import {expect, use} from "chai";
-import {TestLiquidity} from "./test-liquidity";
+import {SNumber, TestLiquidity} from "./test-liquidity";
 import {getAccount, SIDE} from "../utils/utils";
 //
 // import {waffle} from "hardhat";
@@ -29,6 +29,7 @@ export class YamlTestProcess {
         const revert = action.getProp("Revert")
 
         const amountVirtual = action.getProp("AmountVirtual")
+        const tokenId = action.getProp("tokenId")
 
 
 
@@ -43,7 +44,8 @@ export class YamlTestProcess {
             quoteVirtual,
             liquidity,
             revert,
-            amountVirtual
+            amountVirtual,
+            tokenId
         }
     }
 
@@ -141,15 +143,23 @@ export class YamlTestProcess {
         }
 
         if ( expect) {
-            // TODO implement
             const extractUser = this.extractUser(expectUser)
 
-            await  this.testHelper.expectUserLiquidity();
+            await  this.testHelper.expectUserLiquidity({
+                BalanceQuote: extractUser.balanceQuote,
+                BalanceBase : extractUser.balanceBase,
+                TokenId: extractUser.tokenId,
+                Liquidity:extractUser.liquidity,
+                FeeGrowthBase : extractUser.balanceBase,
+                FeeGrowthQuote : extractUser.feeGrowthQuote,
+                BaseVirtual : extractUser.baseVirtual,
+                QuoteVirtual : extractUser.quoteVirtual,
+                Id : extractUser.id
+            });
         }
 
         if (expectPool) {
             const extract = this.extractPool(expectPool)
-
             await this.testHelper.expectPool({
                 Liquidity: extract.liquidity,
                 BaseVirtual: extract.baseVirtual,
@@ -163,8 +173,8 @@ export class YamlTestProcess {
                 FeeGrowthQuote: extract.feeGrowthQuote,
                 K : extract.k
             })
-
         }
+
     }
 
     async SetCurrentPrice(stepData) {
@@ -177,7 +187,7 @@ export class YamlTestProcess {
 
     async AddLiquidity(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await this.testHelper.addLiquidity(action.baseVirtual, action.quoteVirtual, action.indexPipRange)}
+        if (action) { await this.testHelper.addLiquidity(action.amountVirtual, action.indexPipRange, action.asset, action.id)}
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
     }
@@ -188,7 +198,7 @@ export class YamlTestProcess {
 
     async RemoveLiquidity(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await this.testHelper.removeLiquidity( action.indexPipRange, action.liquidity)}
+        if (action) { await this.testHelper.removeLiquidity( action.tokenId, action.id)}
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
     }
@@ -196,17 +206,25 @@ export class YamlTestProcess {
 
     async IncreaseLiquidity(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-
-
+        if (action) { await this.testHelper.increaseLiquidity(action.tokenId,  action.amountVirtual, action.asset, action.id)}
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
     }
     async DecreaseLiquidity(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
+        if (action) { await  this.testHelper.decreaseLiquidity(action.tokenId, action.liquidity, action.asset, action.id)}
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
 
 
     }
 
     async ShiftRange(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
+        // TODO implement call shiftRange
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
+
     }
 
 
@@ -223,7 +241,7 @@ export class YamlTestProcess {
     }
     async OpenMarket(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await this.testHelper.openMarketOrder(  action.side, action.quantity, action.asset, {revert : action.revert})}
+        if (action) { await this.testHelper.openMarketOrder(  action.side, action.quantity, action.asset, action.id,{revert : action.revert})}
 
         if (action.revert === undefined){
             const expectData = stepData.getProp("Expect");
