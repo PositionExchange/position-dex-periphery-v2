@@ -6,7 +6,7 @@ pragma solidity ^0.8.9;
 
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 
-library Liquidity {
+library UserLiquidity {
     struct Data {
         uint128 baseVirtual;
         uint128 quoteVirtual;

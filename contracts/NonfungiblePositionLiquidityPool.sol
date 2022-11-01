@@ -66,7 +66,7 @@ contract NonfungiblePositionLiquidityPool is
         external
         view
         override
-        returns (Liquidity.Data memory)
+        returns (UserLiquidity.Data memory)
     {
         return
             IConcentratedLiquidity(counterParty).getDataNonfungibleToken(
@@ -77,7 +77,7 @@ contract NonfungiblePositionLiquidityPool is
     function getAllToken(address owner)
         external
         view
-        returns (Liquidity.Data[] memory, uint256[] memory)
+        returns (UserLiquidity.Data[] memory, uint256[] memory)
     {
         uint256[] memory tokens = tokensOfOwner(owner);
         return (
