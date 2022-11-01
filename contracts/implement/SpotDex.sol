@@ -450,7 +450,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         if (isBuy) {
             // withdraw  base asset
-            _withdraw(_pairManager, _trader, Asset.Base, state.sizeOut, true);
+            _withdraw(_pairManager, _trader, Asset.Base, state.sizeOut, false);
         }
         if (!isBuy) {
             // withdraw quote asset
@@ -459,7 +459,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _trader,
                 Asset.Quote,
                 state.quoteAmountFilled,
-                true
+                false
             );
         }
 
@@ -549,7 +549,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 })
             );
         }
-        _withdraw(_pairManager, _trader, Asset.Base, baseAmountReceive, true);
+        _withdraw(_pairManager, _trader, Asset.Base, baseAmountReceive, false);
 
         emit LimitOrderOpened(
             state.orderId,
@@ -593,7 +593,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
-            _withdraw(_pairManager, _recipient, Asset.Base, _quantity, true);
+            _withdraw(_pairManager, _recipient, Asset.Base, _quantity, false);
         } else {
             // SELL market
             uint256 baseAmountTransferred = _deposit(
@@ -614,7 +614,13 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
-            _withdraw(_pairManager, _recipient, Asset.Quote, quoteAmount, true);
+            _withdraw(
+                _pairManager,
+                _recipient,
+                Asset.Quote,
+                quoteAmount,
+                false
+            );
             _quantity = baseAmountTransferred;
         }
 
@@ -661,7 +667,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
-            _withdraw(_pairManager, _recipient, Asset.Base, baseAmount, true);
+            _withdraw(_pairManager, _recipient, Asset.Base, baseAmount, false);
         } else {
             // SELL market
             uint256 amountTransferred = _deposit(
@@ -686,7 +692,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _recipient,
                 Asset.Quote,
                 _quoteAmount,
-                true
+                false
             );
         }
         emit MarketOrderOpened(
