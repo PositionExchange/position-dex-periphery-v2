@@ -19,5 +19,5 @@ interface INonfungiblePositionLiquidityPool is IERC721Upgradeable {
     function getDataNonfungibleToken(uint256 tokenId)
         external
         view
-        returns (Liquidity.Data memory);
+        returns (UserLiquidity.Data memory);
 }

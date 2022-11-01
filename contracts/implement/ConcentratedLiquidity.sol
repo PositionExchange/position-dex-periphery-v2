@@ -13,7 +13,7 @@ import "../interfaces/IConcentratedLiquidity.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
-    using Liquidity for Liquidity.Data;
+    using UserLiquidity for UserLiquidity.Data;
     INonfungiblePositionLiquidityPool public positionDexNft;
 
     modifier nftOwner(uint256 nftId) {
@@ -21,7 +21,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         _;
     }
 
-    mapping(uint256 => Liquidity.Data) public concentratedLiquidity;
+    mapping(uint256 => UserLiquidity.Data) public concentratedLiquidity;
 
     function _initializeConcentratedLiquidity(address _positionDexNft)
         internal
@@ -65,7 +65,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         uint256 nftTokenId = positionDexNft.mint(user);
 
-        concentratedLiquidity[nftTokenId] = Liquidity.Data({
+        concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             baseVirtual: baseAmountAdded,
             quoteVirtual: quoteAmountAdded,
             liquidity: uint128(liquidity),
@@ -134,7 +134,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     // 5. Transfer fee reward
     // 6. Emit Event
     function removeLiquidity(uint256 nftTokenId) public virtual {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
 
         positionDexNft.burn(nftTokenId);
         delete concentratedLiquidity[nftTokenId];
@@ -173,7 +173,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         public
         virtual
     {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
 
         require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
@@ -218,7 +218,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
@@ -268,7 +268,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
-        Liquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
         // 1. Check amount Base, Quote when removing liquidity
         // 2. Check base, quote Amount of new liquidity range
         // 3. Update liquidity info
@@ -350,6 +350,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     function collectFee(uint256 nftTokenId) public virtual {
         address owner = _msgSender();
         require(owner == positionDexNft.ownerOf(nftTokenId), "!Owner");
+
+//    uint256 feeGrowthBase,
+//    uint256 feeGrowthQuote,
+//    uint128 liquidity,
+//    uint32 indexedPipRange
+//    ) =
+
+
     }
 
     function liquidity(uint256 nftTokenId)
@@ -370,18 +378,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     function getDataNonfungibleToken(uint256 nftTokenId)
         external
         view
-        returns (Liquidity.Data memory)
+        returns (UserLiquidity.Data memory)
     {
-        Liquidity.Data memory LiquidityData;
+        UserLiquidity.Data memory LiquidityData;
         return LiquidityData;
     }
 
     function getAllDataTokens(uint256[] memory tokens)
         external
         view
-        returns (Liquidity.Data[] memory)
+        returns (UserLiquidity.Data[] memory)
     {
-        Liquidity.Data[] memory LiquidityData;
+        UserLiquidity.Data[] memory LiquidityData;
         return LiquidityData;
     }
 
@@ -452,7 +460,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     }
 
     function _removeLiquidity(
-        Liquidity.Data memory liquidityData,
+        UserLiquidity.Data memory liquidityData,
         uint128 liquidity
     ) internal returns (uint128 baseAmount, uint128 quoteAmount) {
         return
@@ -466,7 +474,25 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
     }
 
-    function _getPipRange(IMatchingEngineAMM pool)
+function _removeLiquidity(
+IMatchingEngineAMM pool,
+uint256 feeGrowthBase,
+uint256 feeGrowthQuote,
+uint128 liquidity,
+uint32 indexedPipRange
+) internal returns (uint256 baseAmount,
+    uint256 quoteAmount,
+    uint256 newFeeGrowthBase,
+    uint256 newFeeGrowthQuote) {
+return pool.collectFee(
+    feeGrowthBase,
+        feeGrowthQuote,
+        liquidity,
+        indexedPipRange);
+}
+
+
+function _getPipRange(IMatchingEngineAMM pool)
         internal
         returns (uint128 pipRange)
     {

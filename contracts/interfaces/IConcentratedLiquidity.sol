@@ -20,13 +20,13 @@ interface IConcentratedLiquidity {
     function getDataNonfungibleToken(uint256 nftTokenId)
         external
         view
-        returns (Liquidity.Data memory);
+        returns (UserLiquidity.Data memory);
 
     // @dev get all data of nft
     function getAllDataTokens(uint256[] memory tokens)
         external
         view
-        returns (Liquidity.Data[] memory);
+        returns (UserLiquidity.Data[] memory);
 
     //------------------------------------------------------------------------------------------------------------------
     // EVENTS
