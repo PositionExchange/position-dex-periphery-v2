@@ -227,10 +227,10 @@ contract SpotHouse is
     }
 
     function collectFee(uint256 nftTokenId)
-    public
-    override(ConcentratedLiquidity)
-    nonReentrant
-    nftOwner(nftTokenId)
+        public
+        override(ConcentratedLiquidity)
+        nonReentrant
+        nftOwner(nftTokenId)
     {
         super.collectFee(nftTokenId);
     }

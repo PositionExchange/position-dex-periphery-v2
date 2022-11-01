@@ -134,7 +134,9 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     // 5. Transfer fee reward
     // 6. Emit Event
     function removeLiquidity(uint256 nftTokenId) public virtual {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
 
         positionDexNft.burn(nftTokenId);
         delete concentratedLiquidity[nftTokenId];
@@ -173,7 +175,9 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         public
         virtual
     {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
 
         require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
@@ -218,7 +222,9 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
         (
             uint128 baseAmountAdded,
             uint128 quoteAmountAdded,
@@ -268,7 +274,9 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftTokenId];
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
         // 1. Check amount Base, Quote when removing liquidity
         // 2. Check base, quote Amount of new liquidity range
         // 3. Update liquidity info
@@ -347,17 +355,30 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         // TODO Update farm/pool
     }
 
-    function collectFee(uint256 nftTokenId) public virtual {
+    function collectFee(uint256 nftTokenId)
+        public
+        virtual
+        returns (
+            uint256 baseAmount,
+            uint256 quoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        )
+    {
         address owner = _msgSender();
         require(owner == positionDexNft.ownerOf(nftTokenId), "!Owner");
 
-//    uint256 feeGrowthBase,
-//    uint256 feeGrowthQuote,
-//    uint128 liquidity,
-//    uint32 indexedPipRange
-//    ) =
-
-
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
+        return
+            _collectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
     }
 
     function liquidity(uint256 nftTokenId)
@@ -474,25 +495,31 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
     }
 
-function _removeLiquidity(
-IMatchingEngineAMM pool,
-uint256 feeGrowthBase,
-uint256 feeGrowthQuote,
-uint128 liquidity,
-uint32 indexedPipRange
-) internal returns (uint256 baseAmount,
-    uint256 quoteAmount,
-    uint256 newFeeGrowthBase,
-    uint256 newFeeGrowthQuote) {
-return pool.collectFee(
-    feeGrowthBase,
-        feeGrowthQuote,
-        liquidity,
-        indexedPipRange);
-}
+    function _collectFee(
+        IMatchingEngineAMM pool,
+        uint256 feeGrowthBase,
+        uint256 feeGrowthQuote,
+        uint128 liquidity,
+        uint32 indexedPipRange
+    )
+        internal
+        returns (
+            uint256 baseAmount,
+            uint256 quoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        )
+    {
+        return
+            pool.collectFee(
+                feeGrowthBase,
+                feeGrowthQuote,
+                liquidity,
+                indexedPipRange
+            );
+    }
 
-
-function _getPipRange(IMatchingEngineAMM pool)
+    function _getPipRange(IMatchingEngineAMM pool)
         internal
         returns (uint128 pipRange)
     {
