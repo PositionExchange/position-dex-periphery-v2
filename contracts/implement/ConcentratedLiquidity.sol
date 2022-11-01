@@ -201,7 +201,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
             liquidityData.baseVirtual - baseAmountRemoved,
-            liquidityData.quoteVirtual - quoteAmountRemoved
+            liquidityData.quoteVirtual - quoteAmountRemoved,
+            liquidityData.indexedPipRange,
+            0,
+            0
         );
 
         address user = _msgSender();
@@ -253,23 +256,27 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity + uint128(liquidity),
             liquidityData.baseVirtual + baseAmountAdded,
-            liquidityData.quoteVirtual + quoteAmountAdded
+            liquidityData.quoteVirtual + quoteAmountAdded,
+            liquidityData.indexedPipRange,
+            0,
+            0
         );
-
         address user = _msgSender();
-        depositLiquidity(
-            liquidityData.pool,
-            user,
-            SpotHouseStorage.Asset.Base,
-            baseAmountAdded
-        );
+        {
+            depositLiquidity(
+                liquidityData.pool,
+                user,
+                SpotHouseStorage.Asset.Base,
+                baseAmountAdded
+            );
 
-        depositLiquidity(
-            liquidityData.pool,
-            user,
-            SpotHouseStorage.Asset.Quote,
-            quoteAmountAdded
-        );
+            depositLiquidity(
+                liquidityData.pool,
+                user,
+                SpotHouseStorage.Asset.Quote,
+                quoteAmountAdded
+            );
+        }
 
         emit LiquidityModified(
             user,
@@ -323,37 +330,50 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 liquidityData.pool
             );
 
+        (
+            uint256 feeBaseAmount,
+            uint256 feeQuoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        ) = _collectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
+
         {
             address user = _msgSender();
-            if (quoteAmountRemoved < quoteAmountAdded) {
+            if (quoteAmountRemoved + feeQuoteAmount < quoteAmountAdded) {
                 depositLiquidity(
                     liquidityData.pool,
                     user,
                     SpotHouseStorage.Asset.Quote,
-                    quoteAmountAdded - quoteAmountRemoved
+                    quoteAmountAdded - quoteAmountRemoved - feeQuoteAmount
                 );
             } else {
                 withdrawLiquidity(
                     liquidityData.pool,
                     user,
                     SpotHouseStorage.Asset.Quote,
-                    quoteAmountRemoved - quoteAmountAdded
+                    quoteAmountRemoved + feeQuoteAmount - quoteAmountAdded
                 );
             }
 
-            if (baseAmountRemoved < baseAmountAdded) {
+            if (baseAmountRemoved + feeBaseAmount < baseAmountAdded) {
                 depositLiquidity(
                     liquidityData.pool,
                     user,
                     SpotHouseStorage.Asset.Base,
-                    baseAmountAdded - baseAmountRemoved
+                    baseAmountAdded - baseAmountRemoved - feeBaseAmount
                 );
             } else {
                 withdrawLiquidity(
                     liquidityData.pool,
                     user,
                     SpotHouseStorage.Asset.Base,
-                    baseAmountRemoved - baseAmountAdded
+                    baseAmountRemoved + feeBaseAmount - baseAmountAdded
                 );
             }
         }
@@ -361,7 +381,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         concentratedLiquidity[nftTokenId].updateLiquidity(
             uint128(liquidity),
             baseAmountAdded,
-            quoteAmountAdded
+            quoteAmountAdded,
+            targetIndex,
+            newFeeGrowthBase,
+            newFeeGrowthQuote
         );
 
         // TODO Update farm/pool

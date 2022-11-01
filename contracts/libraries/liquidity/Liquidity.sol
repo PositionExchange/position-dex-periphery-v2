@@ -21,10 +21,20 @@ library UserLiquidity {
         Data storage self,
         uint128 liquidity,
         uint128 baseAmount,
-        uint128 quoteAmount
+        uint128 quoteAmount,
+        uint32 indexedPipRange,
+        uint256 feeGrowthBase,
+        uint256 feeGrowthQuote
     ) internal {
         self.liquidity = liquidity;
         self.baseVirtual = baseAmount;
         self.quoteVirtual = quoteAmount;
+        self.indexedPipRange = indexedPipRange;
+        if (feeGrowthBase != 0) {
+            self.feeGrowthBase = feeGrowthBase;
+        }
+        if (feeGrowthQuote != 0) {
+            self.feeGrowthQuote = feeGrowthQuote;
+        }
     }
 }
