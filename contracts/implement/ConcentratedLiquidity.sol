@@ -146,19 +146,32 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidityData.liquidity);
 
+        (
+            uint256 feeBaseAmount,
+            uint256 feeQuoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        ) = _collectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
+
         address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Base,
-            baseAmountRemoved
+            baseAmountRemoved + feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Quote,
-            quoteAmountRemoved
+            quoteAmountRemoved + feeQuoteAmount
         );
 
         // TODO get fee reward
