@@ -231,14 +231,24 @@ contract SpotHouse is
         override(ConcentratedLiquidity)
         nonReentrant
         nftOwner(nftTokenId)
-        returns (
-            uint256 baseAmount,
-            uint256 quoteAmount,
-            uint256 newFeeGrowthBase,
-            uint256 newFeeGrowthQuote
-        )
     {
         super.collectFee(nftTokenId);
+    }
+
+    function liquidity(uint256 nftTokenId)
+        public
+        view
+        override(ConcentratedLiquidity)
+        returns (
+            uint128 baseVirtual,
+            uint128 quoteVirtual,
+            uint128 liquidity,
+            uint256 feeBasePending,
+            uint256 feeQuotePending,
+            IMatchingEngineAMM pool
+        )
+    {
+        super.liquidity(nftTokenId);
     }
 
     //------------------------------------------------------------------------------------------------------------------

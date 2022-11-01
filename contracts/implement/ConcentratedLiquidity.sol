@@ -174,7 +174,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             quoteAmountRemoved + feeQuoteAmount
         );
 
-        // TODO get fee reward
         emit LiquidityRemoved(
             user,
             address(liquidityData.pool),
@@ -368,45 +367,78 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         // TODO Update farm/pool
     }
 
-    function collectFee(uint256 nftTokenId)
-        public
-        virtual
-        returns (
-            uint256 baseAmount,
-            uint256 quoteAmount,
-            uint256 newFeeGrowthBase,
-            uint256 newFeeGrowthQuote
-        )
-    {
-        address owner = _msgSender();
-        require(owner == positionDexNft.ownerOf(nftTokenId), "!Owner");
-
+    function collectFee(uint256 nftTokenId) public virtual {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
-        return
-            _collectFee(
+        (
+            uint256 feeBaseAmount,
+            uint256 feeQuoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        ) = _collectFee(
                 liquidityData.pool,
                 liquidityData.feeGrowthBase,
                 liquidityData.feeGrowthQuote,
                 liquidityData.liquidity,
                 liquidityData.indexedPipRange
             );
+
+        address user = _msgSender();
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Base,
+            feeBaseAmount
+        );
+
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Quote,
+            feeQuoteAmount
+        );
+        concentratedLiquidity[nftTokenId].feeGrowthBase = newFeeGrowthBase;
+        concentratedLiquidity[nftTokenId].feeGrowthQuote = newFeeGrowthQuote;
     }
 
     function liquidity(uint256 nftTokenId)
         public
         view
+        virtual
         returns (
             uint128 baseVirtual,
             uint128 quoteVirtual,
             uint128 liquidity,
             uint256 feeBasePending,
             uint256 feeQuotePending,
-            address pool
+            IMatchingEngineAMM pool
         )
     {
-        return (0, 0, 0, 0, 0, address(0x00000));
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
+        (
+            uint256 feeBaseAmount,
+            uint256 feeQuoteAmount,
+            uint256 newFeeGrowthBase,
+            uint256 newFeeGrowthQuote
+        ) = _collectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
+
+        return (
+            liquidityData.baseVirtual,
+            liquidityData.quoteVirtual,
+            liquidityData.liquidity,
+            feeBaseAmount,
+            feeQuoteAmount,
+            liquidityData.pool
+        );
     }
 
     function getDataNonfungibleToken(uint256 nftTokenId)
@@ -516,6 +548,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint32 indexedPipRange
     )
         internal
+        view
         returns (
             uint256 baseAmount,
             uint256 quoteAmount,
