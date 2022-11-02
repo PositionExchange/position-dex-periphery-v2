@@ -17,6 +17,13 @@ library UserLiquidity {
         IMatchingEngineAMM pool;
     }
 
+    struct CollectFeeData {
+        uint256 feeBaseAmount;
+        uint256 feeQuoteAmount;
+        uint256 newFeeGrowthBase;
+        uint256 newFeeGrowthQuote;
+    }
+
     function updateLiquidity(
         Data storage self,
         uint128 liquidity,
