@@ -128,4 +128,32 @@ describe("manage liquidity", async () => {
             console.log("liquidity: ", dataAfter.liquidity.toString());
         })
     })
+
+    describe("decrease liquidity", async () => {
+
+        it("decrease liquidity", async () => {
+
+            await dexNFT.addLiquidity({
+                pool: matching.address,
+                amountVirtual: toWei(100),
+                isBase: true,
+                indexedPipRange: 2
+            });
+
+            const dataBefore = await dexNFT.concentratedLiquidity(1000001)
+            console.log(dataBefore.toString());
+            console.log("baseAmount: ", dataBefore.baseVirtual.toString());
+            console.log("quoteAmount: ", dataBefore.quoteVirtual.toString());
+            console.log("liquidity: ", dataBefore.liquidity.toString());
+            expect(dataBefore.pool).to.equal(matching.address)
+
+            await dexNFT.decreaseLiquidity( 1000001,100000);
+
+            const dataAfter = await dexNFT.concentratedLiquidity(1000001)
+            console.log(dataAfter.toString());
+            console.log("baseAmount: ", dataAfter.baseVirtual.toString());
+            console.log("quoteAmount: ", dataAfter.quoteVirtual.toString());
+            console.log("liquidity: ", dataAfter.liquidity.toString());
+        })
+    })
 })
