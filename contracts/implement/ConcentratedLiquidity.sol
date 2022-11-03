@@ -14,20 +14,8 @@ import "../libraries/helper/LiquidityHelper.sol";
 
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using UserLiquidity for UserLiquidity.Data;
-    INonfungiblePositionLiquidityPool public positionDexNft;
-
-    modifier nftOwner(uint256 nftId) {
-        require(_msgSender() == positionDexNft.ownerOf(nftId), "!Owner");
-        _;
-    }
 
     mapping(uint256 => UserLiquidity.Data) public concentratedLiquidity;
-
-    function _initializeConcentratedLiquidity(address _positionDexNft)
-        internal
-    {
-        positionDexNft = INonfungiblePositionLiquidityPool(_positionDexNft);
-    }
 
     struct AddLiquidityParams {
         IMatchingEngineAMM pool;
@@ -57,7 +45,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         address user = _msgSender();
 
-        uint256 nftTokenId = positionDexNft.mint(user);
+        uint256 nftTokenId = mint(user);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             baseVirtual: _addLiquidity.baseAmountAdded,
@@ -112,12 +100,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         returns (SpotFactoryStorage.Pair memory pair)
     {}
 
-    function _getQuoteAndBase(address pairManager)
-        internal
-        view
-        virtual
-        returns (SpotFactoryStorage.Pair memory)
-    {}
 
     function _getWBNBAddress() internal view virtual returns (address) {}
 
@@ -132,7 +114,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
 
-        positionDexNft.burn(nftTokenId);
+        burn(nftTokenId);
         delete concentratedLiquidity[nftTokenId];
 
         (
@@ -456,7 +438,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     }
 
     function getAllDataTokens(uint256[] memory tokens)
-        external
+        public
         view
         returns (UserLiquidity.Data[] memory)
     {
@@ -491,15 +473,13 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         bool isBase,
         uint32 indexedPipRange,
         IMatchingEngineAMM pool
-    ) internal returns (ResultAddLiquidity memory) {
+    ) internal returns (ResultAddLiquidity memory result) {
         State memory state;
-        //        uint128 baseAmountModify;
-        //        uint128 quoteAmountModify;
         state.pipRange = _getPipRange(pool);
         //
         //        // Require input is BNB if base or quote is BNB
         //
-        state.pair = _getQuoteAndBase(address(pool));
+        state.pair = _getQuoteAndBase(pool);
 
         state.WBNBAddress = _getWBNBAddress();
 
@@ -529,11 +509,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 );
         }
         (
-            uint128 baseAmountAdded,
-            uint128 quoteAmountAdded,
-            uint256 liquidity,
-            uint256 feeGrowthBase,
-            uint256 feeGrowthQuote
+            result.baseAmountAdded,
+            result.quoteAmountAdded,
+            result.liquidity,
+            result.feeGrowthBase,
+            result.feeGrowthQuote
         ) = pool.addLiquidity(
                 IAutoMarketMakerCore.AddLiquidity({
                     baseAmount: state.baseAmountModify,
@@ -542,14 +522,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 })
             );
 
-        return
-            ResultAddLiquidity({
-                baseAmountAdded: baseAmountAdded,
-                quoteAmountAdded: quoteAmountAdded,
-                liquidity: liquidity,
-                feeGrowthBase: feeGrowthBase,
-                feeGrowthQuote: feeGrowthQuote
-            });
     }
 
     function _removeLiquidity(
@@ -577,29 +549,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         internal
         view
         returns (UserLiquidity.CollectFeeData memory _feeData)
-    //            uint256 baseAmount,
-    //            uint256 quoteAmount,
-    //            uint256 newFeeGrowthBase,
-    //            uint256 newFeeGrowthQuote
     {
-        UserLiquidity.CollectFeeData memory _feeData;
         (
-            uint256 feeBaseAmount,
-            uint256 feeQuoteAmount,
-            uint256 newFeeGrowthBase,
-            uint256 newFeeGrowthQuote
+            _feeData.feeBaseAmount,
+            _feeData.feeQuoteAmount,
+            _feeData.newFeeGrowthBase,
+            _feeData.newFeeGrowthQuote
         ) = pool.collectFee(
                 feeGrowthBase,
                 feeGrowthQuote,
                 liquidity,
                 indexedPipRange
             );
-        _feeData.feeBaseAmount = feeBaseAmount;
-        _feeData.feeQuoteAmount = feeQuoteAmount;
-        _feeData.newFeeGrowthBase = newFeeGrowthBase;
-        _feeData.newFeeGrowthQuote = newFeeGrowthQuote;
-
-        return _feeData;
     }
 
     function _getPipRange(IMatchingEngineAMM pool)
@@ -608,4 +569,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     {
         return pool.getPipRange();
     }
+
+    function mint(address user) internal virtual returns (uint256 tokenId) {}
+
+    function burn(uint256 tokenId) internal virtual {}
 }

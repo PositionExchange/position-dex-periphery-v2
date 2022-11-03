@@ -22,13 +22,11 @@ import "hardhat/console.sol";
 import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
 import "./implement/SpotDex.sol";
-import "./implement/ConcentratedLiquidity.sol";
 
 contract SpotHouse is
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
-    ConcentratedLiquidity,
     SpotDex
 {
     using Convert for uint256;
@@ -42,7 +40,6 @@ contract SpotHouse is
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
-        _initializeConcentratedLiquidity(_positionDexNft);
 
         feeBasis = 10000;
         fee = 20;
@@ -156,99 +153,14 @@ contract SpotHouse is
         super.claimAsset(_pairManager);
     }
 
-    function addLiquidity(AddLiquidityParams calldata params)
-        public
-        payable
-        override(ConcentratedLiquidity)
-        nonReentrant
-    {
-        super.addLiquidity(params);
-    }
-
-    function removeLiquidity(uint256 nftTokenId)
-        public
-        override(ConcentratedLiquidity)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
-        super.removeLiquidity(nftTokenId);
-    }
-
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
-        override(SpotDex, ConcentratedLiquidity)
+        override(SpotDex)
         returns (SpotFactoryStorage.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
         require(pair.BaseAsset != address(0), "!0x");
-    }
-
-    function _getWBNBAddress()
-        internal
-        view
-        override(ConcentratedLiquidity)
-        returns (address)
-    {
-        return WBNB;
-    }
-
-    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
-        public
-        override(ConcentratedLiquidity)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
-        super.decreaseLiquidity(nftTokenId, liquidity);
-    }
-
-    function increaseLiquidity(
-        uint256 nftTokenId,
-        uint128 amountModify,
-        bool isBase
-    )
-        public
-        payable
-        override(ConcentratedLiquidity)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
-        super.increaseLiquidity(nftTokenId, amountModify, isBase);
-    }
-
-    function shiftRange(uint256 nftTokenId, uint32 targetIndex)
-        public
-        payable
-        override(ConcentratedLiquidity)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
-        super.shiftRange(nftTokenId, targetIndex);
-    }
-
-    function collectFee(uint256 nftTokenId)
-        public
-        override(ConcentratedLiquidity)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
-        super.collectFee(nftTokenId);
-    }
-
-    function liquidity(uint256 nftTokenId)
-        public
-        view
-        override(ConcentratedLiquidity)
-        returns (
-            uint128 baseVirtual,
-            uint128 quoteVirtual,
-            uint128 liquidity,
-            uint256 feeBasePending,
-            uint256 feeQuotePending,
-            IMatchingEngineAMM pool
-        )
-    {
-        super.liquidity(nftTokenId);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -331,7 +243,7 @@ contract SpotHouse is
     function _msgSender()
         internal
         view
-        override(ContextUpgradeable, SpotDex, ConcentratedLiquidity)
+        override(ContextUpgradeable, SpotDex)
         returns (address)
     {
         return msg.sender;
@@ -357,24 +269,6 @@ contract SpotHouse is
             _amount
         );
         withdrawBNB.withdraw(_trader, _amount);
-    }
-
-    function depositLiquidity(
-        IMatchingEngineAMM _pairManager,
-        address _payer,
-        Asset _asset,
-        uint256 _amount
-    ) internal override(ConcentratedLiquidity) {
-        _deposit(_pairManager, _payer, _asset, _amount);
-    }
-
-    function withdrawLiquidity(
-        IMatchingEngineAMM _pairManager,
-        address _recipient,
-        Asset _asset,
-        uint256 _amount
-    ) internal override(ConcentratedLiquidity) {
-        _withdraw(_pairManager, _recipient, _asset, _amount, false);
     }
 
     function _deposit(
