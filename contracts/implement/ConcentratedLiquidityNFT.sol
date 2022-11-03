@@ -12,6 +12,8 @@ abstract contract ConcentratedLiquidityNFT is
     ERC721EnumerableUpgradeable,
     VotesUpgradeable
 {
+    uint256 public tokenID;
+
     function supportsInterface(bytes4 interfaceId)
         public
         view
