@@ -30,7 +30,6 @@ describe("manage liquidity", async () => {
             spotHouse = await deployContract("MockSpotHouse", deployer);
             factory = await deployContract("PositionSpotFactory", deployer);
             dexNFT = await deployContract("PositionConcentratedLiquidity", deployer);
-
             quote = await deployMockToken("Quote");
             base = await deployMockToken("Base");
 
@@ -79,25 +78,6 @@ describe("manage liquidity", async () => {
             expect(data.pool).to.equal(matching.address)
         })
 
-        // it("remove liquidity", async () => {
-        //
-        //     await dexNFT.addLiquidity({
-        //         pool: matching.address,
-        //         amountVirtual: toWei(100),
-        //         isBase: true,
-        //         indexedPipRange: 2
-        //     });
-        //
-        //     const data = await dexNFT.concentratedLiquidity(1000001)
-        //     console.log(data.toString());
-        //     console.log("baseAmount: ", data.baseVirtual.toString());
-        //     console.log("quoteAmount: ", data.quoteVirtual.toString());
-        //     console.log("liquidity: ", data.liquidity.toString());
-        //     expect(data.pool).to.equal(matching.address)
-        //     await dexNFT.removeLiquidity( 1000001
-        //     );
-        // })
-
     })
 
     describe("remove liquidity", async () => {
@@ -134,19 +114,18 @@ describe("manage liquidity", async () => {
                 indexedPipRange: 2
             });
 
-            const data = await dexNFT.concentratedLiquidity(1000001)
-            console.log(data.toString());
-            console.log("baseAmount: ", data.baseVirtual.toString());
-            console.log("quoteAmount: ", data.quoteVirtual.toString());
-            console.log("liquidity: ", data.liquidity.toString());
-            expect(data.pool).to.equal(matching.address)
-            await dexNFT.increaseLiquidity( 1000001, toWei(100), false)
-
-
-
-            ;
+            const dataBefore = await dexNFT.concentratedLiquidity(1000001)
+            console.log(dataBefore.toString());
+            console.log("baseAmount: ", dataBefore.baseVirtual.toString());
+            console.log("quoteAmount: ", dataBefore.quoteVirtual.toString());
+            console.log("liquidity: ", dataBefore.liquidity.toString());
+            expect(dataBefore.pool).to.equal(matching.address)
+            await dexNFT.increaseLiquidity( 1000001, toWei(100), false);
+            const dataAfter = await dexNFT.concentratedLiquidity(1000001)
+            console.log(dataAfter.toString());
+            console.log("baseAmount: ", dataAfter.baseVirtual.toString());
+            console.log("quoteAmount: ", dataAfter.quoteVirtual.toString());
+            console.log("liquidity: ", dataAfter.liquidity.toString());
         })
-
     })
-
 })
