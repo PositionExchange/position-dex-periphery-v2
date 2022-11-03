@@ -37,45 +37,60 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
-        ResultAddLiquidity memory _addLiquidity = _addLiquidity(
-            params.amountVirtual,
+        address user = _msgSender();
+        uint256 _addedAmountVirtual = depositLiquidity(
+            params.pool,
+            user,
+            params.isBase
+                ? SpotHouseStorage.Asset.Base
+                : SpotHouseStorage.Asset.Quote,
+            params.amountVirtual
+        );
+
+        ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
+            uint128(_addedAmountVirtual),
             params.isBase,
             params.indexedPipRange,
             params.pool
         );
 
-        address user = _msgSender();
+        uint256 amountModifySecondAsset = depositLiquidity(
+            params.pool,
+            user,
+            params.isBase
+                ? SpotHouseStorage.Asset.Quote
+                : SpotHouseStorage.Asset.Base,
+            params.isBase
+                ? _resultAddLiquidity.quoteAmountAdded
+                : _resultAddLiquidity.baseAmountAdded
+        );
+
+        require(
+            params.isBase
+                ? amountModifySecondAsset >=
+                    _resultAddLiquidity.quoteAmountAdded
+                : amountModifySecondAsset >=
+                    _resultAddLiquidity.baseAmountAdded,
+            "not support"
+        );
 
         uint256 nftTokenId = mint(user);
-        console.log("TOKEN", nftTokenId);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
-            baseVirtual: _addLiquidity.baseAmountAdded,
-            quoteVirtual: _addLiquidity.quoteAmountAdded,
-            liquidity: uint128(_addLiquidity.liquidity),
+            baseVirtual: _resultAddLiquidity.baseAmountAdded,
+            quoteVirtual: _resultAddLiquidity.quoteAmountAdded,
+            liquidity: uint128(_resultAddLiquidity.liquidity),
             indexedPipRange: params.indexedPipRange,
-            feeGrowthBase: _addLiquidity.feeGrowthBase,
-            feeGrowthQuote: _addLiquidity.feeGrowthQuote,
+            feeGrowthBase: _resultAddLiquidity.feeGrowthBase,
+            feeGrowthQuote: _resultAddLiquidity.feeGrowthQuote,
             pool: params.pool
         });
 
-        depositLiquidity(
-            params.pool,
-            user,
-            SpotHouseStorage.Asset.Base,
-            _addLiquidity.baseAmountAdded
-        );
-        depositLiquidity(
-            params.pool,
-            user,
-            SpotHouseStorage.Asset.Quote,
-            _addLiquidity.quoteAmountAdded
-        );
         emit LiquidityAdded(
             user,
             address(params.pool),
-            _addLiquidity.baseAmountAdded,
-            _addLiquidity.quoteAmountAdded,
+            _resultAddLiquidity.baseAmountAdded,
+            _resultAddLiquidity.quoteAmountAdded,
             params.indexedPipRange,
             nftTokenId
         );
@@ -214,11 +229,35 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
+        address user = _msgSender();
+        uint256 _amountModify = depositLiquidity(
+            liquidityData.pool,
+            user,
+            isBase ? SpotHouseStorage.Asset.Base : SpotHouseStorage.Asset.Quote,
+            amountModify
+        );
+
         ResultAddLiquidity memory _addLiquidity = _addLiquidity(
-            amountModify,
+            uint128(_amountModify),
             isBase,
             liquidityData.indexedPipRange,
             liquidityData.pool
+        );
+
+        uint256 AmountModifySecondAsset = depositLiquidity(
+            liquidityData.pool,
+            user,
+            isBase ? SpotHouseStorage.Asset.Quote : SpotHouseStorage.Asset.Base,
+            isBase
+                ? _addLiquidity.quoteAmountAdded
+                : _addLiquidity.baseAmountAdded
+        );
+
+        require(
+            isBase
+                ? AmountModifySecondAsset >= _addLiquidity.quoteAmountAdded
+                : AmountModifySecondAsset >= _addLiquidity.baseAmountAdded,
+            "not support"
         );
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
@@ -229,22 +268,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             0,
             0
         );
-        address user = _msgSender();
-        {
-            depositLiquidity(
-                liquidityData.pool,
-                user,
-                SpotHouseStorage.Asset.Base,
-                _addLiquidity.baseAmountAdded
-            );
-
-            depositLiquidity(
-                liquidityData.pool,
-                user,
-                SpotHouseStorage.Asset.Quote,
-                _addLiquidity.quoteAmountAdded
-            );
-        }
 
         emit LiquidityModified(
             user,
@@ -481,7 +504,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         //        // Require input is BNB if base or quote is BNB
         //
         state.pair = _getQuoteAndBase(pool);
-        console.log(state.pair.BaseAsset);
 
         state.WBNBAddress = _getWBNBAddress();
 
