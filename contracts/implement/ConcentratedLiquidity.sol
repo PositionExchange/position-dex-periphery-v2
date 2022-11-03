@@ -11,6 +11,7 @@ import "../interfaces/INonfungiblePositionLiquidityPool.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
 import "../libraries/helper/LiquidityHelper.sol";
+import "hardhat/console.sol";
 
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using UserLiquidity for UserLiquidity.Data;
@@ -46,6 +47,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         address user = _msgSender();
 
         uint256 nftTokenId = mint(user);
+        console.log("TOKEN", nftTokenId);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             baseVirtual: _addLiquidity.baseAmountAdded,
@@ -84,7 +86,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         address _payer,
         SpotHouseStorage.Asset _asset,
         uint256 _amount
-    ) internal virtual {}
+    ) internal virtual returns (uint256 amount) {}
 
     function withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
@@ -99,7 +101,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         virtual
         returns (SpotFactoryStorage.Pair memory pair)
     {}
-
 
     function _getWBNBAddress() internal view virtual returns (address) {}
 
@@ -480,14 +481,17 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         //        // Require input is BNB if base or quote is BNB
         //
         state.pair = _getQuoteAndBase(pool);
+        console.log(state.pair.BaseAsset);
 
         state.WBNBAddress = _getWBNBAddress();
 
-        require(
-            (state.pair.QuoteAsset == state.WBNBAddress && !isBase) ||
-                (state.pair.BaseAsset == state.WBNBAddress && isBase),
-            "not support"
-        );
+        if (state.pair.QuoteAsset == state.WBNBAddress) {
+            require(!isBase, "not support");
+        }
+
+        if (state.pair.BaseAsset == state.WBNBAddress) {
+            require(isBase, "not support");
+        }
 
         if (isBase) {
             state.baseAmountModify = amountModify;
@@ -515,13 +519,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             result.feeGrowthBase,
             result.feeGrowthQuote
         ) = pool.addLiquidity(
-                IAutoMarketMakerCore.AddLiquidity({
-                    baseAmount: state.baseAmountModify,
-                    quoteAmount: state.quoteAmountModify,
-                    indexedPipRange: indexedPipRange
-                })
-            );
-
+            IAutoMarketMakerCore.AddLiquidity({
+                baseAmount: state.baseAmountModify,
+                quoteAmount: state.quoteAmountModify,
+                indexedPipRange: indexedPipRange
+            })
+        );
     }
 
     function _removeLiquidity(
@@ -545,22 +548,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint256 feeGrowthQuote,
         uint128 liquidity,
         uint32 indexedPipRange
-    )
-        internal
-        view
-        returns (UserLiquidity.CollectFeeData memory _feeData)
-    {
+    ) internal view returns (UserLiquidity.CollectFeeData memory _feeData) {
         (
             _feeData.feeBaseAmount,
             _feeData.feeQuoteAmount,
             _feeData.newFeeGrowthBase,
             _feeData.newFeeGrowthQuote
         ) = pool.collectFee(
-                feeGrowthBase,
-                feeGrowthQuote,
-                liquidity,
-                indexedPipRange
-            );
+            feeGrowthBase,
+            feeGrowthQuote,
+            liquidity,
+            indexedPipRange
+        );
     }
 
     function _getPipRange(IMatchingEngineAMM pool)

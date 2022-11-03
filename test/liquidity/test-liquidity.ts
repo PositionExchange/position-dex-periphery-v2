@@ -4,7 +4,7 @@ import YAML from "js-yaml";
     MockMatchingEngineAMM,
     MockSpotHouse,
     MockToken,
-        NonfungiblePositionLiquidityPool,
+        PositionConcentratedLiquidity,
     PositionSpotFactory
 } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
@@ -92,6 +92,7 @@ function price2Pip(currentPrice: number | string) {
 function fromWeiAndFormat(n, decimal = 6): number{
     return new Decimal(fromWei(n).toString()).toDP(decimal).toNumber()
 }
+
 function sqrt(n: number) :number {
 
     return Math.sqrt(n);
@@ -109,7 +110,7 @@ export async function deployAndCreateRouterHelper() {
     let quote : MockToken;
     let base : MockToken;
     let testHelper: TestLiquidity;
-    let dexNFT : NonfungiblePositionLiquidityPool;
+    let dexNFT : PositionConcentratedLiquidity;
 
 
     let users  : any[] = [];
@@ -165,7 +166,7 @@ export class TestLiquidity {
     mockSpotHouse: MockSpotHouse;
     mockMatching : MockMatchingEngineAMM;
     factory : PositionSpotFactory;
-    dexNFT : NonfungiblePositionLiquidityPool;
+    dexNFT : PositionConcentratedLiquidity;
     quote : MockToken;
     base : MockToken;
 
@@ -184,7 +185,7 @@ export class TestLiquidity {
         _mockSpotHouse: MockSpotHouse,
         _mockMatching : MockMatchingEngineAMM,
         _factory :PositionSpotFactory,
-        _dexNFT : NonfungiblePositionLiquidityPool,
+        _dexNFT : PositionConcentratedLiquidity,
         _quote : MockToken,
         _base : MockToken,
         _defaultSender: SignerWithAddress,
@@ -239,27 +240,27 @@ export class TestLiquidity {
     async addLiquidity(amountVirtual: StringOrNumber, indexPip : StringOrNumber, asset : string, idSender : number ,opts: CallOptions = {}): Promise<number> {
 
         console.group(`AddLiquidity`);
-        await this.mockSpotHouse.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :amountVirtual, indexedPipRange :indexPip, isBase : asset == "base" });
+        await this.dexNFT.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :amountVirtual, indexedPipRange :indexPip, isBase : asset == "base" });
         return 0;
     }
 
 
     async removeLiquidity(tokenId: SNumber,  idSender : number, opts: CallOptions = {}) {
         console.group(`RemoveLiquidity`);
-        await this.mockSpotHouse.connect(this.users[idSender]).removeLiquidity(tokenId)
+        await this.dexNFT.connect(this.users[idSender]).removeLiquidity(tokenId)
         console.groupEnd();
     }
 
     async increaseLiquidity(tokenId : SNumber, amountVirtual: SNumber, asset: string, idSender : number , opts?: CallOptions) {
         console.group(`IncreaseLiquidity`);
-        await  this.mockSpotHouse.connect(this.users[idSender]).increaseLiquidity(tokenId, amountVirtual, asset == "base");
+        await  this.dexNFT.connect(this.users[idSender]).increaseLiquidity(tokenId, amountVirtual, asset == "base");
         console.groupEnd();
 
     }
 
     async decreaseLiquidity(tokenId : SNumber, liquidity: SNumber, asset: string, idSender : number , opts?: CallOptions){
         console.group(`DecreaseLiquidity`);
-        await  this.mockSpotHouse.connect(this.users[idSender]).decreaseLiquidity(tokenId, liquidity);
+        await  this.dexNFT.connect(this.users[idSender]).decreaseLiquidity(tokenId, liquidity);
         console.groupEnd();
     }
 
@@ -362,7 +363,7 @@ export class TestLiquidity {
         if (expectData.TokenId) {
             expect(await this.dexNFT.ownerOf(expectData.TokenId)).to.be.equal(this.users[expectData.Id].address);
 
-            const liquidityInfo = await this.mockSpotHouse.concentratedLiquidity(expectData.TokenId);
+            const liquidityInfo = await this.dexNFT.concentratedLiquidity(expectData.TokenId);
 
             if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
             if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
