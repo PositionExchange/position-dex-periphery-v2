@@ -529,29 +529,29 @@ contract PositionStakingDexManager is
             msg.sender == address(concentratedLiquidityNft),
             "only concentrated liquidity"
         );
-        require(
-            concentratedLiquidityNft.ownerOf(tokenId) == address(this),
-            "!staked"
-        );
-        PoolInfo storage pool = poolInfo[poolId];
-        UserInfo storage user = userInfo[poolId][user];
 
-        updatePool(poolId);
+        if (concentratedLiquidityNft.ownerOf(tokenId) == address(this)) {
+            PoolInfo storage pool = poolInfo[poolId];
+            UserInfo storage user = userInfo[poolId][user];
 
-        payOrLockupPendingPosition(poolId);
+            updatePool(poolId);
 
-        user.amount = modifyType == IConcentratedLiquidity.ModifyType.INCREASE
-            ? user.amount.add(deltaLiquidityModify)
-            : user.amount.sub(deltaLiquidityModify);
+            payOrLockupPendingPosition(poolId);
 
-        user.rewardDebt = uint128(
-            user.amount.mul(pool.accPositionPerShare).div(1e12)
-        );
+            user.amount = modifyType ==
+                IConcentratedLiquidity.ModifyType.INCREASE
+                ? user.amount.add(deltaLiquidityModify)
+                : user.amount.sub(deltaLiquidityModify);
 
-        pool.totalStaked = modifyType ==
-            IConcentratedLiquidity.ModifyType.INCREASE
-            ? pool.totalStaked + deltaLiquidityModify
-            : pool.totalStaked - deltaLiquidityModify;
+            user.rewardDebt = uint128(
+                user.amount.mul(pool.accPositionPerShare).div(1e12)
+            );
+
+            pool.totalStaked = modifyType ==
+                IConcentratedLiquidity.ModifyType.INCREASE
+                ? pool.totalStaked + deltaLiquidityModify
+                : pool.totalStaked - deltaLiquidityModify;
+        }
     }
 
     // Pay or lockup pending Positions.
