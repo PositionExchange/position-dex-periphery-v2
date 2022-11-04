@@ -7,13 +7,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "../libraries/liquidity/Liquidity.sol";
 
-interface INonfungiblePositionLiquidityPool is IERC721Upgradeable {
+interface IConcentratedLiquidityNFT is IERC721Upgradeable {
     function voteFor() external;
 
     function voteAgainst() external;
-
-    function getDataNonfungibleToken(uint256 tokenId)
-        external
-        view
-        returns (UserLiquidity.Data memory);
 }
