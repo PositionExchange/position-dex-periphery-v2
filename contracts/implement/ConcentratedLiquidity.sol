@@ -7,16 +7,18 @@ pragma solidity ^0.8.9;
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
-import "../interfaces/INonfungiblePositionLiquidityPool.sol";
+import "../interfaces/IConcentratedLiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "hardhat/console.sol";
+import "../staking/PositionStakingDexManager.sol";
 
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using UserLiquidity for UserLiquidity.Data;
 
     mapping(uint256 => UserLiquidity.Data) public concentratedLiquidity;
+    IPositionStakingDexManager stakingManager;
 
     struct AddLiquidityParams {
         IMatchingEngineAMM pool;
@@ -210,6 +212,13 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             SpotHouseStorage.Asset.Quote,
             quoteAmountRemoved
         );
+        _updateLiquidity(
+            user,
+            nftTokenId,
+            address(liquidityData.pool),
+            liquidity,
+            ModifyType.DECREASE
+        );
 
         emit LiquidityModified(
             user,
@@ -271,6 +280,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.indexedPipRange,
             0,
             0
+        );
+
+        _updateLiquidity(
+            user,
+            nftTokenId,
+            address(liquidityData.pool),
+            uint128(_addLiquidity.liquidity),
+            ModifyType.INCREASE
         );
 
         emit LiquidityModified(
@@ -593,6 +610,22 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         returns (uint128 pipRange)
     {
         return pool.getPipRange();
+    }
+
+    function _updateLiquidity(
+        address user,
+        uint256 tokenId,
+        address poolId,
+        uint128 deltaLiquidityModify,
+        ModifyType modifyType
+    ) internal {
+        stakingManager.updateLiquidity(
+            user,
+            tokenId,
+            poolId,
+            deltaLiquidityModify,
+            modifyType
+        );
     }
 
     function mint(address user) internal virtual returns (uint256 tokenId) {}
