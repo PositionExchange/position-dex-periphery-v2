@@ -399,7 +399,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             );
         }
         (state.orderId, state.sizeOut, state.quoteAmountFilled) = _pairManager
-            .openLimit(_pip, _quantity.Uint256ToUint128(), isBuy, _trader, 0);
+            .openLimit(
+                _pip,
+                _quantity.Uint256ToUint128(),
+                isBuy,
+                _trader,
+                0,
+                0
+            );
         if (isBuy) {
             // Buy limit
             quoteAmount =
@@ -499,7 +506,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _quantity.Uint256ToUint128(),
                 true,
                 _trader,
-                quoteAmountTransferred
+                quoteAmountTransferred,
+                0
             );
         uint256 baseAmountReceive = state.sizeOut;
         if (
@@ -568,7 +576,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             (sizeOut, quoteAmount) = _pairManager.openMarket(
                 _quantity,
                 true,
-                _payer
+                _payer,
+                0
             );
             require(sizeOut == _quantity, Errors.VL_NOT_ENOUGH_LIQUIDITY);
 
@@ -597,7 +606,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             (sizeOut, quoteAmount) = _pairManager.openMarket(
                 baseAmountTransferred,
                 false,
-                _payer
+                _payer,
+                0
             );
             require(
                 sizeOut == baseAmountTransferred,
@@ -640,7 +650,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             (sizeOutQuote, baseAmount) = _pairManager.openMarketWithQuoteAsset(
                 amountTransferred,
                 true,
-                _payer
+                _payer,
+                0
             );
 
             require(
@@ -663,7 +674,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             (sizeOutQuote, baseAmount) = _pairManager.openMarketWithQuoteAsset(
                 amountTransferred,
                 false,
-                _payer
+                _payer,
+                0
             );
             require(
                 sizeOutQuote == _quoteAmount,
