@@ -73,15 +73,16 @@ contract PositionSpotFactory is
         pair = Clones.cloneDeterministic(templatePair, salt);
 
         IMatchingEngineAMM(pair).initialize(
-            quoteAsset,
-            baseAsset,
+            IERC20(quoteAsset),
+            IERC20(baseAsset),
             basisPoint,
             baseBasisPoint,
             maxFindingWordsIndex,
             initialPip,
             pipRange,
             tickSpace,
-            creator
+            creator,
+            address(0)
         );
 
         emit PairManagerInitialized(

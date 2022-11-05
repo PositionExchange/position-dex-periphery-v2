@@ -9,6 +9,7 @@ import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../interfaces/IConcentratedLiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "hardhat/console.sol";
@@ -593,16 +594,44 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint32 indexedPipRange
     ) internal view returns (UserLiquidity.CollectFeeData memory _feeData) {
         (
-            _feeData.feeBaseAmount,
-            _feeData.feeQuoteAmount,
+            ,
+            ,
+            ,
+            ,
+            ,
             _feeData.newFeeGrowthBase,
-            _feeData.newFeeGrowthQuote
-        ) = pool.collectFee(
-            feeGrowthBase,
-            feeGrowthQuote,
+            _feeData.newFeeGrowthQuote,
+
+        ) = pool.liquidityInfo(indexedPipRange);
+
+        _feeData.feeBaseAmount = Math.mulDiv(
+            _feeData.newFeeGrowthBase,
             liquidity,
-            indexedPipRange
+            FixedPoint128.Q128
         );
+        _feeData.feeQuoteAmount = Math.mulDiv(
+            _feeData.newFeeGrowthQuote,
+            liquidity,
+            FixedPoint128.Q128
+        );
+        //        return (
+        //            baseAmount,
+        //            quoteAmount,
+        //            _liquidityInfo.feeGrowthBase,
+        //            _liquidityInfo.feeGrowthQuote
+        //        );
+        //
+        //        (
+        //            _feeData.feeBaseAmount,
+        //            _feeData.feeQuoteAmount,
+        //            _feeData.newFeeGrowthBase,
+        //            _feeData.newFeeGrowthQuote
+        //        ) = pool.collectFee(
+        //            feeGrowthBase,
+        //            feeGrowthQuote,
+        //            liquidity,
+        //            indexedPipRange
+        //        );
     }
 
     function _getPipRange(IMatchingEngineAMM pool)
