@@ -373,6 +373,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint64 orderId;
         uint256 sizeOut;
         uint256 quoteAmountFilled;
+        uint256 feeAmount;
     }
 
     function _openLimitOrder(
@@ -399,15 +400,19 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _quantity.Uint256ToUint128()
             );
         }
-        (state.orderId, state.sizeOut, state.quoteAmountFilled) = _pairManager
-            .openLimit(
-                _pip,
-                _quantity.Uint256ToUint128(),
-                isBuy,
-                _trader,
-                0,
-                fee
-            );
+        (
+            state.orderId,
+            state.sizeOut,
+            state.quoteAmountFilled,
+            state.feeAmount
+        ) = _pairManager.openLimit(
+            _pip,
+            _quantity.Uint256ToUint128(),
+            isBuy,
+            _trader,
+            0,
+            fee
+        );
         if (isBuy) {
             // Buy limit
             quoteAmount =
@@ -451,7 +456,13 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         if (isBuy) {
             // withdraw  base asset
-            _withdraw(_pairManager, _trader, Asset.Base, state.sizeOut, false);
+            _withdraw(
+                _pairManager,
+                _trader,
+                Asset.Base,
+                state.sizeOut - state.feeAmount,
+                false
+            );
         }
         if (!isBuy) {
             // withdraw quote asset
@@ -459,7 +470,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Quote,
-                state.quoteAmountFilled,
+                state.quoteAmountFilled - state.feeAmount,
                 false
             );
         }
@@ -501,15 +512,19 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _quantity = _pairManager.quoteToBase(quoteAmountTransferred, _pip);
         }
 
-        (state.orderId, state.sizeOut, state.quoteAmountFilled) = _pairManager
-            .openLimit(
-                _pip,
-                _quantity.Uint256ToUint128(),
-                true,
-                _trader,
-                quoteAmountTransferred,
-                _getFee()
-            );
+        (
+            state.orderId,
+            state.sizeOut,
+            state.quoteAmountFilled,
+            state.feeAmount
+        ) = _pairManager.openLimit(
+            _pip,
+            _quantity.Uint256ToUint128(),
+            true,
+            _trader,
+            quoteAmountTransferred,
+            _getFee()
+        );
         uint256 baseAmountReceive = state.sizeOut;
         if (
             state.sizeOut == _quantity &&
@@ -564,6 +579,12 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         );
     }
 
+    struct OpenMarketState {
+        uint256 mainSideOut;
+        uint256 flipSideOut;
+        uint256 feeAmount;
+    }
+
     function _openMarketOrder(
         IMatchingEngineAMM _pairManager,
         Side _side,
@@ -571,32 +592,43 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address _payer,
         address _recipient
     ) internal returns (uint256[] memory) {
-        uint256 sizeOut;
-        uint256 quoteAmount;
+        /// state.mainSideOut is base asset
+        /// state.flipSideOut is quote asset
+        OpenMarketState memory state;
+        //        uint256 sizeOut;
+        //        uint256 quoteAmount;
         uint16 fee = _getFee();
 
         if (_side == Side.BUY) {
-            (sizeOut, quoteAmount) = _pairManager.openMarket(
-                _quantity,
-                true,
-                _payer,
-                fee
+            (
+                state.mainSideOut,
+                state.flipSideOut,
+                state.feeAmount
+            ) = _pairManager.openMarket(_quantity, true, _payer, fee);
+            require(
+                state.mainSideOut == _quantity,
+                Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
-            require(sizeOut == _quantity, Errors.VL_NOT_ENOUGH_LIQUIDITY);
 
             // deposit quote asset
             uint256 amountTransferred = _deposit(
                 _pairManager,
                 _payer,
                 Asset.Quote,
-                quoteAmount
+                state.flipSideOut
             );
 
-            require(amountTransferred == quoteAmount, "!RFI");
+            require(amountTransferred == state.flipSideOut, "!RFI");
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
-            _withdraw(_pairManager, _recipient, Asset.Base, _quantity, false);
+            _withdraw(
+                _pairManager,
+                _recipient,
+                Asset.Base,
+                _quantity - state.feeAmount,
+                false
+            );
         } else {
             // SELL market
             uint256 baseAmountTransferred = _deposit(
@@ -606,14 +638,18 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _quantity
             );
 
-            (sizeOut, quoteAmount) = _pairManager.openMarket(
+            (
+                state.mainSideOut,
+                state.flipSideOut,
+                state.feeAmount
+            ) = _pairManager.openMarket(
                 baseAmountTransferred,
                 false,
                 _payer,
                 fee
             );
             require(
-                sizeOut == baseAmountTransferred,
+                state.mainSideOut == baseAmountTransferred,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
@@ -621,7 +657,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _pairManager,
                 _recipient,
                 Asset.Quote,
-                quoteAmount,
+                state.flipSideOut - state.feeAmount,
                 false
             );
             _quantity = baseAmountTransferred;
@@ -629,14 +665,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         emit MarketOrderOpened(
             _payer,
-            _quantity,
-            quoteAmount,
+            state.mainSideOut,
+            state.flipSideOut,
             _side,
             _pairManager,
             _pairManager.getCurrentPip(),
             _blockTimestamp()
         );
-        return _calculatorAmounts(_side, _quantity, quoteAmount);
+        return _calculatorAmounts(_side, state.mainSideOut, state.flipSideOut);
     }
 
     function _openMarketOrderWithQuote(
@@ -646,8 +682,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address _payer,
         address _recipient
     ) internal returns (uint256[] memory) {
-        uint256 sizeOutQuote;
-        uint256 baseAmount;
+        /// state.mainSideOut is quote asset
+        /// state.flipSideOut is base asset
+        OpenMarketState memory state;
+
         uint16 fee = _getFee();
 
         if (_side == Side.BUY) {
@@ -658,7 +696,11 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 _quoteAmount
             );
-            (sizeOutQuote, baseAmount) = _pairManager.openMarketWithQuoteAsset(
+            (
+                state.mainSideOut,
+                state.flipSideOut,
+                state.feeAmount
+            ) = _pairManager.openMarketWithQuoteAsset(
                 amountTransferred,
                 true,
                 _payer,
@@ -666,50 +708,60 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             );
 
             require(
-                sizeOutQuote == amountTransferred,
+                state.mainSideOut == amountTransferred,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
-            _withdraw(_pairManager, _recipient, Asset.Base, baseAmount, false);
+            _withdraw(
+                _pairManager,
+                _recipient,
+                Asset.Base,
+                state.flipSideOut - state.feeAmount,
+                false
+            );
         } else {
             // SELL market
             uint256 amountTransferred = _deposit(
                 _pairManager,
                 _payer,
                 Asset.Base,
-                baseAmount
+                _quoteAmount
             );
 
-            (sizeOutQuote, baseAmount) = _pairManager.openMarketWithQuoteAsset(
+            (
+                state.mainSideOut,
+                state.flipSideOut,
+                state.feeAmount
+            ) = _pairManager.openMarketWithQuoteAsset(
                 amountTransferred,
                 false,
                 _payer,
                 fee
             );
             require(
-                sizeOutQuote == _quoteAmount,
+                state.mainSideOut == _quoteAmount,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
             _withdraw(
                 _pairManager,
                 _recipient,
                 Asset.Quote,
-                _quoteAmount,
+                _quoteAmount - state.feeAmount,
                 false
             );
         }
         emit MarketOrderOpened(
             _payer,
-            baseAmount,
-            _quoteAmount,
+            state.flipSideOut,
+            state.mainSideOut,
             _side,
             _pairManager,
             _pairManager.getCurrentPip(),
             _blockTimestamp()
         );
-        return _calculatorAmounts(_side, baseAmount, _quoteAmount);
+        return _calculatorAmounts(_side, state.flipSideOut, state.mainSideOut);
     }
 
     function _clearLimitOrder(address _pairManagerAddress, address _trader)
