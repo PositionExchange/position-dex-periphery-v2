@@ -9,8 +9,7 @@ import "@openzeppelin/contracts-upgradeable/governance/utils/VotesUpgradeable.so
 /// @notice This NFT is voteable
 abstract contract ConcentratedLiquidityNFT is
     ERC721Upgradeable,
-    ERC721EnumerableUpgradeable,
-    VotesUpgradeable
+    ERC721EnumerableUpgradeable
 {
     uint256 public tokenID;
 
@@ -50,21 +49,7 @@ abstract contract ConcentratedLiquidityNFT is
         address to,
         uint256 tokenId
     ) internal virtual override {
-        _transferVotingUnits(from, to, 1);
         super._afterTokenTransfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev Returns the balance of `account`.
-     */
-    function _getVotingUnits(address account)
-        internal
-        view
-        virtual
-        override
-        returns (uint256)
-    {
-        return balanceOf(account);
     }
 
     /**

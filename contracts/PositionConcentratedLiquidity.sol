@@ -32,7 +32,6 @@ contract PositionConcentratedLiquidity is
         __ReentrancyGuard_init();
         __Ownable_init();
         __ERC721_init("Position Liquidity Pool", "PLP");
-        __EIP712_init("Position Liquidity NFT", "1.0.0");
         tokenID = 1000000;
     }
 
