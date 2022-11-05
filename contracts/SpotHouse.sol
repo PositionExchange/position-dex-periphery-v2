@@ -348,7 +348,7 @@ contract SpotHouse is
         );
 
         if (isTakeFee) {
-            uint256 feeCalculatedAmount = _feeCalculator(_amount, fee);
+            uint256 feeCalculatedAmount = _feeCalculator(_amount, _getFee());
             _amount -= feeCalculatedAmount;
             _increaseFee(_pairManager, feeCalculatedAmount, asset);
         }
