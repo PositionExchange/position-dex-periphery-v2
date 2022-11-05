@@ -385,6 +385,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address _pairManagerAddress = address(_pairManager);
         OpenLimitOrderState memory state;
         uint256 quoteAmount;
+        uint16 fee = _getFee();
         bool isBuy = _side == Side.BUY ? true : false;
         if (!isBuy) {
             // Sell limit
@@ -405,7 +406,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 isBuy,
                 _trader,
                 0,
-                0
+                fee
             );
         if (isBuy) {
             // Buy limit
@@ -507,7 +508,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 true,
                 _trader,
                 quoteAmountTransferred,
-                0
+                _getFee()
             );
         uint256 baseAmountReceive = state.sizeOut;
         if (
@@ -572,12 +573,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     ) internal returns (uint256[] memory) {
         uint256 sizeOut;
         uint256 quoteAmount;
+        uint16 fee = _getFee();
+
         if (_side == Side.BUY) {
             (sizeOut, quoteAmount) = _pairManager.openMarket(
                 _quantity,
                 true,
                 _payer,
-                0
+                fee
             );
             require(sizeOut == _quantity, Errors.VL_NOT_ENOUGH_LIQUIDITY);
 
@@ -607,7 +610,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 baseAmountTransferred,
                 false,
                 _payer,
-                0
+                fee
             );
             require(
                 sizeOut == baseAmountTransferred,
@@ -645,6 +648,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     ) internal returns (uint256[] memory) {
         uint256 sizeOutQuote;
         uint256 baseAmount;
+        uint16 fee = _getFee();
+
         if (_side == Side.BUY) {
             // deposit quote asset
             uint256 amountTransferred = _deposit(
@@ -657,7 +662,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 amountTransferred,
                 true,
                 _payer,
-                0
+                fee
             );
 
             require(
@@ -681,7 +686,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 amountTransferred,
                 false,
                 _payer,
-                0
+                fee
             );
             require(
                 sizeOutQuote == _quoteAmount,
@@ -825,4 +830,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     ) internal virtual {}
 
     function _msgSender() internal view virtual returns (address) {}
+
+    function _getFee() internal view virtual returns (uint16) {}
 }

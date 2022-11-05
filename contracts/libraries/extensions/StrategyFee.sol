@@ -5,7 +5,7 @@
 pragma solidity ^0.8.9;
 
 abstract contract StrategyFee {
-    uint16 public fee;
+    uint16 public defaultFeePercentage;
 
     struct FeeDiscount {
         uint32 minHold;
@@ -15,19 +15,26 @@ abstract contract StrategyFee {
 
     FeeDiscount[] public strategyFee;
 
-    function getFeeDiscount(uint256 amount) internal view returns (uint256) {
-        if (strategyFee.length == 0) {
+    function initStrategyFee(uint16 _defaultFeePercentage) internal {
+        defaultFeePercentage = _defaultFeePercentage;
+    }
+
+    function condition() internal view virtual returns (uint16) {}
+
+    function getFeeDiscount() internal view returns (uint16) {
+        uint256 _condition = condition();
+        if (strategyFee.length == 0 || _condition == 0) {
             return defaultFeePercentage;
         }
 
-        uint256 feeDiscountPercent;
+        uint16 feeDiscountPercent;
 
         for (uint256 i = 0; i < strategyFee.length; i++) {
             if (
-                amount >= strategyFee[i].minHold &&
-                amount <= strategyFee[i].maxHold
+                _condition >= strategyFee[i].minHold &&
+                _condition <= strategyFee[i].maxHold
             ) {
-                discount = strategyFee[i].discount;
+                feeDiscountPercent = strategyFee[i].fee;
                 break;
             }
         }
@@ -38,12 +45,12 @@ abstract contract StrategyFee {
         external
         virtual
     {
-        delete discountStrategy;
+        delete strategyFee;
 
         if (newStrategyDiscount.length != 0) {
             for (uint32 i = 0; i < newStrategyDiscount.length; i++) {
                 FeeDiscount memory discount = newStrategyDiscount[i];
-                discountStrategy.push(discount);
+                strategyFee.push(discount);
             }
         }
     }

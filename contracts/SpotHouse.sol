@@ -22,11 +22,13 @@ import "hardhat/console.sol";
 import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
 import "./implement/SpotDex.sol";
+import "./libraries/extensions/StrategyFee.sol";
 
 contract SpotHouse is
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
+    StrategyFee,
     SpotDex
 {
     using Convert for uint256;
@@ -40,9 +42,10 @@ contract SpotHouse is
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
+        initStrategyFee(20);
 
         feeBasis = 10000;
-        fee = 20;
+        //        fee = 20;
         WBNB = address(0);
     }
 
@@ -239,6 +242,14 @@ contract SpotHouse is
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
+
+    function _getFee() internal view override(SpotDex) returns (uint16) {
+        return getFeeDiscount();
+    }
+
+    function condition() internal view override(StrategyFee) returns (uint16) {
+        return 0;
+    }
 
     function _msgSender()
         internal
