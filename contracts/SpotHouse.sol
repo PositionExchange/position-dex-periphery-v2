@@ -38,16 +38,15 @@ contract SpotHouse is
         _;
     }
 
-    function initialize(address _positionDexNft) public initializer {
+    function initialize() public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
-        initStrategyFee(20);
+        _initStrategyFee(20);
 
         feeBasis = 10000;
         //        fee = 20;
-        WBNB = address(0);
-    }
+     }
 
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
