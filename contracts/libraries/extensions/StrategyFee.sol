@@ -15,7 +15,7 @@ abstract contract StrategyFee {
 
     FeeDiscount[] public strategyFee;
 
-    function initStrategyFee(uint16 _defaultFeePercentage) internal {
+    function _initStrategyFee(uint16 _defaultFeePercentage) internal {
         defaultFeePercentage = _defaultFeePercentage;
     }
 
