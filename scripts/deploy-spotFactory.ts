@@ -18,6 +18,8 @@ task('spot-factory-testnet', 'How is your girl friend?', async (taskArgs, hre) =
     await instance.deployed();
 
     const address = instance.address
+    console.log("PositionSpotFactory deployed address: ",  address);
+
 
     const upgraded = await hre.upgrades.upgradeProxy(
         address,

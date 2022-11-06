@@ -9,4 +9,5 @@ typechain-types
 cache
 artifacts
 *.idea*
+config-testnet.json
 

@@ -18,6 +18,7 @@ task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskAr
     await instance.deployed();
 
     const address = instance.address
+    console.log("PositionConcentratedLiquidity deploy address: ",  address);
 
     const upgraded = await hre.upgrades.upgradeProxy(
         address,
