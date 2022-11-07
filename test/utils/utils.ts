@@ -231,6 +231,29 @@ export async function approveAndMintToken(
   });
 }
 
+
+export async function approve(
+    quoteAsset: any,
+    baseAsset: any,
+    contract: any,
+    users: SignerWithAddress[]
+) {
+
+    const quoteSymbol = await quoteAsset.symbol();
+    const baseSymbol = await baseAsset.symbol();
+
+    users.forEach((user) => {
+
+        quoteAsset
+            .connect(user)
+            .approve(contract.address, ethers.constants.MaxUint256);
+
+        baseAsset
+            .connect(user)
+            .approve(contract.address, ethers.constants.MaxUint256);
+    });
+}
+
 export async function approveAndMintToken2(
   quoteAsset: any,
   baseAsset: any,

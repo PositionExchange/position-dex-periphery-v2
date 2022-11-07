@@ -7,7 +7,7 @@ import {
     PositionSpotFactory
 } from "../../typeChain";
 import {BASIS_POINT, TestLiquidity} from "./test-liquidity";
-import {approveAndMintToken, deployContract, getAccount, toWei} from "../utils/utils";
+import {approve, approveAndMintToken, deployContract, getAccount, toWei} from "../utils/utils";
 import {deployMockToken} from "../utils/mock";
 import {exchange} from "../../typeChain/@positionex/matching-engine/contracts/libraries";
 import {expect} from "chai";
@@ -43,9 +43,11 @@ describe("manage liquidity", async () => {
                 100000,
                 30_000,
                 1,
-                deployer.address);
+                deployer.address,
+                dexNFT.address
+            );
 
-            await spotHouse.initialize(dexNFT.address);
+            await spotHouse.initialize();
 
             await spotHouse.setFactory(factory.address);
 
@@ -55,8 +57,8 @@ describe("manage liquidity", async () => {
 
             await factory.addPairManagerManual(matching.address, base.address, quote.address);
             await approveAndMintToken(quote, base, dexNFT, users)
-            await approveAndMintToken(quote, base, dexNFT, users)
-            await matching.approve(base.address, quote.address, dexNFT.address)
+            await approve(quote, base, spotHouse, users)
+            await matching.approve()
         }
     )
 
