@@ -8,7 +8,16 @@ import YAML from "js-yaml";
     PositionSpotFactory
 } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
-import {deployContract, expectRevert, fromWei, getAccount, SIDE, toWei} from "../utils/utils";
+import {
+    approve,
+    approveAndMintToken,
+    deployContract,
+    expectRevert,
+    fromWei,
+    getAccount,
+    SIDE,
+    toWei
+} from "../utils/utils";
 import {BigNumber, ethers} from "ethers";
 import {YamlTestProcess} from "./yaml-test-process";
 import Decimal from "decimal.js";
@@ -134,16 +143,18 @@ export async function deployAndCreateRouterHelper() {
         100000,
         30_000,
         1,
-        deployer.address);
+        deployer.address,
+        dexNFT.address);
 
-    await spotHouse.initialize(dexNFT.address);
+    await spotHouse.initialize();
 
     await spotHouse.setFactory(factory.address);
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
-
-
+    await approveAndMintToken(quote, base, dexNFT, users)
+    await approve(quote, base, spotHouse, users)
+    await  matching.approve()
 
 
     testHelper = new TestLiquidity(
