@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract SpotFactoryStorage {
     address public spotHouse;
 
-    address public liquidityPool;
+    address public positionLiquidity;
 
     struct Pair {
         address BaseAsset;

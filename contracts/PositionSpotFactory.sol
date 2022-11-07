@@ -19,10 +19,11 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 
 contract PositionSpotFactory is
     ISpotFactory,
-    SpotFactoryStorage,
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    SpotFactoryStorage
+
 {
     function initialize() public initializer {
         __ReentrancyGuard_init();
@@ -82,7 +83,7 @@ contract PositionSpotFactory is
             pipRange,
             tickSpace,
             creator,
-            address(0)
+            positionLiquidity
         );
 
         emit PairManagerInitialized(
@@ -154,9 +155,9 @@ contract PositionSpotFactory is
         spotHouse = newSpotHouse;
     }
 
-    function setLiquidityPool(address _liquidityPool) external onlyOwner {
-        require(_liquidityPool != address(0), Errors.VL_EMPTY_ADDRESS);
-        liquidityPool = _liquidityPool;
+    function setPositionLiquidity(address _positionLiquidity) external onlyOwner {
+        require(_positionLiquidity != address(0), Errors.VL_EMPTY_ADDRESS);
+        positionLiquidity = _positionLiquidity;
     }
 
     function pause() external onlyOwner {
