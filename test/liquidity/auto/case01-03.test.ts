@@ -43,8 +43,7 @@ describe("Integration-Case01", async function(){
     Id: 3
     IndexPipRange: 1
     Asset: base
-    BaseVirtual: 20
-    QuoteVirtual: 258.7230767
+    AmountVirtual: 20
   Expect:
     Pool:
       Liquidity: 513.32195038742
@@ -72,13 +71,13 @@ describe("Integration-Case01", async function(){
     Id: 4
     Asset: base
     Side: 0
-    Quantity: 15
+    Quantity: 16
     Price: 30000
   Expect:
     PendingOrder:
       OrderId: 3
       Price: 30000
-      Size : 15
+      Size : 16
       Side: 0
 - S5: OpenMarket
   Action:
@@ -128,20 +127,20 @@ describe("Integration-Case01", async function(){
       BalanceBase: 955.00000
       BalanceQuote: 1118.53129
 - S8: Expect
-   User:
-      Id: 1
-      BalanceBase: 1009.70000
-      BalanceQuote: 970
+  User:
+    Id: 1
+    BalanceBase: 1009.70000
+    BalanceQuote: 970
 - S9: Expect
-   User:
-      Id: 2
-      BalanceBase: 1019.40000
-      BalanceQuote: 940
+  User:
+    Id: 2
+    BalanceBase: 1019.40000
+    BalanceQuote: 940
 - S10: Expect
-   User:
-      Id: 4
-      BalanceBase: 1014.55000
-      BalanceQuote: 955.00000`
+  User:
+    Id: 4
+    BalanceBase: 1014.55000
+    BalanceQuote: 955.00000`
         )
     })
 })

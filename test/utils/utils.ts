@@ -184,8 +184,6 @@ export async function expectBalanceOfToken(
     await expect(tokenBalance).eq(expectedAmount);
 }
 
-
-
 export async function setDataForExpectedMap(
     expectedMap: Map<IERC20, ExpectErc20Detail[]>,
     token: IERC20,
@@ -211,19 +209,20 @@ export async function approveAndMintToken(
 
   const quoteSymbol = await quoteAsset.symbol();
   const baseSymbol = await baseAsset.symbol();
+  console.log(quoteSymbol)
 
   users.forEach((user) => {
 
 
     if ( quoteSymbol != "WBNB"){
-      quoteAsset.mint(user.address, toWei(100000000));
+      quoteAsset.mint(user.address, toWei(1000));
     }
     quoteAsset
       .connect(user)
       .approve(contract.address, ethers.constants.MaxUint256);
 
     if ( baseSymbol != "WBNB"){
-      baseAsset.mint(user.address, toWei(100000000));
+      baseAsset.mint(user.address, toWei(1000));
     }
     baseAsset
       .connect(user)

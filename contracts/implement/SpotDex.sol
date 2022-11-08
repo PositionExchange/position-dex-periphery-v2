@@ -11,6 +11,7 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
+import "hardhat/console.sol";
 
 abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
@@ -292,7 +293,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _pairManagerAddress
         ][_trader];
         uint256 i = 0;
-        uint256 _basisPoint = _pairManager.getBasisPoint();
+        uint256 _basisPoint = _pairManager.basisPoint();
         uint128 _feeBasis = feeBasis;
         IMatchingEngineAMM.ExchangedData memory exData = IMatchingEngineAMM
             .ExchangedData({
@@ -414,6 +415,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             fee
         );
         if (isBuy) {
+
+
             // Buy limit
             quoteAmount =
                 _pairManager.calculatingQuoteAmount(
@@ -421,6 +424,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     _pip
                 ) +
                 state.quoteAmountFilled;
+
+            console.log("isBuy quoteAmount", quoteAmount);
+
             //            quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
             // with token has RFI we need deposit first
@@ -648,10 +654,13 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _payer,
                 fee
             );
+            console.log(" SELL state.mainSideOut, baseAmountTransferred ", state.mainSideOut, baseAmountTransferred);
             require(
                 state.mainSideOut == baseAmountTransferred,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
+            console.log(" SELL state.flipSideOut ", state.flipSideOut, state.feeAmount);
+
 
             _withdraw(
                 _pairManager,
@@ -660,6 +669,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.flipSideOut - state.feeAmount,
                 false
             );
+
             _quantity = baseAmountTransferred;
         }
 

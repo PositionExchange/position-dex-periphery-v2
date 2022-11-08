@@ -6,45 +6,34 @@ import "./Convert.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/LiquidityMath.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
+import "hardhat/console.sol";
 
 library LiquidityHelper {
-    function calculateQuoteVirtualAmountFromBaseVirtualAmount(
-        uint128 baseVirtualAmount,
-        IMatchingEngineAMM _pairManager,
-        uint32 indexedPipRange,
-        uint128 pipRange
-    ) internal view returns (uint128 quoteVirtualAmount) {
-        uint128 currentPrice = _pairManager.getCurrentPip();
-        (uint128 minPip, uint128 maxPip) = LiquidityMath.calculatePipRange(
-            indexedPipRange,
-            pipRange
-        );
+    function calculateQuoteVirtualFromBaseReal(
+        uint128 baseReal,
+        uint128 sqrtCurrentPrice,
+        uint128 sqrtPriceMin,
+        uint256 sqrtBasicPoint
+    ) internal view returns (uint128) {
+        console.log("sqrtBasicPoint: ", sqrtBasicPoint);
         return
-            LiquidityMath.calculateQuoteVirtualAmountFromBaseVirtualAmount(
-                baseVirtualAmount,
-                uint128(Math.sqrt(uint256(currentPrice))),
-                uint128(Math.sqrt(uint256(maxPip))),
-                uint128(Math.sqrt(uint256(minPip)))
-            );
+            uint128(
+                uint256(baseReal) *
+                    uint256(sqrtCurrentPrice / sqrtBasicPoint) *
+                    (uint256(sqrtCurrentPrice/ sqrtBasicPoint) - uint256(sqrtPriceMin / sqrtBasicPoint))
+            ) / 10**18;
     }
 
-    function calculateBaseVirtualAmountFromQuoteVirtualAmount(
-        uint128 quoteVirtualAmount,
-        IMatchingEngineAMM _pairManager,
-        uint32 indexedPipRange,
-        uint128 pipRange
-    ) internal view returns (uint128 baseVirtualAmount) {
-        uint128 currentPrice = _pairManager.getCurrentPip();
-        (uint128 minPip, uint128 maxPip) = LiquidityMath.calculatePipRange(
-            indexedPipRange,
-            pipRange
-        );
+    function calculateBaseVirtualFromQuoteReal(
+        uint128 quoteReal,
+        uint128 sqrtCurrentPrice,
+        uint128 sqrtPriceMax
+    ) internal returns (uint128) {
         return
-            LiquidityMath.calculateQuoteVirtualAmountFromBaseVirtualAmount(
-                quoteVirtualAmount,
-                uint128(Math.sqrt(uint256(currentPrice))),
-                uint128(Math.sqrt(uint256(maxPip))),
-                uint128(Math.sqrt(uint256(minPip)))
+            uint128(
+                (uint256(quoteReal) *
+                    (uint256(sqrtPriceMax) - uint256(sqrtCurrentPrice))) /
+                    (uint256(sqrtCurrentPrice**2 * sqrtPriceMax))
             );
     }
 }

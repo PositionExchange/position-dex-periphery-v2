@@ -1,7 +1,7 @@
 import {expect, use} from "chai";
 import YAML from "js-yaml";
     import {
-    MockMatchingEngineAMM,
+        ForkMatchingEngineAMM,
     MockSpotHouse,
     MockToken,
         PositionConcentratedLiquidity,
@@ -113,7 +113,7 @@ function roundNumber(n, decimal = 6){
 
 // useWBNB: 0 is not use, 1 is WBNB Quote, 2 is WBNB Base
 export async function deployAndCreateRouterHelper() {
-    let matching: MockMatchingEngineAMM
+    let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
     let quote : MockToken;
@@ -125,7 +125,7 @@ export async function deployAndCreateRouterHelper() {
     let users  : any[] = [];
     users = await getAccount() as unknown as any[];
     const deployer = users[0];
-    matching = await deployContract("MockMatchingEngineAMM", deployer );
+    matching = await deployContract("ForkMatchingEngineAMM", deployer );
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
     dexNFT = await deployContract("PositionConcentratedLiquidity", deployer );
@@ -149,9 +149,11 @@ export async function deployAndCreateRouterHelper() {
     await spotHouse.initialize();
 
     await spotHouse.setFactory(factory.address);
+    await dexNFT.setFactory(factory.address);
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
+    await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users)
     await approve(quote, base, spotHouse, users)
     await  matching.approve()
@@ -162,8 +164,8 @@ export async function deployAndCreateRouterHelper() {
         matching,
         factory,
         dexNFT,
-        base,
         quote,
+        base,
         deployer  ,{
         users
     });
@@ -175,7 +177,7 @@ export async function deployAndCreateRouterHelper() {
 
 export class TestLiquidity {
     mockSpotHouse: MockSpotHouse;
-    mockMatching : MockMatchingEngineAMM;
+    mockMatching : ForkMatchingEngineAMM;
     factory : PositionSpotFactory;
     dexNFT : PositionConcentratedLiquidity;
     quote : MockToken;
@@ -186,7 +188,6 @@ export class TestLiquidity {
     nftTokenId: number = 1000000;
     baseToken: MockToken;
     quoteToken: MockToken;
-    // @notice fee in %
     spotFee: number;
     verbose = true;
     users : SignerWithAddress[]
@@ -194,7 +195,7 @@ export class TestLiquidity {
 
     constructor(
         _mockSpotHouse: MockSpotHouse,
-        _mockMatching : MockMatchingEngineAMM,
+        _mockMatching : ForkMatchingEngineAMM,
         _factory :PositionSpotFactory,
         _dexNFT : PositionConcentratedLiquidity,
         _quote : MockToken,
@@ -207,8 +208,8 @@ export class TestLiquidity {
         this.mockMatching = _mockMatching;
         this.factory = _factory;
         this.dexNFT = _dexNFT;
-        this.base = _base;
-        this.quote = _quote;
+        this.baseToken = _base;
+        this.quoteToken = _quote;
         this.defaultSender = _defaultSender;
         this.users = opts.users;
     }
@@ -251,7 +252,8 @@ export class TestLiquidity {
     async addLiquidity(amountVirtual: StringOrNumber, indexPip : StringOrNumber, asset : string, idSender : number ,opts: CallOptions = {}): Promise<number> {
 
         console.group(`AddLiquidity`);
-        await this.dexNFT.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :amountVirtual, indexedPipRange :indexPip, isBase : asset == "base" });
+        console.log("id sender: ", idSender);
+        await this.dexNFT.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :toWei(amountVirtual), indexedPipRange :indexPip, isBase : asset == "base" });
         return 0;
     }
 
@@ -293,6 +295,9 @@ export class TestLiquidity {
     async expectPool( expectData: ExpectedPoolData) {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
+
+        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
+        console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
 
 
         if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
@@ -375,18 +380,21 @@ export class TestLiquidity {
             expect(await this.dexNFT.ownerOf(expectData.TokenId)).to.be.equal(this.users[expectData.Id].address);
 
             const liquidityInfo = await this.dexNFT.concentratedLiquidity(expectData.TokenId);
+            console.log("liquidityInfo: ",fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase));
 
             if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
-            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
-            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.01)).to.equal(true, "Liquidity user");
-            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
-            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
+            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
+            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.01)).to.equal(true, "FeeGrowthQuote user");
+            if (expectData.QuoteVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
+            if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
 
         }
-        if ( expectData.BalanceBase) {
-            expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
-            expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
-        }
+        console.log("this.baseToken :" , this.baseToken.address, expectData.Id);
+        const balnceBase = await this.baseToken.balanceOf(this.users[expectData.Id].address);
+        console.log("balnceBase :" , balnceBase.toString());
+        if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
+        if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.01)).to.equal(true, "BalanceQuote user");
+
     }
 
 

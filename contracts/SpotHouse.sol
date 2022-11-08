@@ -42,11 +42,11 @@ contract SpotHouse is
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
-        _initStrategyFee(20);
+        _initStrategyFee(300);
 
         feeBasis = 10000;
         //        fee = 20;
-     }
+    }
 
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
@@ -287,10 +287,14 @@ contract SpotHouse is
         Asset _asset,
         uint256 _amount
     ) internal override(SpotDex) returns (uint256) {
+
+
         if (_amount == 0) return 0;
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
         );
+        console.log("_deposit override; ", _pairAddress.QuoteAsset);
+
         address pairManagerAddress = address(_pairManager);
         uint256 _fee;
         uint128 _feeBasis = feeBasis;
@@ -312,7 +316,9 @@ contract SpotHouse is
                     pairManagerAddress
                 );
                 _amount = _balanceAfter - _balanceBefore;
-            }
+                console.log("_deposit _balanceAfter:",_balanceAfter );
+
+}
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
@@ -356,6 +362,9 @@ contract SpotHouse is
             if (_pairAddress.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
+                uint256 balanceOfPairManager = IERC20(_pairAddress.QuoteAsset)
+                    .balanceOf(pairManagerAddress);
+                console.log("balanceOfPairManager quote", balanceOfPairManager);
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.QuoteAsset),
                     address(_pairManager),
