@@ -150,7 +150,7 @@ export class YamlTestProcess {
                 BalanceBase : extractUser.balanceBase,
                 TokenId: extractUser.tokenId,
                 Liquidity:extractUser.liquidity,
-                FeeGrowthBase : extractUser.balanceBase,
+                FeeGrowthBase : extractUser.feeGrowthBase,
                 FeeGrowthQuote : extractUser.feeGrowthQuote,
                 BaseVirtual : extractUser.baseVirtual,
                 QuoteVirtual : extractUser.quoteVirtual,

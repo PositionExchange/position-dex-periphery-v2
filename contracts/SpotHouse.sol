@@ -46,7 +46,7 @@ contract SpotHouse is
 
         feeBasis = 10000;
         //        fee = 20;
-     }
+    }
 
     function openLimitOrder(
         IMatchingEngineAMM pairManager,

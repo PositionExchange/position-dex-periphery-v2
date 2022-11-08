@@ -6,6 +6,4 @@ pragma solidity ^0.8.9;
 
 import "../implement/ConcentratedLiquidity.sol";
 
-contract MockConcentratedLiquidity is ConcentratedLiquidity{
-
-}
+contract MockConcentratedLiquidity is ConcentratedLiquidity {}

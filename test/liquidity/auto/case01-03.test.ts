@@ -43,8 +43,7 @@ describe("Integration-Case01", async function(){
     Id: 3
     IndexPipRange: 1
     Asset: base
-    BaseVirtual: 20
-    QuoteVirtual: 258.7230767
+    AmountVirtual: 20
   Expect:
     Pool:
       Liquidity: 513.32195038742
