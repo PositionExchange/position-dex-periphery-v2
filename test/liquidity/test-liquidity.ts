@@ -1,7 +1,7 @@
 import {expect, use} from "chai";
 import YAML from "js-yaml";
     import {
-    MockMatchingEngineAMM,
+        ForkMatchingEngineAMM,
     MockSpotHouse,
     MockToken,
         PositionConcentratedLiquidity,
@@ -113,7 +113,7 @@ function roundNumber(n, decimal = 6){
 
 // useWBNB: 0 is not use, 1 is WBNB Quote, 2 is WBNB Base
 export async function deployAndCreateRouterHelper() {
-    let matching: MockMatchingEngineAMM
+    let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
     let quote : MockToken;
@@ -125,7 +125,7 @@ export async function deployAndCreateRouterHelper() {
     let users  : any[] = [];
     users = await getAccount() as unknown as any[];
     const deployer = users[0];
-    matching = await deployContract("MockMatchingEngineAMM", deployer );
+    matching = await deployContract("ForkMatchingEngineAMM", deployer );
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
     dexNFT = await deployContract("PositionConcentratedLiquidity", deployer );
@@ -152,6 +152,7 @@ export async function deployAndCreateRouterHelper() {
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
+    matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users)
     await approve(quote, base, spotHouse, users)
     await  matching.approve()
@@ -175,7 +176,7 @@ export async function deployAndCreateRouterHelper() {
 
 export class TestLiquidity {
     mockSpotHouse: MockSpotHouse;
-    mockMatching : MockMatchingEngineAMM;
+    mockMatching : ForkMatchingEngineAMM;
     factory : PositionSpotFactory;
     dexNFT : PositionConcentratedLiquidity;
     quote : MockToken;
@@ -194,7 +195,7 @@ export class TestLiquidity {
 
     constructor(
         _mockSpotHouse: MockSpotHouse,
-        _mockMatching : MockMatchingEngineAMM,
+        _mockMatching : ForkMatchingEngineAMM,
         _factory :PositionSpotFactory,
         _dexNFT : PositionConcentratedLiquidity,
         _quote : MockToken,

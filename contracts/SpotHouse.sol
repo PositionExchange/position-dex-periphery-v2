@@ -42,7 +42,7 @@ contract SpotHouse is
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
-        _initStrategyFee(20);
+        _initStrategyFee(300);
 
         feeBasis = 10000;
         //        fee = 20;

@@ -184,8 +184,6 @@ export async function expectBalanceOfToken(
     await expect(tokenBalance).eq(expectedAmount);
 }
 
-
-
 export async function setDataForExpectedMap(
     expectedMap: Map<IERC20, ExpectErc20Detail[]>,
     token: IERC20,
@@ -211,6 +209,7 @@ export async function approveAndMintToken(
 
   const quoteSymbol = await quoteAsset.symbol();
   const baseSymbol = await baseAsset.symbol();
+  console.log(quoteSymbol)
 
   users.forEach((user) => {
 

@@ -14,4 +14,9 @@ contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
 //        IERC20(quoteAsset).approve(_nftContractAddress, type(uint256).max);
 //        IERC20(baseAsset).approve(_nftContractAddress, type(uint256).max);
 //    }
+
+//
+    function setCounterParty02(address a) public {
+        counterParty = a;
+    }
 }

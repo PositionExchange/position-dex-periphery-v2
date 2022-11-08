@@ -128,20 +128,20 @@ describe("Integration-Case01", async function(){
       BalanceBase: 955.00000
       BalanceQuote: 1118.53129
 - S8: Expect
-   User:
-      Id: 1
-      BalanceBase: 1009.70000
-      BalanceQuote: 970
+  User:
+    Id: 1
+    BalanceBase: 1009.70000
+    BalanceQuote: 970
 - S9: Expect
-   User:
-      Id: 2
-      BalanceBase: 1019.40000
-      BalanceQuote: 940
+  User:
+    Id: 2
+    BalanceBase: 1019.40000
+    BalanceQuote: 940
 - S10: Expect
-   User:
-      Id: 4
-      BalanceBase: 1014.55000
-      BalanceQuote: 955.00000`
+  User:
+    Id: 4
+    BalanceBase: 1014.55000
+    BalanceQuote: 955.00000`
         )
     })
 })
