@@ -164,8 +164,8 @@ export async function deployAndCreateRouterHelper() {
         matching,
         factory,
         dexNFT,
-        base,
         quote,
+        base,
         deployer  ,{
         users
     });
@@ -252,6 +252,7 @@ export class TestLiquidity {
     async addLiquidity(amountVirtual: StringOrNumber, indexPip : StringOrNumber, asset : string, idSender : number ,opts: CallOptions = {}): Promise<number> {
 
         console.group(`AddLiquidity`);
+        console.log("id sender: ", idSender);
         await this.dexNFT.connect(this.users[idSender]).addLiquidity({pool : this.mockMatching.address, amountVirtual :toWei(amountVirtual), indexedPipRange :indexPip, isBase : asset == "base" });
         return 0;
     }
@@ -294,6 +295,9 @@ export class TestLiquidity {
     async expectPool( expectData: ExpectedPoolData) {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
+
+        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
+        console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
 
 
         if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
@@ -385,7 +389,9 @@ export class TestLiquidity {
             if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
 
         }
-        console.log("this.baseToken :" , this.baseToken.address);
+        console.log("this.baseToken :" , this.baseToken.address, expectData.Id);
+        const balnceBase = await this.baseToken.balanceOf(this.users[expectData.Id].address);
+        console.log("balnceBase :" , balnceBase.toString());
         if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
         if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.01)).to.equal(true, "BalanceQuote user");
 

@@ -15,11 +15,12 @@ library LiquidityHelper {
         uint128 sqrtPriceMin,
         uint256 sqrtBasicPoint
     ) internal view returns (uint128) {
+        console.log("sqrtBasicPoint: ", sqrtBasicPoint);
         return
             uint128(
                 uint256(baseReal) *
                     uint256(sqrtCurrentPrice / sqrtBasicPoint) *
-                    (uint256(sqrtCurrentPrice/ sqrtBasicPoint) - uint256(sqrtPriceMin/ sqrtBasicPoint))
+                    (uint256(sqrtCurrentPrice/ sqrtBasicPoint) - uint256(sqrtPriceMin / sqrtBasicPoint))
             ) / 10**18;
     }
 

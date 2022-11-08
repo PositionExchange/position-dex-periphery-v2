@@ -215,14 +215,14 @@ export async function approveAndMintToken(
 
 
     if ( quoteSymbol != "WBNB"){
-      quoteAsset.mint(user.address, toWei(100000000));
+      quoteAsset.mint(user.address, toWei(1000));
     }
     quoteAsset
       .connect(user)
       .approve(contract.address, ethers.constants.MaxUint256);
 
     if ( baseSymbol != "WBNB"){
-      baseAsset.mint(user.address, toWei(100000000));
+      baseAsset.mint(user.address, toWei(1000));
     }
     baseAsset
       .connect(user)

@@ -71,13 +71,13 @@ describe("Integration-Case01", async function(){
     Id: 4
     Asset: base
     Side: 0
-    Quantity: 15
+    Quantity: 16
     Price: 30000
   Expect:
     PendingOrder:
       OrderId: 3
       Price: 30000
-      Size : 15
+      Size : 16
       Side: 0
 - S5: OpenMarket
   Action:

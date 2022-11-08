@@ -580,7 +580,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                         ),
                         state.currentPrice,
                         state.minPip,
-                        uint128(Math.sqrt(pool.getBasisPoint()))
+                        uint128(Math.sqrt(pool.basisPoint()))
                     );
 
             } else {
@@ -650,12 +650,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         _feeData.feeBaseAmount = Math.mulDiv(
             _feeData.newFeeGrowthBase,
             liquidity,
-            FixedPoint128.Q128
+            FixedPoint128.BUFFER
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
             _feeData.newFeeGrowthQuote,
             liquidity,
-            FixedPoint128.Q128
+            FixedPoint128.BUFFER
         );
     }
 
