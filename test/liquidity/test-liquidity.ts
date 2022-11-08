@@ -128,7 +128,7 @@ export async function deployAndCreateRouterHelper() {
     matching = await deployContract("MockMatchingEngineAMM", deployer );
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
-    dexNFT = await deployContract("NonfungiblePositionLiquidityPool", deployer );
+    dexNFT = await deployContract("PositionConcentratedLiquidity", deployer );
 
     quote = await deployMockToken("Quote");
     base = await deployMockToken("Base");

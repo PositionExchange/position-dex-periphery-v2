@@ -34,6 +34,8 @@ describe("manage liquidity", async () => {
             base = await deployMockToken("Base");
 
 
+        console.log("TTT", quote, base)
+
             await matching.initialize(
                 quote.address,
                 base.address,
@@ -53,7 +55,6 @@ describe("manage liquidity", async () => {
 
             await dexNFT.setFactory(factory.address)
             await dexNFT.initialize()
-
 
             await factory.addPairManagerManual(matching.address, base.address, quote.address);
             await approveAndMintToken(quote, base, dexNFT, users)
