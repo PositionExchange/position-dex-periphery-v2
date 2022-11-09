@@ -306,6 +306,10 @@ contract SpotHouse is
                 uint256 _balanceBefore = quoteAsset.balanceOf(
                     pairManagerAddress
                 );
+
+                console.log("_QUOTE Balance", IERC20(_pairAddress.QuoteAsset).balanceOf(_payer));
+                console.log("_transfer amount", _amount);
+
                 TransferHelper.transferFrom(
                     quoteAsset,
                     _payer,
