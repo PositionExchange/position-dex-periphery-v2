@@ -290,6 +290,12 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
+    async claimAsset( idSender : number) {
+        console.group(`ClaimAsset`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).claimAsset(this.mockMatching.address);
+        console.groupEnd();
+    }
+
 
 
     async expectPool( expectData: ExpectedPoolData) {

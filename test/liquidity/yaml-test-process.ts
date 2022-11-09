@@ -244,6 +244,14 @@ export class YamlTestProcess {
         }
 
     }
+
+    async ClaimAsset(stepData) {
+        const action = this.extractAction(stepData.getProp("Action"));
+        if (action)  await this.testHelper.claimAsset(action.id)
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
+    }
+
     async Expect(stepData) {
         if (stepData) await this.expectTest(stepData);
     }

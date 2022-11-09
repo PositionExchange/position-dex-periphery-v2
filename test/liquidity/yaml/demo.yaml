@@ -101,7 +101,7 @@
     FeeGrowthBase: 100 # Optional
     FeeGrowthQuote: 100 # Optional
 
--S6: IncreaseLiquidity
+- S6: IncreaseLiquidity
   Action:
     Id: 1
     TokenId: 1
@@ -112,16 +112,18 @@
       Id: 1
       BalanceBase: 100
       BalanceQuote: 100
-  -S6: DecreaseLiquidity
-    Action:
+- S6: DecreaseLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    Liquidity: 100
+  Expect:
+    User:
       Id: 1
-      IndexPipRange: 1
-      Liquidity: 100
-    Expect:
-      User:
-        Id: 1
-        BalanceBase: 100
-        BalanceQuote: 100
--S7 ShiftRange
+      BalanceBase: 100
+      BalanceQuote: 100
+-S8: ClaimAsset
+  Action:
+    Id: 1
 
 
