@@ -637,6 +637,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
+            console.log("_mainSideOut", state.mainSideOut);
+
+        console.log("flipSideOut Balance", state.flipSideOut);
+
             // deposit quote asset
             uint256 amountTransferred = _deposit(
                 _pairManager,
@@ -644,8 +648,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 state.flipSideOut
             );
+            console.log("_amountTransferred", amountTransferred);
 
-            require(amountTransferred == state.flipSideOut, "!RFI");
+        require(amountTransferred == state.flipSideOut, "!RFI");
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
