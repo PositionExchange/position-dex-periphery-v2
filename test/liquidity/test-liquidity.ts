@@ -389,9 +389,10 @@ export class TestLiquidity {
             if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
 
         }
-        console.log("this.baseToken :" , this.baseToken.address, expectData.Id);
-        const balnceBase = await this.baseToken.balanceOf(this.users[expectData.Id].address);
-        console.log("balnceBase :" , balnceBase.toString());
+        const balanceBase = await this.baseToken.balanceOf(this.users[expectData.Id].address);
+        const balanceQuote = await this.quoteToken.balanceOf(this.users[expectData.Id].address);
+        console.log("balance base and expect:" , fromWeiAndFormat(balanceBase.toString()), Number(expectData.BalanceBase));
+        console.log("balance quote and expect:" , fromWeiAndFormat(balanceQuote.toString()), Number(expectData.BalanceQuote));
         if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
         if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.01)).to.equal(true, "BalanceQuote user");
 
