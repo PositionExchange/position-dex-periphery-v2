@@ -97,6 +97,10 @@ describe("Integration-Case01", async function(){
       MinPip: 30000 
       FeeGrowthBase: 0
       FeeGrowthQuote: 0.009072309059
+    User:
+      Id: 3
+      BalanceBase: 913.19799
+      BalanceQuote: 992.23831
 - S6: OpenMarket
   Action:
     Id: 3
@@ -125,7 +129,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 3
       BalanceBase: 955.00000
-      BalanceQuote: 1118.53129
+      BalanceQuote: 1127.84532
 - S8: Expect
   User:
     Id: 1
@@ -134,13 +138,13 @@ describe("Integration-Case01", async function(){
 - S9: Expect
   User:
     Id: 2
-    BalanceBase: 1019.40000
+    BalanceBase: 1000
     BalanceQuote: 940
 - S10: Expect
   User:
     Id: 4
-    BalanceBase: 1014.55000
-    BalanceQuote: 955.00000`
-        )
+    BalanceBase: 1000
+    BalanceQuote: 952.00000
+`)
     })
 })
