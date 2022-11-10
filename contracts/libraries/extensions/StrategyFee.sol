@@ -54,4 +54,8 @@ abstract contract StrategyFee {
             }
         }
     }
+
+    function setFee(uint16 _defaultFeePercentage) external virtual {
+        defaultFeePercentage = _defaultFeePercentage;
+    }
 }

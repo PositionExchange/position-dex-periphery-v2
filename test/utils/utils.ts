@@ -204,25 +204,28 @@ export async function approveAndMintToken(
   quoteAsset: any,
   baseAsset: any,
   contract: any,
-  users: SignerWithAddress[]
+  users: SignerWithAddress[],
+  amounts?: number
 ) {
 
   const quoteSymbol = await quoteAsset.symbol();
   const baseSymbol = await baseAsset.symbol();
   console.log(quoteSymbol)
 
+    amounts =  amounts == undefined ? 1000: 10000;
+
   users.forEach((user) => {
 
 
     if ( quoteSymbol != "WBNB"){
-      quoteAsset.mint(user.address, toWei(1000));
+      quoteAsset.mint(user.address, toWei(amounts));
     }
     quoteAsset
       .connect(user)
       .approve(contract.address, ethers.constants.MaxUint256);
 
     if ( baseSymbol != "WBNB"){
-      baseAsset.mint(user.address, toWei(1000));
+      baseAsset.mint(user.address, toWei(amounts));
     }
     baseAsset
       .connect(user)

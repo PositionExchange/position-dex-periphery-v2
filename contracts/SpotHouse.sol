@@ -287,8 +287,6 @@ contract SpotHouse is
         Asset _asset,
         uint256 _amount
     ) internal override(SpotDex) returns (uint256) {
-
-
         if (_amount == 0) return 0;
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
@@ -307,7 +305,10 @@ contract SpotHouse is
                     pairManagerAddress
                 );
 
-                console.log("_QUOTE Balance", IERC20(_pairAddress.QuoteAsset).balanceOf(_payer));
+                console.log(
+                    "_QUOTE Balance",
+                    IERC20(_pairAddress.QuoteAsset).balanceOf(_payer)
+                );
                 console.log("_transfer amount", _amount);
 
                 TransferHelper.transferFrom(
@@ -320,9 +321,8 @@ contract SpotHouse is
                     pairManagerAddress
                 );
                 _amount = _balanceAfter - _balanceBefore;
-                console.log("_deposit _balanceAfter:",_balanceAfter );
-
-}
+                console.log("_deposit _balanceAfter:", _balanceAfter);
+            }
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);

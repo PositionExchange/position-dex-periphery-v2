@@ -130,6 +130,20 @@ contract PositionConcentratedLiquidity is
         counterParties[_account] = false;
     }
 
+    function donatePool(
+        IMatchingEngineAMM pool,
+        uint256 base,
+        uint256 quote
+    ) external {
+        depositLiquidity(
+            pool,
+            _msgSender(),
+            SpotHouseStorage.Asset.Quote,
+            quote
+        );
+        depositLiquidity(pool, _msgSender(), SpotHouseStorage.Asset.Base, base);
+    }
+
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
@@ -208,6 +222,12 @@ contract PositionConcentratedLiquidity is
             if (_pairAddress.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
+                console.log(
+                    "balance quote pair: ",
+                    IERC20(_pairAddress.QuoteAsset).balanceOf(
+                        address(_pairManager)
+                    )
+                );
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.QuoteAsset),
                     address(_pairManager),
@@ -219,6 +239,13 @@ contract PositionConcentratedLiquidity is
             if (_pairAddress.BaseAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
+                console.log(
+                    "balance base pair: ",
+                    IERC20(_pairAddress.BaseAsset).balanceOf(
+                        address(_pairManager)
+                    )
+                );
+
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.BaseAsset),
                     address(_pairManager),
