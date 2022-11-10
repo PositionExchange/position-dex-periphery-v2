@@ -51,12 +51,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             params.amountVirtual
         );
 
+        console.log("[ConcentratedLiquidity]_addedAmountVirtual: ", _addedAmountVirtual);
+
         ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
             uint128(_addedAmountVirtual),
             params.isBase,
             params.indexedPipRange,
             params.pool
         );
+
+        console.log("[ConcentratedLiquidity]ResultAddLiquidity: ", _resultAddLiquidity.liquidity);
 
         uint256 amountModifySecondAsset = depositLiquidity(
             params.pool,
@@ -90,7 +94,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             pool: params.pool
         });
 
-        emit LiquidityAdded(
+        console.log("[ConcentratedLiquidity]addLiquidity: ", concentratedLiquidity[nftTokenId].liquidity);
+
+
+    emit LiquidityAdded(
             user,
             address(params.pool),
             _resultAddLiquidity.baseAmountAdded,
@@ -524,6 +531,9 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint32 indexedPipRange,
         IMatchingEngineAMM pool
     ) internal returns (ResultAddLiquidity memory result) {
+
+        console.log("[ConcentratedLiquidity][_addLiquidity] amountModify: ", amountModify);
+
         State memory state;
         state.currentIndexedPipRange = _getCurrentIndexPipRange(pool);
         state.currentPrice = pool.getCurrentPip();
@@ -547,6 +557,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         //            require(isBase, "not support");
         //        }
 
+        console.log("[ConcentratedLiquidity][_addLiquidity] indexedPipRange state.currentIndexedPipRange: ", indexedPipRange, state.currentIndexedPipRange);
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.currentPrice  state.maxPip : ", state.currentPrice, state.maxPip );
         if (
             (indexedPipRange < state.currentIndexedPipRange) ||
             (indexedPipRange == state.currentIndexedPipRange &&
@@ -582,6 +594,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                         state.minPip,
                         uint128(Math.sqrt(pool.basisPoint()))
                     );
+                console.log("[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify state.quoteAmountModify x: ", state.baseAmountModify,  state.quoteAmountModify);
 
             } else {
                 state.quoteAmountModify = amountModify;
@@ -598,7 +611,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             }
         }
 
-        (
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify: ", state.baseAmountModify);
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.quoteAmountModify: ", state.quoteAmountModify);
+
+    (
             result.baseAmountAdded,
             result.quoteAmountAdded,
             result.liquidity,
