@@ -99,8 +99,8 @@ export class YamlTestProcess {
     }
 
     extractUser(expect){
-
-        const id = expect.getProp("Id")
+        console.log("expect: ", expect)
+        const id = expect.getProp("id")
         const tokenId = expect.getProp("TokenId")
         const liquidity = expect.getProp("Liquidity")
 
@@ -142,15 +142,15 @@ export class YamlTestProcess {
             await this.testHelper.expectPending(extract.orderId, extract.price, extract.side, extract.size);
         }
 
-        if ( expect) {
+        if (expectUser) {
             const extractUser = this.extractUser(expectUser)
 
             await  this.testHelper.expectUserLiquidity({
                 BalanceQuote: extractUser.balanceQuote,
                 BalanceBase : extractUser.balanceBase,
                 TokenId: extractUser.tokenId,
-                Liquidity:extractUser.liquidity,
-                FeeGrowthBase : extractUser.balanceBase,
+                Liquidity: extractUser.liquidity,
+                FeeGrowthBase : extractUser.feeGrowthBase,
                 FeeGrowthQuote : extractUser.feeGrowthQuote,
                 BaseVirtual : extractUser.baseVirtual,
                 QuoteVirtual : extractUser.quoteVirtual,
@@ -226,11 +226,6 @@ export class YamlTestProcess {
         if (expectData) await this.expectTest(expectData);
 
     }
-
-
-
-
-
 
     async OpenLimit(stepData) {
 

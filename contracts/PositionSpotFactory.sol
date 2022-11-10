@@ -23,7 +23,6 @@ contract PositionSpotFactory is
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
     SpotFactoryStorage
-
 {
     function initialize() public initializer {
         __ReentrancyGuard_init();
@@ -155,7 +154,10 @@ contract PositionSpotFactory is
         spotHouse = newSpotHouse;
     }
 
-    function setPositionLiquidity(address _positionLiquidity) external onlyOwner {
+    function setPositionLiquidity(address _positionLiquidity)
+        external
+        onlyOwner
+    {
         require(_positionLiquidity != address(0), Errors.VL_EMPTY_ADDRESS);
         positionLiquidity = _positionLiquidity;
     }

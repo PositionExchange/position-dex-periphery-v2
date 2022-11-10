@@ -6,12 +6,17 @@ pragma solidity ^0.8.9;
 import "@positionex/matching-engine/contracts/test/MockMatchingEngineAMM.sol";
 
 contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
-//    function approve(
-//        address baseAsset,
-//        address quoteAsset,
-//        address _nftContractAddress
-//    ) public {
-//        IERC20(quoteAsset).approve(_nftContractAddress, type(uint256).max);
-//        IERC20(baseAsset).approve(_nftContractAddress, type(uint256).max);
-//    }
+    //    function approve(
+    //        address baseAsset,
+    //        address quoteAsset,
+    //        address _nftContractAddress
+    //    ) public {
+    //        IERC20(quoteAsset).approve(_nftContractAddress, type(uint256).max);
+    //        IERC20(baseAsset).approve(_nftContractAddress, type(uint256).max);
+    //    }
+
+    //
+    function setCounterParty02(address a) public {
+        counterParty = a;
+    }
 }

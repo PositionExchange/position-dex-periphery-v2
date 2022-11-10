@@ -34,6 +34,8 @@ describe("manage liquidity", async () => {
             base = await deployMockToken("Base");
 
 
+            console.log("TTT", quote, base)
+
             await matching.initialize(
                 quote.address,
                 base.address,
@@ -54,8 +56,8 @@ describe("manage liquidity", async () => {
             await dexNFT.setFactory(factory.address)
             await dexNFT.initialize()
 
-
             await factory.addPairManagerManual(matching.address, base.address, quote.address);
+            await matching.setCounterParty02(spotHouse.address);
             await approveAndMintToken(quote, base, dexNFT, users)
             await approve(quote, base, spotHouse, users)
             await matching.approve()
@@ -68,7 +70,7 @@ describe("manage liquidity", async () => {
             await dexNFT.addLiquidity({
                 pool: matching.address,
                 amountVirtual: toWei(100),
-                isBase: true,
+                isBase: false,
                 indexedPipRange: 2
             });
 
@@ -86,10 +88,12 @@ describe("manage liquidity", async () => {
 
         it("remove liquidity", async () => {
 
+            console.log("current pip : ", matching.getPipRange())
+
             await dexNFT.addLiquidity({
                 pool: matching.address,
                 amountVirtual: toWei(100),
-                isBase: true,
+                isBase: false,
                 indexedPipRange: 2
             });
 
@@ -109,10 +113,12 @@ describe("manage liquidity", async () => {
 
         it("increase liquidity", async () => {
 
+            console.log("current pip : ", matching.getPipRange())
+
             await dexNFT.addLiquidity({
                 pool: matching.address,
                 amountVirtual: toWei(100),
-                isBase: true,
+                isBase: false,
                 indexedPipRange: 2
             });
 
@@ -122,9 +128,13 @@ describe("manage liquidity", async () => {
             console.log("quoteAmount: ", dataBefore.quoteVirtual.toString());
             console.log("liquidity: ", dataBefore.liquidity.toString());
             expect(dataBefore.pool).to.equal(matching.address)
+            console.log("dexNFT: ", dexNFT.address)
+
             await dexNFT.increaseLiquidity( 1000001, toWei(100), false);
+            console.log("dexNFT: ", dexNFT.address)
+
             const dataAfter = await dexNFT.concentratedLiquidity(1000001)
-            console.log(dataAfter.toString());
+            console.log('dataAfter', dataAfter.toString());
             console.log("baseAmount: ", dataAfter.baseVirtual.toString());
             console.log("quoteAmount: ", dataAfter.quoteVirtual.toString());
             console.log("liquidity: ", dataAfter.liquidity.toString());
@@ -138,7 +148,7 @@ describe("manage liquidity", async () => {
             await dexNFT.addLiquidity({
                 pool: matching.address,
                 amountVirtual: toWei(100),
-                isBase: true,
+                isBase: false,
                 indexedPipRange: 2
             });
 

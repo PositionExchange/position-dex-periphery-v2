@@ -6,11 +6,13 @@ pragma solidity ^0.8.9;
 
 import "../libraries/types/SpotHouseStorage.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
+import "hardhat/console.sol";
 
 abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
@@ -116,10 +118,12 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 refundBase;
         uint256 quoteFilled;
         uint256 baseFilled;
+        uint256 basicPoint;
 
         (
             quoteFilled,
-            baseFilled
+            baseFilled,
+            basicPoint
             //            uint256 feeQuote,
             //            uint256 feeBase
         ) = getAmountClaimable(_pairManager, _trader);
@@ -158,9 +162,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 );
 
             if (_pendingLimitOrder.isBuy) {
-                refundQuote += _pairManager.calculatingQuoteAmount(
+                refundQuote += _baseToQuote(
                     refundQuantity,
-                    _pendingLimitOrder.pip
+                    _pendingLimitOrder.pip,
+                    basicPoint
                 );
             } else {
                 refundBase += refundQuantity;
@@ -199,6 +204,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint128 _pip
     ) public virtual {
         address _trader = _msgSender();
+        uint256 basicPoint = _basisPoint(_pairManager);
 
         SpotLimitOrder.Data[] storage _orders = limitOrders[
             address(_pairManager)
@@ -229,9 +235,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             .cancelLimitOrder(_order.pip, _order.orderId);
 
         if (_order.isBuy) {
-            uint256 quoteAmount = _pairManager.calculatingQuoteAmount(
+            uint256 quoteAmount = _baseToQuote(
                 refundQuantity,
-                _order.pip
+                _order.pip,
+                basicPoint
             );
 
             _withdraw(_pairManager, _trader, Asset.Quote, quoteAmount, false);
@@ -243,9 +250,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     _pairManager,
                     _trader,
                     Asset.Quote,
-                    _pairManager.calculatingQuoteAmount(
+                    _baseToQuote(
                         partialFilled,
-                        _order.pip
+                        _order.pip,
+                        basicPoint
                     ),
                     true
                 );
@@ -266,7 +274,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     function claimAsset(IMatchingEngineAMM _pairManager) public virtual {
         address _trader = _msgSender();
 
-        (uint256 quoteAmount, uint256 baseAmount) = getAmountClaimable(
+        (uint256 quoteAmount, uint256 baseAmount, uint256 basicPoint) = getAmountClaimable(
             _pairManager,
             _trader
         );
@@ -274,7 +282,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             quoteAmount > 0 || baseAmount > 0,
             Errors.VL_NO_AMOUNT_TO_CLAIM
         );
-        _clearLimitOrder(address(_pairManager), _trader);
+        _clearLimitOrder(address(_pairManager), _trader, basicPoint);
 
         _withdraw(_pairManager, _trader, Asset.Quote, quoteAmount, true);
         _withdraw(_pairManager, _trader, Asset.Base, baseAmount, true);
@@ -285,14 +293,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     function getAmountClaimable(
         IMatchingEngineAMM _pairManager,
         address _trader
-    ) public view virtual returns (uint256 quoteAmount, uint256 baseAmount) {
+    ) public view virtual returns (uint256 quoteAmount, uint256 baseAmount, uint256 basisPoint) {
         address _pairManagerAddress = address(_pairManager);
 
         SpotLimitOrder.Data[] memory listLimitOrder = limitOrders[
             _pairManagerAddress
         ][_trader];
         uint256 i = 0;
-        uint256 _basisPoint = _pairManager.getBasisPoint();
+        basisPoint = _basisPoint(_pairManager);
         uint128 _feeBasis = feeBasis;
         IMatchingEngineAMM.ExchangedData memory exData = IMatchingEngineAMM
             .ExchangedData({
@@ -308,12 +316,12 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 listLimitOrder[i].pip,
                 listLimitOrder[i].orderId,
                 exData,
-                _basisPoint,
+                basisPoint,
                 listLimitOrder[i].fee,
                 _feeBasis
             );
         }
-        return (exData.quoteAmount, exData.baseAmount);
+        return (exData.quoteAmount, exData.baseAmount, basisPoint);
     }
 
     function getPendingLimitOrders(
@@ -374,6 +382,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 sizeOut;
         uint256 quoteAmountFilled;
         uint256 feeAmount;
+        uint256 basicPoint;
     }
 
     function _openLimitOrder(
@@ -386,6 +395,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address _pairManagerAddress = address(_pairManager);
         OpenLimitOrderState memory state;
         uint256 quoteAmount;
+        state.basicPoint = _basisPoint(_pairManager);
         uint16 fee = _getFee();
         bool isBuy = _side == Side.BUY ? true : false;
         if (!isBuy) {
@@ -414,13 +424,20 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             fee
         );
         if (isBuy) {
+
+
             // Buy limit
-            quoteAmount =
-                _pairManager.calculatingQuoteAmount(
-                    (_quantity - state.sizeOut).Uint256ToUint128(),
-                    _pip
-                ) +
-                state.quoteAmountFilled;
+            quoteAmount = _baseToQuote((_quantity - state.sizeOut),
+                _pip,state.basicPoint)
+//                _pairManager.calculatingQuoteAmount(
+//                    (_quantity - state.sizeOut).Uint256ToUint128(),
+//                    _pip
+//                )
+                + state.quoteAmountFilled;
+
+            console.log("isBuy quoteAmount, _quantity", quoteAmount, _quantity, state.sizeOut);
+            console.log("_pip, state.quoteAmountFilled", _pip, state.quoteAmountFilled);
+
             //            quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
             // with token has RFI we need deposit first
@@ -434,9 +451,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
             require(quoteAmountTransferred == quoteAmount, "!RFI");
         } else {
-            quoteAmount = _pairManager.calculatingQuoteAmount(
-                (_quantity - state.sizeOut).Uint256ToUint128(),
-                _pip
+            quoteAmount = _baseToQuote(
+                _quantity - state.sizeOut,
+                _pip,
+                state.basicPoint
             );
         }
 
@@ -495,11 +513,19 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     ) internal {
         address _pairManagerAddress = address(_pairManager);
         OpenLimitOrderState memory state;
+        state.basicPoint = _basisPoint(_pairManager);
 
-        uint256 quoteAmount = _pairManager.calculatingQuoteAmount(
-            _quantity.Uint256ToUint128(),
-            _pip
+
+        uint256 quoteAmount = _baseToQuote(
+            _quantity,
+            _pip,
+            state.basicPoint
         );
+//
+//        uint256 quoteAmount = _pairManager.calculatingQuoteAmount(
+//            _quantity.Uint256ToUint128(),
+//            _pip
+//        );
 
         uint256 quoteAmountTransferred = _deposit(
             _pairManager,
@@ -509,7 +535,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         );
 
         if (quoteAmountTransferred != quoteAmount) {
-            _quantity = _pairManager.quoteToBase(quoteAmountTransferred, _pip);
+            _quantity = _quoteToBase(quoteAmountTransferred, _pip, state.basicPoint);
         }
 
         (
@@ -530,9 +556,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             state.sizeOut == _quantity &&
             quoteAmountTransferred > state.quoteAmountFilled
         ) {
-            _quantity = _pairManager.quoteToBase(
+            _quantity = _quoteToBase(
                 quoteAmountTransferred - state.quoteAmountFilled,
-                _pip
+                _pip,
+                state.basicPoint
             );
 
             emit MarketOrderOpened(
@@ -553,10 +580,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     pip: _pip,
                     orderId: state.orderId,
                     isBuy: true,
-                    quoteAmount: _pairManager
-                        .calculatingQuoteAmount(
-                            (_quantity - state.sizeOut).Uint256ToUint128(),
-                            _pip
+                    quoteAmount: _baseToQuote(
+                            _quantity - state.sizeOut,
+                            _pip,
+                            state.basicPoint
                         )
                         .Uint256ToUint128(),
                     baseAmount: (_quantity - state.sizeOut).Uint256ToUint128(),
@@ -610,6 +637,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
+            console.log("_mainSideOut", state.mainSideOut);
+
+        console.log("flipSideOut Balance", state.flipSideOut);
+
             // deposit quote asset
             uint256 amountTransferred = _deposit(
                 _pairManager,
@@ -617,8 +648,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 state.flipSideOut
             );
+            console.log("_amountTransferred", amountTransferred);
 
-            require(amountTransferred == state.flipSideOut, "!RFI");
+        require(amountTransferred == state.flipSideOut, "!RFI");
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
@@ -648,10 +680,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _payer,
                 fee
             );
+            console.log(" SELL state.mainSideOut, baseAmountTransferred ", state.mainSideOut, baseAmountTransferred);
+            console.log(" SELL state.flipSideOut - state.feeAmount, state.feeAmount ", state.flipSideOut - state.feeAmount, state.feeAmount);
             require(
                 state.mainSideOut == baseAmountTransferred,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
+            console.log(" SELL state.flipSideOut ", state.flipSideOut, state.feeAmount);
+
 
             _withdraw(
                 _pairManager,
@@ -660,6 +696,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.flipSideOut - state.feeAmount,
                 false
             );
+
             _quantity = baseAmountTransferred;
         }
 
@@ -764,14 +801,15 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         return _calculatorAmounts(_side, state.flipSideOut, state.mainSideOut);
     }
 
-    function _clearLimitOrder(address _pairManagerAddress, address _trader)
+    function _clearLimitOrder(address _pairManagerAddress, address _trader, uint256 basicPoint)
         internal
     {
         if (limitOrders[_pairManagerAddress][_trader].length > 0) {
             SpotLimitOrder.Data[]
                 memory subListLimitOrder = _clearAllFilledOrder(
                     IMatchingEngineAMM(_pairManagerAddress),
-                    limitOrders[_pairManagerAddress][_trader]
+                    limitOrders[_pairManagerAddress][_trader],
+                    basicPoint
                 );
             delete limitOrders[_pairManagerAddress][_trader];
             for (uint256 i = 0; i < subListLimitOrder.length; i++) {
@@ -787,7 +825,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
     function _clearAllFilledOrder(
         IMatchingEngineAMM _pairManager,
-        SpotLimitOrder.Data[] memory listLimitOrder
+        SpotLimitOrder.Data[] memory listLimitOrder,
+        uint256 basicPoint
     ) internal returns (SpotLimitOrder.Data[] memory) {
         SpotLimitOrder.Data[]
             memory subListLimitOrder = new SpotLimitOrder.Data[](
@@ -810,9 +849,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     subListLimitOrder[index].baseAmount = (size - partialFilled)
                         .Uint256ToUint128();
                     subListLimitOrder[index].quoteAmount = (
-                        _pairManager.calculatingQuoteAmount(
+                        _baseToQuote(
                             size - partialFilled,
-                            listLimitOrder[i].pip
+                            listLimitOrder[i].pip,
+                            basicPoint
                         )
                     ).Uint256ToUint128();
                 }
@@ -844,6 +884,17 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
 
         return amounts;
+    }
+
+    function _baseToQuote(uint256 baseAmount, uint128 pip, uint256 basisPoint) internal view returns (uint256) {
+        return TradeConvert.baseToQuote(baseAmount, pip, basisPoint);
+    }
+    function _quoteToBase(uint256 quoteAmount, uint128 pip, uint256 basisPoint) internal view returns (uint256){
+        return TradeConvert.quoteToBase(quoteAmount, pip, basisPoint);
+    }
+
+    function _basisPoint(IMatchingEngineAMM _pairManager) internal view returns(uint256){
+        return _pairManager.basisPoint();
     }
 
     // HOOK

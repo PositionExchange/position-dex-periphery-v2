@@ -103,7 +103,8 @@ interface ISpotDex {
         view
         returns (
             uint256 quoteAsset,
-            uint256 baseAsset
+            uint256 baseAsset,
+            uint256 basisPoint
             //            uint256 feeQuoteAmount,
             //            uint256 feeBaseAmount
         );

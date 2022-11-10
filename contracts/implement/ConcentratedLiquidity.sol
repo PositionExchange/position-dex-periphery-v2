@@ -10,6 +10,7 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "../interfaces/IConcentratedLiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "hardhat/console.sol";
@@ -24,8 +25,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     struct AddLiquidityParams {
         IMatchingEngineAMM pool;
         uint128 amountVirtual;
-        bool isBase;
         uint32 indexedPipRange;
+        bool isBase;
     }
 
     // 1.1 Add Liquidity
@@ -50,12 +51,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             params.amountVirtual
         );
 
+        console.log("[ConcentratedLiquidity]_addedAmountVirtual: ", _addedAmountVirtual);
+
         ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
             uint128(_addedAmountVirtual),
             params.isBase,
             params.indexedPipRange,
             params.pool
         );
+
+        console.log("[ConcentratedLiquidity]ResultAddLiquidity: ", _resultAddLiquidity.liquidity);
 
         uint256 amountModifySecondAsset = depositLiquidity(
             params.pool,
@@ -89,7 +94,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             pool: params.pool
         });
 
-        emit LiquidityAdded(
+        console.log("[ConcentratedLiquidity]addLiquidity: ", concentratedLiquidity[nftTokenId].liquidity);
+
+
+    emit LiquidityAdded(
             user,
             address(params.pool),
             _resultAddLiquidity.baseAmountAdded,
@@ -509,9 +517,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     struct State {
         uint128 baseAmountModify;
         uint128 quoteAmountModify;
-        uint128 pipRange;
+        uint256 currentIndexedPipRange;
         SpotFactoryStorage.Pair pair;
         address WBNBAddress;
+        uint128 currentPrice;
+        uint128 maxPip;
+        uint128 minPip;
     }
 
     function _addLiquidity(
@@ -520,43 +531,90 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint32 indexedPipRange,
         IMatchingEngineAMM pool
     ) internal returns (ResultAddLiquidity memory result) {
+
+        console.log("[ConcentratedLiquidity][_addLiquidity] amountModify: ", amountModify);
+
         State memory state;
-        state.pipRange = _getPipRange(pool);
-        //
-        //        // Require input is BNB if base or quote is BNB
-        //
+        state.currentIndexedPipRange = _getCurrentIndexPipRange(pool);
+        state.currentPrice = pool.getCurrentPip();
+
+        (state.minPip, state.maxPip) = LiquidityMath.calculatePipRange(
+            indexedPipRange,
+            _getPipRange(pool)
+        );
+
+        //        console.log("state.pipRange: ", state.pipRange);
+        ////
         state.pair = _getQuoteAndBase(pool);
 
-        state.WBNBAddress = _getWBNBAddress();
+        // TODO consider necessary to check it
+        //        state.WBNBAddress = _getWBNBAddress();
+        //        if (state.pair.QuoteAsset == state.WBNBAddress) {
+        //            require(!isBase, "not support");
+        //        }
+        //
+        //        if (state.pair.BaseAsset == state.WBNBAddress) {
+        //            require(isBase, "not support");
+        //        }
 
-        if (state.pair.QuoteAsset == state.WBNBAddress) {
-            require(!isBase, "not support");
-        }
+        console.log("[ConcentratedLiquidity][_addLiquidity] indexedPipRange state.currentIndexedPipRange: ", indexedPipRange, state.currentIndexedPipRange);
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.currentPrice  state.maxPip : ", state.currentPrice, state.maxPip );
+        if (
+            (indexedPipRange < state.currentIndexedPipRange) ||
+            (indexedPipRange == state.currentIndexedPipRange &&
+                state.currentPrice == state.maxPip)
+        ) {
+            if (isBase) revert("!Base");
 
-        if (state.pair.BaseAsset == state.WBNBAddress) {
-            require(isBase, "not support");
-        }
-
-        if (isBase) {
+            state.quoteAmountModify = amountModify;
+        } else if (
+            (indexedPipRange > state.currentIndexedPipRange) ||
+            (indexedPipRange == state.currentIndexedPipRange &&
+                state.currentPrice == state.minPip)
+        ) {
+            if (!isBase) revert("!Quote");
             state.baseAmountModify = amountModify;
-            state.quoteAmountModify = LiquidityHelper
-                .calculateQuoteVirtualAmountFromBaseVirtualAmount(
-                    amountModify,
-                    pool,
-                    indexedPipRange,
-                    state.pipRange
-                );
-        } else {
-            state.baseAmountModify = amountModify;
-            state.quoteAmountModify = LiquidityHelper
-                .calculateBaseVirtualAmountFromQuoteVirtualAmount(
-                    amountModify,
-                    pool,
-                    indexedPipRange,
-                    state.pipRange
-                );
+        } else if (indexedPipRange == state.currentIndexedPipRange) {
+            state.maxPip = uint128(Math.sqrt(uint256(state.maxPip) * 10**18));
+            state.minPip = uint128(Math.sqrt(uint256(state.minPip) * 10**18));
+            state.currentPrice = uint128(
+                Math.sqrt(uint256(state.currentPrice) * 10**18)
+            );
+
+            if (isBase) {
+                state.baseAmountModify = amountModify;
+                state.quoteAmountModify = LiquidityHelper
+                    .calculateQuoteVirtualFromBaseReal(
+                        LiquidityMath.calculateBaseReal(
+                            state.maxPip,
+                            amountModify,
+                            state.currentPrice
+                        ),
+                        state.currentPrice,
+                        state.minPip,
+                        uint128(Math.sqrt(pool.basisPoint()))
+                    );
+                console.log("[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify state.quoteAmountModify x: ", state.baseAmountModify,  state.quoteAmountModify);
+
+            } else {
+                state.quoteAmountModify = amountModify;
+                state.baseAmountModify = LiquidityHelper
+                    .calculateBaseVirtualFromQuoteReal(
+                        LiquidityMath.calculateQuoteReal(
+                            uint128(Math.sqrt(uint256(state.minPip))),
+                            amountModify,
+                            uint128(Math.sqrt(uint256(state.currentPrice)))
+                        ),
+                        state.currentPrice,
+                        state.maxPip
+                    );
+            }
         }
-        (
+
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify: ", state.baseAmountModify);
+        console.log("[ConcentratedLiquidity][_addLiquidity] state.quoteAmountModify: ", state.quoteAmountModify);
+
+    (
             result.baseAmountAdded,
             result.quoteAmountAdded,
             result.liquidity,
@@ -569,6 +627,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 indexedPipRange: indexedPipRange
             })
         );
+
     }
 
     function _removeLiquidity(
@@ -607,31 +666,13 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         _feeData.feeBaseAmount = Math.mulDiv(
             _feeData.newFeeGrowthBase,
             liquidity,
-            FixedPoint128.Q128
+            FixedPoint128.BUFFER
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
             _feeData.newFeeGrowthQuote,
             liquidity,
-            FixedPoint128.Q128
+            FixedPoint128.BUFFER
         );
-        //        return (
-        //            baseAmount,
-        //            quoteAmount,
-        //            _liquidityInfo.feeGrowthBase,
-        //            _liquidityInfo.feeGrowthQuote
-        //        );
-        //
-        //        (
-        //            _feeData.feeBaseAmount,
-        //            _feeData.feeQuoteAmount,
-        //            _feeData.newFeeGrowthBase,
-        //            _feeData.newFeeGrowthQuote
-        //        ) = pool.collectFee(
-        //            feeGrowthBase,
-        //            feeGrowthQuote,
-        //            liquidity,
-        //            indexedPipRange
-        //        );
     }
 
     function _getPipRange(IMatchingEngineAMM pool)
@@ -640,6 +681,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     {
         return pool.getPipRange();
     }
+
+    function _getCurrentIndexPipRange(IMatchingEngineAMM pool)
+        internal
+        returns (uint256)
+    {
+        return pool.currentIndexedPipRange();
+    }
+
+    function _getCurrentPrice(IMatchingEngineAMM pool)
+        internal
+        returns (uint128)
+    {}
 
     function _updateLiquidity(
         address user,
