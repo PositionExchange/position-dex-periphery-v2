@@ -16,12 +16,14 @@ library LiquidityHelper {
         uint256 sqrtBasicPoint
     ) internal view returns (uint128) {
         console.log("sqrtBasicPoint: ", sqrtBasicPoint);
+        console.log("[calculateQuoteVirtualFromBaseReal]baseReal sqrtCurrentPrice : ", baseReal, sqrtCurrentPrice);
+        console.log("[calculateQuoteVirtualFromBaseReal]sqrtPriceMin sqrtBasicPoint: ", sqrtPriceMin, sqrtBasicPoint);
         return
-            uint128(
-                uint256(baseReal) *
-                    uint256(sqrtCurrentPrice / sqrtBasicPoint) *
-                    (uint256(sqrtCurrentPrice/ sqrtBasicPoint) - uint256(sqrtPriceMin / sqrtBasicPoint))
-            ) / 10**18;
+        uint128(
+            (uint256(baseReal) *
+            uint256(sqrtCurrentPrice / sqrtBasicPoint) *
+            (uint256(sqrtCurrentPrice / sqrtBasicPoint) - uint256(sqrtPriceMin / sqrtBasicPoint))) / 10 ** 18
+        );
     }
 
     function calculateBaseVirtualFromQuoteReal(
@@ -29,6 +31,9 @@ library LiquidityHelper {
         uint128 sqrtCurrentPrice,
         uint128 sqrtPriceMax
     ) internal returns (uint128) {
+        console.log("[calculateBaseVirtualFromQuoteReal]quoteReal: ", quoteReal);
+        console.log("[calculateBaseVirtualFromQuoteReal]sqrtCurrentPrice : ", sqrtCurrentPrice);
+        console.log("[calculateBaseVirtualFromQuoteReal]sqrtPriceMax: ", sqrtPriceMax);
         return
             uint128(
                 (uint256(quoteReal) *
