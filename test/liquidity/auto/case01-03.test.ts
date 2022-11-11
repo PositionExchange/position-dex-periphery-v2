@@ -58,7 +58,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 513.32195038742
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -115,7 +115,7 @@ describe("Integration-Case01", async function(){
 - S7: RemoveLiquidity
   Action:
     Id: 3
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 0
@@ -198,7 +198,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 39.68118785069
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -246,7 +246,7 @@ describe("Integration-Case01", async function(){
 - S6: RemoveLiquidity
   Action:
     Id: 3
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 0
@@ -316,7 +316,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 513.32195038742
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -344,7 +344,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 2
+      TokenId: 1000002
       Liquidity: 769.98292558113
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -372,7 +372,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 3
+      TokenId: 1000003
       Liquidity: 58.07126941179
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -400,8 +400,8 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 4
-      Liquidity: 81.29977717650
+      TokenId: 1000004
+      Liquidity: 23.22850776472
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
       BaseVirtual: 0
@@ -430,19 +430,19 @@ describe("Integration-Case01", async function(){
       FeeQuote: 20.77936326
     User:
       Id: 3
-      BalanceBase: 970.00000
+      BalanceBase: 812.44658
       BalanceQuote: 1671.86608
 - S7: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 769.98292558113
       BaseVirtual: 130.20301673297
       QuoteVirtual: 0
-      BaseReal: 34.49257425028
-      QuoteReal: 68.98514850055
+      BaseReal: 444.54984935568
+      QuoteReal: 1333.64954806704
       IndexPipRange: 1 
       MaxPip: 59999 
       MinPip: 30000
@@ -453,7 +453,7 @@ describe("Integration-Case01", async function(){
 - S8: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 2
+    TokenId: 1000002
   Expect:
     Pool:
       Liquidity: 0
@@ -471,7 +471,7 @@ describe("Integration-Case01", async function(){
 - S9: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 3
+    TokenId: 1000003
   Expect:
     Pool:
       Liquidity: 23.22850776472
@@ -489,7 +489,7 @@ describe("Integration-Case01", async function(){
 - S10: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 4
+    TokenId: 1000004
   Expect:
     Pool:
       Liquidity: 0
@@ -503,7 +503,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 1103.21684
-      BalanceQuote: 557.03379`)
+      BalanceQuote: 589.65157`)
     })
     it ("Case #4", async () => {
         return testHelper.process(`
@@ -543,7 +543,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 256.66097519371
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -571,7 +571,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 2
+      TokenId: 1000002
       Liquidity: 513.32195038742
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -599,7 +599,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 3
+      TokenId: 1000003
       Liquidity: 1067.90393641912
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -627,7 +627,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 3
+      TokenId: 1000003
       Liquidity: 1067.90393641912
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -655,7 +655,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 4
+      TokenId: 1000004
       Liquidity: 533.95196820956
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -688,7 +688,7 @@ describe("Integration-Case01", async function(){
 - S7: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 513.32195038742
@@ -706,7 +706,7 @@ describe("Integration-Case01", async function(){
 - S8: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 2
+    TokenId: 1000002
   Expect:
     Pool:
       Liquidity: 0
@@ -724,7 +724,7 @@ describe("Integration-Case01", async function(){
 - S9: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 3
+    TokenId: 1000003
   Expect:
     Pool:
       Liquidity: 533.95196820956
@@ -742,7 +742,7 @@ describe("Integration-Case01", async function(){
 - S10: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 4
+    TokenId: 1000004
   Expect:
     Pool:
       Liquidity: 0
