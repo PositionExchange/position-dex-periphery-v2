@@ -89,6 +89,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         uint256 nftTokenId = mint(user);
+        console.log(
+            "[ConcentratedLiquidity]added nftTokenId: ",
+                nftTokenId
+        );
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             //            baseVirtual: _resultAddLiquidity.baseAmountAdded,
@@ -101,7 +105,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         });
 
         console.log(
-            "[ConcentratedLiquidity]addLiquidity: ",
+            "[ConcentratedLiquidity]added addLiquidity: ",
             concentratedLiquidity[nftTokenId].liquidity
         );
 
@@ -689,6 +693,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 quoteAmount: state.quoteAmountModify,
                 indexedPipRange: indexedPipRange
             })
+        );
+        console.log(
+            "[ConcentratedLiquidity][_addLiquidity] result.liquidity: ",
+        result.liquidity
         );
     }
 
