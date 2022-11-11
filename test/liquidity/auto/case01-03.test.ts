@@ -401,11 +401,11 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       TokenId: 4
-      Liquidity: 23.22850776472
+      Liquidity: 81.29977717650
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
       BaseVirtual: 0
-      QuoteVirtual: 40
+      QuoteVirtual: 140
       BalanceBase: 970.00000
       BalanceQuote: 551.91538
 - S6: OpenMarket
@@ -430,7 +430,7 @@ describe("Integration-Case01", async function(){
       FeeQuote: 20.77936326
     User:
       Id: 3
-      BalanceBase: 812.44658
+      BalanceBase: 970.00000
       BalanceQuote: 1671.86608
 - S7: RemoveLiquidity
   Action:
@@ -441,8 +441,8 @@ describe("Integration-Case01", async function(){
       Liquidity: 769.98292558113
       BaseVirtual: 130.20301673297
       QuoteVirtual: 0
-      BaseReal: 444.54984935568
-      QuoteReal: 1333.64954806704
+      BaseReal: 34.49257425028
+      QuoteReal: 68.98514850055
       IndexPipRange: 1 
       MaxPip: 59999 
       MinPip: 30000
@@ -503,6 +503,6 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 1103.21684
-      BalanceQuote: 589.65157`)
+      BalanceQuote: 557.03379`)
     })
 })
