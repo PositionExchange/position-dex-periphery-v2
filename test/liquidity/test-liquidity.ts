@@ -278,7 +278,8 @@ export class TestLiquidity {
 
     async decreaseLiquidity(tokenId : SNumber, liquidity: SNumber, asset: string, idSender : number , opts?: CallOptions){
         console.group(`DecreaseLiquidity`);
-        await  this.dexNFT.connect(this.users[idSender]).decreaseLiquidity(tokenId, toWei(liquidity));
+        console.log("decreaseLiquidity liquidity: ", liquidity)
+        await  this.dexNFT.connect(this.users[idSender]).decreaseLiquidity(tokenId, toWei(liquidity.toString()));
         console.groupEnd();
     }
 
@@ -303,6 +304,8 @@ export class TestLiquidity {
 
         console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
         console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
+        console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
+        // console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip));
 
 
         if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
