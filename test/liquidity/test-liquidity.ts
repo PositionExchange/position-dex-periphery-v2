@@ -352,9 +352,6 @@ export class TestLiquidity {
     async setPrice(price: number | string) {
     }
 
-
-
-
     async  expectPending(orderId : number, price : number, side : any, _size : number){
 
         console.log("price: ", price);
