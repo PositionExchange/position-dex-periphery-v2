@@ -170,11 +170,7 @@ contract PositionConcentratedLiquidity is
                 _depositBNB(pairManagerAddress, _amount);
             } else {
                 IERC20 quoteAsset = IERC20(_pairAddress.QuoteAsset);
-                uint256
-
-
-
-                _balanceBefore = quoteAsset.balanceOf(
+                uint256 _balanceBefore = quoteAsset.balanceOf(
                     pairManagerAddress
                 );
                 TransferHelper.transferFrom(

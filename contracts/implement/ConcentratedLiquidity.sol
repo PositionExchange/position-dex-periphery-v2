@@ -91,8 +91,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint256 nftTokenId = mint(user);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
-            baseVirtual: _resultAddLiquidity.baseAmountAdded,
-            quoteVirtual: _resultAddLiquidity.quoteAmountAdded,
+            //            baseVirtual: _resultAddLiquidity.baseAmountAdded,
+            //            quoteVirtual: _resultAddLiquidity.quoteAmountAdded,
             liquidity: uint128(_resultAddLiquidity.liquidity),
             indexedPipRange: params.indexedPipRange,
             feeGrowthBase: _resultAddLiquidity.feeGrowthBase,
@@ -215,22 +215,35 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
 
-        require(liquidityData.liquidity >= liquidity, "!Liquidity");
+        console.log("liquidityData.liquidity: ", liquidityData.liquidity);
+        console.log("liquidity: ", liquidity);
+
+        //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
+
+        if (liquidity > liquidityData.liquidity) {
+            liquidity = liquidityData.liquidity;
+        }
 
         (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
+        console.log(" baseAmountRemoved: ", baseAmountRemoved);
+        console.log(" quoteAmountRemoved: ", quoteAmountRemoved);
+        //        console.log(" liquidityData.baseVirtual: ", liquidityData.baseVirtual );
+        //        console.log(" liquidityData.quoteVirtual: ", liquidityData.quoteVirtual );
+
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
-            liquidityData.baseVirtual - baseAmountRemoved,
-            liquidityData.quoteVirtual - quoteAmountRemoved,
+            //            liquidityData.baseVirtual - baseAmountRemoved,
+            //            liquidityData.quoteVirtual - quoteAmountRemoved,
             liquidityData.indexedPipRange,
             0,
             0
         );
 
+        // curretn 5
         address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
@@ -314,8 +327,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity + uint128(_addLiquidity.liquidity),
-            liquidityData.baseVirtual + _addLiquidity.baseAmountAdded,
-            liquidityData.quoteVirtual + _addLiquidity.quoteAmountAdded,
+            //            liquidityData.baseVirtual + _addLiquidity.baseAmountAdded,
+            //            liquidityData.quoteVirtual + _addLiquidity.quoteAmountAdded,
             liquidityData.indexedPipRange,
             0,
             0
@@ -376,8 +389,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             // targetIndex > liquidityData.indexedPipRange
             // else Calculate based on QuoteAmount. Keep the amount of Quote
             targetIndex > liquidityData.indexedPipRange
-                ? liquidityData.baseVirtual
-                : liquidityData.quoteVirtual,
+                ? baseAmountRemoved
+                : quoteAmountRemoved,
             targetIndex > liquidityData.indexedPipRange ? true : false,
             targetIndex,
             liquidityData.pool
@@ -434,8 +447,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
             uint128(_addLiquidity.liquidity),
-            _addLiquidity.baseAmountAdded,
-            _addLiquidity.quoteAmountAdded,
+            //            _addLiquidity.baseAmountAdded,
+            //            _addLiquidity.quoteAmountAdded,
             targetIndex,
             _addLiquidity.feeGrowthBase,
             _addLiquidity.feeGrowthBase
@@ -502,9 +515,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.indexedPipRange
         );
 
+        //TODO call estimate remove
         return (
-            liquidityData.baseVirtual,
-            liquidityData.quoteVirtual,
+            0,
+            0,
             liquidityData.liquidity,
             _collectFeeData.feeBaseAmount,
             _collectFeeData.feeQuoteAmount,
