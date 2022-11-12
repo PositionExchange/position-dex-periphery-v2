@@ -1,4 +1,4 @@
-import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
+import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
 describe("LiquidityActionCase06-10", async function(){
     let testHelper: TestLiquidity
@@ -560,7 +560,7 @@ describe("LiquidityActionCase06-10", async function(){
     Id: 3
     asset: base
     Side: 1
-    Quantity: 5
+    Quantity: 15
   Expect:
     Pool:
       Liquidity: 214.5772209533
@@ -575,9 +575,14 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      BalanceBase: 9995
-      BalanceQuote: 10068.7913211474
-- S6: AddLiquidity
+      BalanceBase: 9985
+      BalanceQuote: 10198.7913211474
+- S6: Expect
+  User:
+    Id: 2
+    BalanceBase: 10010
+    BalanceQuote: 9820   
+- S7: AddLiquidity
   Action:
     Id: 3
     IndexPipRange: 4
@@ -603,9 +608,9 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0 
       BaseVirtual: 30
       QuoteVirtual: 113.6556853169
-      BalanceBase: 9965
-      BalanceQuote: 9955.1356358305
-- S7: DecreaseLiquidity
+      BalanceBase: 9955
+      BalanceQuote: 10085.1356358305
+- S8: DecreaseLiquidity
   Action:
     Id: 1
     TokenId: 1000001
@@ -615,7 +620,7 @@ describe("LiquidityActionCase06-10", async function(){
       Id: 1
       BalanceBase: 10001.2116850001
       BalanceQuote: 9966.8565609357
-- S8: DecreaseLiquidity
+- S9: DecreaseLiquidity
   Action:
     Id: 3
     TokenId: 1000003
@@ -623,9 +628,9 @@ describe("LiquidityActionCase06-10", async function(){
   Expect:
     User:
       Id: 3
-      BalanceBase: 9976.6508173090
-      BalanceQuote: 9999.2750233557
-- S9: RemoveLiquidity
+      BalanceBase: 9966.6508173090
+      BalanceQuote: 10129.2750233557
+- S10: RemoveLiquidity
   Action:
     Id: 1
     TokenId: 1000001
@@ -647,7 +652,7 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0 
       BalanceBase: 10002.1504754807
       BalanceQuote: 9970.4131901171
-- S10: RemoveLiquidity
+- S11: RemoveLiquidity
   Action:
     Id: 2
     TokenId: 1000002
@@ -667,9 +672,9 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 10002.8495245193
+      BalanceBase: 10012.8495245193
       BalanceQuote: 9830.7954887355
-- S11: RemoveLiquidity
+- S12: RemoveLiquidity
   Action:
     Id: 3
     TokenId: 1000003
@@ -689,8 +694,8 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 9995
-      BalanceQuote: 10068.7913211474
+      BalanceBase: 9985
+      BalanceQuote: 10198.7913211474
 `)
     })
     it ("Case #15", async () => {

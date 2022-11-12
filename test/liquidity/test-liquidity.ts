@@ -302,22 +302,26 @@ export class TestLiquidity {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
 
+        console.log(" START expectPool : ", expectData);
         console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
         console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
         console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
+        console.log("QuoteReal", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
+        console.log("K", sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK));
         // console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip));
 
 
-        if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
-        if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**9),Number( poolData.sqrtMinPip), 0.01)).to.equal(true, "MinPip");
-        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.01)).to.equal(true, "FeeGrowthBase");
-        if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.01)).to.equal(true, "FeeGrowthQuote")
+        if (expectData.MaxPip !== undefined) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
+        if (expectData.MinPip !== undefined) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**9),Number( poolData.sqrtMinPip), 0.001)).to.equal(true, "MinPip");
+        if (expectData.FeeGrowthBase !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.001)).to.equal(true, "FeeGrowthBase");
+        if (expectData.FeeGrowthQuote !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.001)).to.equal(true, "FeeGrowthQuote")
 
 
-
-        if (expectData.BaseReal) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.01)).to.equal(true, "BaseReal");
-        if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.01)).to.equal(true, "QuoteReal");
-        if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.01)).to.equal(true, "K");
+        console.log("BaseReal: ", fromWeiAndFormat(poolData.baseReal), expectData.BaseReal);
+        if (expectData.BaseReal !== undefined) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.0001)).to.equal(true, "BaseReal");
+        console.log("QuoteReal: ", fromWeiAndFormat(poolData.quoteReal), expectData.QuoteReal);
+        if (expectData.QuoteReal !== undefined) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.001)).to.equal(true, "QuoteReal");
+        if (expectData.K !== undefined) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.001)).to.equal(true, "K");
 
     }
 
@@ -373,7 +377,7 @@ export class TestLiquidity {
             .getPendingOrderDetail(price, orderId)
         console.log("size: ", size,fromWeiAndFormat(size), _size );
 
-        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.01))
+        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
             .to
             .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
 
@@ -392,19 +396,19 @@ export class TestLiquidity {
             console.log("liquidityInfo feeGrowthBase: ",fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase));
             console.log("liquidityInfo liquidity: ",fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity));
 
-            if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
-            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
-            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.01)).to.equal(true, "FeeGrowthQuote user");
-            // if (expectData.QuoteVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
-            // if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
+            if (expectData.Liquidity !== undefined) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.001)).to.equal(true, "Liquidity user");
+            if (expectData.FeeGrowthBase !== undefined) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.001)).to.equal(true, "FeeGrowthBase user");
+            if (expectData.FeeGrowthQuote !== undefined) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.001)).to.equal(true, "FeeGrowthQuote user");
+            // if (expectData.QuoteVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.001)).to.equal(true, "QuoteVirtual user");
+            // if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.001)).to.equal(true, "BaseVirtual user");
 
         }
         const balanceBase = await this.baseToken.balanceOf(this.users[expectData.Id].address);
         const balanceQuote = await this.quoteToken.balanceOf(this.users[expectData.Id].address);
         console.log("balance base and expect:" , fromWeiAndFormat(balanceBase.toString()), Number(expectData.BalanceBase));
         console.log("balance quote and expect:" , fromWeiAndFormat(balanceQuote.toString()), Number(expectData.BalanceQuote));
-        if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
-        if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.01)).to.equal(true, "BalanceQuote user");
+        if ( expectData.BalanceBase !== undefined) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.001)).to.equal(true, "BalanceBase user");
+        if ( expectData.BalanceQuote !== undefined)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.001)).to.equal(true, "BalanceQuote user");
 
     }
 

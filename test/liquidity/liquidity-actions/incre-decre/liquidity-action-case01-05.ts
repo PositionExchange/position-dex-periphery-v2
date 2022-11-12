@@ -1,4 +1,4 @@
-import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
+import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
 describe("LiquidityActionCase01-05", async function(){
     let testHelper: TestLiquidity
@@ -7,6 +7,9 @@ describe("LiquidityActionCase01-05", async function(){
         testHelper = await deployAndCreateRouterHelper(10_000, false)
     })
 
+
+
+    // 30000 59999
     it ("Case #1", async () => {
         return testHelper.process(`
 - S0: SetCurrentPrice

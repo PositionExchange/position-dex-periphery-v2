@@ -1,4 +1,4 @@
-import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
+import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
 describe("LiquidityActionCase06-10", async function(){
     let testHelper: TestLiquidity
@@ -344,7 +344,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 9896.2353555845
+      BalanceBase: 9986.5620499526
       BalanceQuote: 10178.0410043634
 `)
     })
