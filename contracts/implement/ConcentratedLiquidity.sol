@@ -42,6 +42,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         virtual
     {
         address user = _msgSender();
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] amountVirtual: ",
+            params.amountVirtual
+        );
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] isBase: ",
+            params.isBase
+        );
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
             user,
@@ -79,6 +87,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 : _resultAddLiquidity.baseAmountAdded
         );
 
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] amountModifySecondAsset: ",
+            amountModifySecondAsset
+        );
         require(
             params.isBase
                 ? amountModifySecondAsset >=
@@ -89,10 +101,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         uint256 nftTokenId = mint(user);
-        console.log(
-            "[ConcentratedLiquidity]added nftTokenId: ",
-                nftTokenId
-        );
+        console.log("[ConcentratedLiquidity]added nftTokenId: ", nftTokenId);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             //            baseVirtual: _resultAddLiquidity.baseAmountAdded,
@@ -153,9 +162,15 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
 
-        console.log("start burn: ", nftTokenId);
+        console.log(
+            "[ConcentratedLiquidity][removeLiquidity] user liquidity : ",
+            concentratedLiquidity[nftTokenId].liquidity
+        );
+
+
+    console.log("[ConcentratedLiquidity][removeLiquidity] start burn: ", nftTokenId);
         burn(nftTokenId);
-        console.log("end burn: ", nftTokenId);
+        console.log("[ConcentratedLiquidity][removeLiquidity] end burn: ", nftTokenId);
 
         delete concentratedLiquidity[nftTokenId];
 
@@ -176,7 +191,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         address user = _msgSender();
         console.log(
-            "base receive: ",
+            "[ConcentratedLiquidity][removeLiquidity] base receive: ",
             baseAmountRemoved + _collectFeeData.feeBaseAmount,
             _collectFeeData.feeBaseAmount
         );
@@ -189,7 +204,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         console.log(
-            "quote receive: ",
+            "[ConcentratedLiquidity][removeLiquidity] quote receive: ",
             quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
             _collectFeeData.feeQuoteAmount
         );
@@ -219,8 +234,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
 
-        console.log("liquidityData.liquidity: ", liquidityData.liquidity);
-        console.log("liquidity: ", liquidity);
+        console.log("[ConcentratedLiquidity][decreaseLiquidity]liquidityData.liquidity: ", liquidityData.liquidity);
+        console.log("[ConcentratedLiquidity][decreaseLiquidity]liquidity: ", liquidity);
 
         //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
@@ -233,8 +248,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        console.log(" baseAmountRemoved: ", baseAmountRemoved);
-        console.log(" quoteAmountRemoved: ", quoteAmountRemoved);
+        console.log(" [ConcentratedLiquidity][decreaseLiquidity] baseAmountRemoved: ", baseAmountRemoved);
+        console.log(" [ConcentratedLiquidity][decreaseLiquidity] quoteAmountRemoved: ", quoteAmountRemoved);
         //        console.log(" liquidityData.baseVirtual: ", liquidityData.baseVirtual );
         //        console.log(" liquidityData.quoteVirtual: ", liquidityData.quoteVirtual );
 
@@ -247,7 +262,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             0
         );
 
-        // curretn 5
+        // current 5
         address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
@@ -300,7 +315,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             )
         );
         console.log(
-            "increaseLiquidity; amountModify, isbase, nftTokenId: ",
+            "[ConcentratedLiquidity][increaseLiquidity] amountModify, isbase, nftTokenId: ",
             amountModify,
             isBase,
             nftTokenId
@@ -696,7 +711,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
         console.log(
             "[ConcentratedLiquidity][_addLiquidity] result.liquidity: ",
-        result.liquidity
+            result.liquidity
         );
     }
 

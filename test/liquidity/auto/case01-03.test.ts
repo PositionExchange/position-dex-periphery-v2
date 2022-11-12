@@ -607,34 +607,6 @@ describe("Integration-Case01", async function(){
       QuoteVirtual: 0
       BalanceBase: 910.00000
       BalanceQuote: 870.63846
-- S4: AddLiquidity
-  Action:
-    Id: 2
-    IndexPipRange: 2
-    Asset: base
-    AmountVirtual: 80
-  Expect:
-    Pool:
-      Liquidity: 1067.90393641912
-      BaseVirtual: 80
-      QuoteVirtual: 0
-      BaseReal: 435.96995642274
-      QuoteReal: 0
-      IndexPipRange: 2 
-      MaxPip: 89999 
-      MinPip: 60000 
-      FeeGrowthBase: 0 
-      FeeGrowthQuote: 0
-    User:
-      Id: 2
-      TokenId: 1000003
-      Liquidity: 1067.90393641912
-      FeeGrowthBase: 0 
-      FeeGrowthQuote: 0
-      BaseVirtual: 80
-      QuoteVirtual: 0
-      BalanceBase: 910.00000
-      BalanceQuote: 870.63846
 - S5: AddLiquidity
   Action:
     Id: 1
@@ -684,7 +656,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 3
       BalanceBase: 1133.48495
-      BalanceQuote: 65.72152
+      BalanceQuote: 68.68152
 - S7: RemoveLiquidity
   Action:
     Id: 2

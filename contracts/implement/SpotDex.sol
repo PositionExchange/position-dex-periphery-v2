@@ -641,6 +641,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         //        uint256 quoteAmount;
         uint16 fee = _getFee();
 
+        console.log("[SpotDex][_openMarketOrder]_quantity", _quantity);
+        console.log("[SpotDex][_openMarketOrder]fee", fee);
+
         if (_side == Side.BUY) {
             (
                 state.mainSideOut,
@@ -652,9 +655,19 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
-            console.log("_mainSideOut", state.mainSideOut);
+            console.log(
+                "[SpotDex][_openMarketOrder]_mainSideOut",
+                state.mainSideOut
+            );
+            console.log(
+                "[SpotDex][_openMarketOrder]state.feeAmount",
+                state.feeAmount
+            );
 
-            console.log("flipSideOut Balance", state.flipSideOut);
+            console.log(
+                "[SpotDex][_openMarketOrder]flipSideOut ",
+                state.flipSideOut
+            );
 
             // deposit quote asset
             uint256 amountTransferred = _deposit(
@@ -663,9 +676,17 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 state.flipSideOut
             );
-            console.log("_amountTransferred", amountTransferred);
+            console.log(
+                "[SpotDex][_openMarketOrder]_amountTransferred: ",
+                amountTransferred
+            );
 
             require(amountTransferred == state.flipSideOut, "!RFI");
+
+            console.log(
+                "[SpotDex][_openMarketOrder] transfer to trader: _quantity - state.feeAmount  ",
+                _quantity - state.feeAmount
+            );
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
