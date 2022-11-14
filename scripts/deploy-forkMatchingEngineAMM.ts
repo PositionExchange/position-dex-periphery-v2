@@ -3,7 +3,7 @@ import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./uti
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 
 
-task('forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
+task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
     const configData = await readConfig('config-testnet.json');
 
@@ -18,7 +18,7 @@ task('forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (taskArg
     await instance.deployed();
 
     const address = instance.address
-    console.log("SpotHouse deployed address: ",  address);
+    console.log("forkMatchingEngineAMM deployed address: ",  address);
 
 
     const upgraded = await hre.upgrades.upgradeProxy(
