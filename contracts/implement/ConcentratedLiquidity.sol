@@ -203,12 +203,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
-        console.log(
-            "[ConcentratedLiquidity][removeLiquidity] quote receive: ",
-            quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
-            _collectFeeData.feeQuoteAmount
-        );
-
         withdrawLiquidity(
             liquidityData.pool,
             user,
@@ -223,7 +217,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             quoteAmountRemoved,
             liquidityData.indexedPipRange
         );
-        console.log("end remove: ");
     }
 
     function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
@@ -233,9 +226,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
-
-        console.log("[ConcentratedLiquidity][decreaseLiquidity]liquidityData.liquidity: ", liquidityData.liquidity);
-        console.log("[ConcentratedLiquidity][decreaseLiquidity]liquidity: ", liquidity);
 
         //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
