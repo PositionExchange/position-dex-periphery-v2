@@ -1,0 +1,908 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x972CC7234dA8F62816B7Fe7897cE7375776f6368",
+    "txHash": "0x3dc32ea57ebd92a6af98075f118d072626aab6c863159a9c46b0b73e82c80e46"
+  },
+  "proxies": [
+    {
+      "address": "0x540f22D7E11C3d7FE1e180D0602B1681e48977E7",
+      "txHash": "0xa463fdf57eced942644189295158e32597eb34e060836e198393dfbb919bc975",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF5Fd889dE2D44aC47C9b183C937b5B8DCEAdF3f9",
+      "txHash": "0xf6cb16ebaf9581bd03040156e43b10db2280c8a819ed20d8bce15ba661e90539",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "df6a6043dfba89de02150df694e01c0c8fae7290d83f674c89258747e4193dcd": {
+      "address": "0x5F0bbF249C39d9Ad7F6743efa0F9f947bbd12329",
+      "txHash": "0x6887d7877867e9db1c2d6332a2cea308feadf81f7b353cac49fc9fa25ff36f1a",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "spotHouse",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_address",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:6"
+          },
+          {
+            "label": "positionLiquidity",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_address",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:8"
+          },
+          {
+            "label": "pathPairManagers",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:16"
+          },
+          {
+            "label": "allPairManager",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_mapping(t_address,t_struct(Pair)2342_storage)",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:18"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:25"
+          },
+          {
+            "label": "allowedAddressAddPair",
+            "offset": 0,
+            "slot": "254",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "SpotFactoryStorage",
+            "src": "contracts/libraries/types/SpotFactoryStorage.sol:27"
+          },
+          {
+            "label": "templatePair",
+            "offset": 0,
+            "slot": "255",
+            "type": "t_address",
+            "contract": "PositionSpotFactory",
+            "src": "contracts/PositionSpotFactory.sol:33"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Pair)2342_storage)": {
+            "label": "mapping(address => struct SpotFactoryStorage.Pair)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Pair)2342_storage": {
+            "label": "struct SpotFactoryStorage.Pair",
+            "members": [
+              {
+                "label": "BaseAsset",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "QuoteAsset",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "8c3868fa698b10625da8cda17fda661fa701a44a6c23660bd35ccb01218be8ca": {
+      "address": "0x3cc379AD668a20F3467bA775d7252F153949784a",
+      "txHash": "0x38bcdfbe997abbf7b1767dd4dfacc931e83ec48230ed44ec08cf96429e70298b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "defaultFeePercentage",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_uint16",
+            "contract": "StrategyFee",
+            "src": "contracts/libraries/extensions/StrategyFee.sol:8"
+          },
+          {
+            "label": "strategyFee",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_array(t_struct(FeeDiscount)17532_storage)dyn_storage",
+            "contract": "StrategyFee",
+            "src": "contracts/libraries/extensions/StrategyFee.sol:16"
+          },
+          {
+            "label": "spotFactory",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_contract(ISpotFactory)17445",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:11"
+          },
+          {
+            "label": "WBNB",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:13"
+          },
+          {
+            "label": "limitOrders",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)17520_storage)dyn_storage))",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:15"
+          },
+          {
+            "label": "feeBasis",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_uint128",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:22"
+          },
+          {
+            "label": "fee",
+            "offset": 16,
+            "slot": "206",
+            "type": "t_uint16",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:25"
+          },
+          {
+            "label": "positionRouter",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_address",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:49"
+          },
+          {
+            "label": "withdrawBNB",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_contract(IWithdrawBNB)12899",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:51"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:58"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_struct(Data)17520_storage)dyn_storage": {
+            "label": "struct SpotLimitOrder.Data[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(FeeDiscount)17532_storage)dyn_storage": {
+            "label": "struct StrategyFee.FeeDiscount[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ISpotFactory)17445": {
+            "label": "contract ISpotFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IWithdrawBNB)12899": {
+            "label": "contract IWithdrawBNB",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_struct(Data)17520_storage)dyn_storage)": {
+            "label": "mapping(address => struct SpotLimitOrder.Data[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)17520_storage)dyn_storage))": {
+            "label": "mapping(address => mapping(address => struct SpotLimitOrder.Data[]))",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Data)17520_storage": {
+            "label": "struct SpotLimitOrder.Data",
+            "members": [
+              {
+                "label": "pip",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "orderId",
+                "type": "t_uint64",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "isBuy",
+                "type": "t_bool",
+                "offset": 24,
+                "slot": "0"
+              },
+              {
+                "label": "blockNumber",
+                "type": "t_uint40",
+                "offset": 25,
+                "slot": "0"
+              },
+              {
+                "label": "fee",
+                "type": "t_uint16",
+                "offset": 30,
+                "slot": "0"
+              },
+              {
+                "label": "quoteAmount",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "baseAmount",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(FeeDiscount)17532_storage": {
+            "label": "struct StrategyFee.FeeDiscount",
+            "members": [
+              {
+                "label": "minHold",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "maxHold",
+                "type": "t_uint32",
+                "offset": 4,
+                "slot": "0"
+              },
+              {
+                "label": "fee",
+                "type": "t_uint16",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint40": {
+            "label": "uint40",
+            "numberOfBytes": "5"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "9bc69d46db18f917744fa33f7a5e8e3e488905f962a2e63e1d3a64808bd8be82": {
+      "address": "0x342F90273c494f673cB15a2b92152b3D4d8685de",
+      "txHash": "0x3b4c23d3cd4b63ccea3cc089c18c83ec1308b45f5f459a15b454060eec467e6b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "quoteAsset",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)7626",
+            "contract": "Fee",
+            "src": "@positionex/matching-engine/contracts/libraries/extensions/Fee.sol:12"
+          },
+          {
+            "label": "baseAsset",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IERC20)7626",
+            "contract": "Fee",
+            "src": "@positionex/matching-engine/contracts/libraries/extensions/Fee.sol:15"
+          },
+          {
+            "label": "baseFeeFunding",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256",
+            "contract": "Fee",
+            "src": "@positionex/matching-engine/contracts/libraries/extensions/Fee.sol:18"
+          },
+          {
+            "label": "quoteFeeFunding",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "Fee",
+            "src": "@positionex/matching-engine/contracts/libraries/extensions/Fee.sol:21"
+          },
+          {
+            "label": "pipRange",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint128",
+            "contract": "AMMCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/AMMCoreStorage.sol:8"
+          },
+          {
+            "label": "tickSpace",
+            "offset": 16,
+            "slot": "4",
+            "type": "t_uint32",
+            "contract": "AMMCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/AMMCoreStorage.sol:10"
+          },
+          {
+            "label": "currentIndexedPipRange",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "AMMCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/AMMCoreStorage.sol:12"
+          },
+          {
+            "label": "liquidityInfo",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_mapping(t_uint256,t_struct(Info)15662_storage)",
+            "contract": "AMMCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/AMMCoreStorage.sol:14"
+          },
+          {
+            "label": "feeShareAmm",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint32",
+            "contract": "AMMCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/AMMCoreStorage.sol:16"
+          },
+          {
+            "label": "basisPoint",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_uint256",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:14"
+          },
+          {
+            "label": "maxFindingWordsIndex",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_uint128",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:20"
+          },
+          {
+            "label": "maxWordRangeForLimitOrder",
+            "offset": 16,
+            "slot": "9",
+            "type": "t_uint128",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:22"
+          },
+          {
+            "label": "maxWordRangeForMarketOrder",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_uint128",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:24"
+          },
+          {
+            "label": "reserveSnapshots",
+            "offset": 0,
+            "slot": "11",
+            "type": "t_array(t_struct(ReserveSnapshot)17046_storage)dyn_storage",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:45"
+          },
+          {
+            "label": "singleSlot",
+            "offset": 0,
+            "slot": "12",
+            "type": "t_struct(SingleSlot)17036_storage",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:47"
+          },
+          {
+            "label": "tickPosition",
+            "offset": 0,
+            "slot": "13",
+            "type": "t_mapping(t_uint128,t_struct(Data)14996_storage)",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:48"
+          },
+          {
+            "label": "tickStore",
+            "offset": 0,
+            "slot": "14",
+            "type": "t_mapping(t_uint128,t_uint256)",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:49"
+          },
+          {
+            "label": "liquidityBitmap",
+            "offset": 0,
+            "slot": "15",
+            "type": "t_mapping(t_uint128,t_uint256)",
+            "contract": "MatchingEngineCoreStorage",
+            "src": "@positionex/matching-engine/contracts/libraries/types/MatchingEngineCoreStorage.sol:51"
+          },
+          {
+            "label": "isInitialized",
+            "offset": 0,
+            "slot": "16",
+            "type": "t_bool",
+            "contract": "MatchingEngineAMM",
+            "src": "@positionex/matching-engine/contracts/MatchingEngineAMM.sol:19"
+          },
+          {
+            "label": "counterParty",
+            "offset": 1,
+            "slot": "16",
+            "type": "t_address",
+            "contract": "MatchingEngineAMM",
+            "src": "@positionex/matching-engine/contracts/MatchingEngineAMM.sol:20"
+          },
+          {
+            "label": "positionConcentratedLiquidity",
+            "offset": 0,
+            "slot": "17",
+            "type": "t_address",
+            "contract": "MatchingEngineAMM",
+            "src": "@positionex/matching-engine/contracts/MatchingEngineAMM.sol:21"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_struct(ReserveSnapshot)17046_storage)dyn_storage": {
+            "label": "struct MatchingEngineCoreStorage.ReserveSnapshot[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20)7626": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_uint128,t_struct(Data)14996_storage)": {
+            "label": "mapping(uint128 => struct TickPosition.Data)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint128,t_uint256)": {
+            "label": "mapping(uint128 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Info)15662_storage)": {
+            "label": "mapping(uint256 => struct Liquidity.Info)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint64,t_struct(Data)13494_storage)": {
+            "label": "mapping(uint64 => struct LimitOrder.Data)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Data)13494_storage": {
+            "label": "struct LimitOrder.Data",
+            "members": [
+              {
+                "label": "isBuy",
+                "type": "t_uint8",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "size",
+                "type": "t_uint120",
+                "offset": 1,
+                "slot": "0"
+              },
+              {
+                "label": "partialFilled",
+                "type": "t_uint120",
+                "offset": 16,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(Data)14996_storage": {
+            "label": "struct TickPosition.Data",
+            "members": [
+              {
+                "label": "liquidity",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "filledIndex",
+                "type": "t_uint64",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "currentIndex",
+                "type": "t_uint64",
+                "offset": 24,
+                "slot": "0"
+              },
+              {
+                "label": "orderQueue",
+                "type": "t_mapping(t_uint64,t_struct(Data)13494_storage)",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Info)15662_storage": {
+            "label": "struct Liquidity.Info",
+            "members": [
+              {
+                "label": "sqrtMaxPip",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "sqrtMinPip",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "quoteReal",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "baseReal",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "1"
+              },
+              {
+                "label": "indexedPipRange",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "feeGrowthBase",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "feeGrowthQuote",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "sqrtK",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(ReserveSnapshot)17046_storage": {
+            "label": "struct MatchingEngineCoreStorage.ReserveSnapshot",
+            "members": [
+              {
+                "label": "pip",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "timestamp",
+                "type": "t_uint64",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "blockNumber",
+                "type": "t_uint64",
+                "offset": 24,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(SingleSlot)17036_storage": {
+            "label": "struct MatchingEngineCoreStorage.SingleSlot",
+            "members": [
+              {
+                "label": "pip",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "isFullBuy",
+                "type": "t_uint8",
+                "offset": 16,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint120": {
+            "label": "uint120",
+            "numberOfBytes": "15"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}
