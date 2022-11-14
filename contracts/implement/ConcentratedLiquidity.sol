@@ -640,6 +640,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
 
             if (isBase) {
+                uint128 baseReal = LiquidityMath.calculateBaseReal(
+                    state.maxPip,
+                    amountModify,
+                    state.currentPrice
+                );
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] baseReal: ",
+                    baseReal
+                );
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
                     .calculateQuoteVirtualFromBaseReal(
@@ -761,12 +771,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         _feeData.feeBaseAmount = Math.mulDiv(
             _feeData.newFeeGrowthBase,
             liquidity,
-            FixedPoint128.BUFFER
+            FixedPoint128.Q_POW18
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
             _feeData.newFeeGrowthQuote,
             liquidity,
-            FixedPoint128.BUFFER
+            FixedPoint128.Q_POW18
         );
     }
 
