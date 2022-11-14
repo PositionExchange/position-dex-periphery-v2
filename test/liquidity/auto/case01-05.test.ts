@@ -572,12 +572,12 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       TokenId: 1000002
-      Liquidity: 513.32195038742
+      Liquidity: 513.32195
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
       BaseVirtual: 20
       QuoteVirtual: 258.7230767
-      BalanceBase: 960.00000
+      BalanceBase: 959.00000
       BalanceQuote: 741.27692
 - S4: AddLiquidity
   Action:
@@ -633,7 +633,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
       BaseVirtual: 40
       QuoteVirtual: 0
-      BalanceBase: 920.00000
+      BalanceBase: 919.00000
       BalanceQuote: 741.27692
 - S6: OpenMarket
   Action:
@@ -666,8 +666,8 @@ describe("Integration-Case01", async function(){
       Liquidity: 513.32195038742
       BaseVirtual: 0
       QuoteVirtual: 368.26667532398
-      BaseReal: 377.56105754889
-      QuoteReal: 3020.48846039108
+      BaseReal: 209.56455508181
+      QuoteReal: 1257.36637403534
       IndexPipRange: 1 
       MaxPip: 59999 
       MinPip: 30000
@@ -692,7 +692,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 919.36000
-      BalanceQuote: 1128.94360
+      BalanceQuote: 1109.54360
 - S9: RemoveLiquidity
   Action:
     Id: 2
@@ -728,7 +728,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 930.68123
-      BalanceQuote: 1331.27796`)
+      BalanceQuote: 1311.87796`)
     })
     it ("Case #5", async () => {
         return testHelper.process(`
