@@ -846,7 +846,7 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
       Liquidity: 270.52942592077
       BaseVirtual: 0
       QuoteVirtual: 100.00000000000
-      BaseReal: 0
+      BaseReal: 63.76457431709
       QuoteReal: 1147.75596125021
       IndexPipRange: 5
       MaxPip: 179999
@@ -871,11 +871,11 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
     AmountVirtual: 200.00000000000
   Expect:
     Pool:
-      K: 73186.17028902370
+      K: 658675.53260121300
       Liquidity: 811.58827776232
       BaseVirtual: 0
       QuoteVirtual: 200
-      BaseReal: 0
+      BaseReal: 191.29372295127
       QuoteReal: 3443.26788375064
       IndexPipRange: 5
       MaxPip: 179999
@@ -898,11 +898,11 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
     TokenId: 1000001
   Expect:
     Pool:
-      Liquidity: 0
+      Liquidity: 292744.68115609500
       BaseVirtual: 0
       QuoteVirtual: 0
-      BaseReal: 0
-      QuoteReal: 0
+      BaseReal: 127.52914863418
+      QuoteReal: 2295.51192250042
       IndexPipRange: 5
       MaxPip: 179999
       MinPip: 150000
@@ -918,12 +918,12 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
     AmountVirtual: 55
   Expect:
     Pool:
-      K: 73186.17028902370
+      K: 9895806.75632081000
       Liquidity: 3145.76012377308
       BaseVirtual: 55
       QuoteVirtual: 0
       BaseReal: 741.46277183539
-      QuoteReal: 0
+      QuoteReal: 13346.32989303710
       IndexPipRange: 6
       MaxPip: 209999
       MinPip: 180000

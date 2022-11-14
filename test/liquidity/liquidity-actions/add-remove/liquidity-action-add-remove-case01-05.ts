@@ -398,7 +398,7 @@ describe("LiquidityActionAddRemoveCase01-05", async function(){
       BaseVirtual: 35
       QuoteVirtual: 0
       BaseReal: 471.8399457134
-      QuoteReal: 0
+      QuoteReal: 8493.11902284176
       IndexPipRange: 6
       MaxPip: 209999
       MinPip: 180000
@@ -574,7 +574,7 @@ describe("LiquidityActionAddRemoveCase01-05", async function(){
       Liquidity: 85.6020273337
       BaseVirtual: 0
       QuoteVirtual: 35
-      BaseReal: 0
+      BaseReal: 22.10242209252
       QuoteReal: 331.5341211456
       IndexPipRange: 4
       MaxPip: 149999
@@ -601,7 +601,7 @@ describe("LiquidityActionAddRemoveCase01-05", async function(){
       Liquidity: 32.3215132905
       BaseVirtual: 0
       QuoteVirtual: 15
-      BaseReal: 0
+      BaseReal: 9.33045607643
       QuoteReal: 111.9645398716
       IndexPipRange: 3
       MaxPip: 119999

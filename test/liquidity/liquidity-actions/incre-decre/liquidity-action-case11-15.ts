@@ -24,7 +24,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 50
       QuoteVirtual: 0
       BaseReal: 674.0570653049
-      QuoteReal: 0
+      QuoteReal: 12133.0271754882
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -52,7 +52,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 80
       QuoteVirtual: 0
       BaseReal: 1078.4913044878
-      QuoteReal: 0
+      QuoteReal: 19412.8434807812
       IndexPipRange: 6 
       MaxPip: 209999 
       MinPip: 180000 
@@ -88,7 +88,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 30
       QuoteVirtual: 0
       BaseReal: 404.4342391829
-      QuoteReal: 0
+      QuoteReal: 7279.8163052929
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -141,7 +141,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 50
       QuoteVirtual: 0
       BaseReal: 674.0570653049
-      QuoteReal: 0
+      QuoteReal: 12133.0271754882
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -169,7 +169,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 65
       QuoteVirtual: 0
       BaseReal: 876.2741848964
-      QuoteReal: 0
+      QuoteReal: 15772.9353281347
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -366,7 +366,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -404,7 +404,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 194.5772209533
       BaseVirtual: 0
       QuoteVirtual: 79.5565589448
-      BaseReal: 0
+      BaseReal: 50.2397898865
       QuoteReal: 753.5918243183
       IndexPipRange: 4
       MaxPip: 149999 
@@ -430,7 +430,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -483,7 +483,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -511,7 +511,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 244.5772209533
       BaseVirtual: 0
       QuoteVirtual: 100
-      BaseReal: 0
+      BaseReal: 63.1497774072
       QuoteReal: 947.2403461304
       IndexPipRange: 4
       MaxPip: 149999 
@@ -714,7 +714,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -781,7 +781,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 15
       QuoteVirtual: 0
       BaseReal: 202.2171195915
-      QuoteReal: 0
+      QuoteReal: 3639.9081526465
       IndexPipRange: 6 
       MaxPip: 209999 
       MinPip: 180000 

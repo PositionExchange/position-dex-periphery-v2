@@ -520,7 +520,7 @@ describe("LiquidityActionCase06-10", async function(){
     Id: 3
     asset: base
     Side: 0
-    Quantity: 34.8039021273991
+    Quantity: 34.8028021274
   Expect:
     Pool:
       Liquidity: 9541.9238831013
