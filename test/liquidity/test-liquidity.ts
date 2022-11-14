@@ -302,22 +302,23 @@ export class TestLiquidity {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
 
-        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
+        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote), poolData.feeGrowthQuote.toString());
         console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
         console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
-        // console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip));
+        console.log("QuoteReal: ", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
+        console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip)/10**24);
 
 
-        if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
-        if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**9),Number( poolData.sqrtMinPip), 0.01)).to.equal(true, "MinPip");
-        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.01)).to.equal(true, "FeeGrowthBase");
-        if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.01)).to.equal(true, "FeeGrowthQuote")
+        if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**12),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
+        if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**12),Number( poolData.sqrtMinPip), 0.001)).to.equal(true, "MinPip");
+        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.03)).to.equal(true, "FeeGrowthBase");
+        if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.001)).to.equal(true, "FeeGrowthQuote")
 
 
 
-        if (expectData.BaseReal) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.01)).to.equal(true, "BaseReal");
-        if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.01)).to.equal(true, "QuoteReal");
-        if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.01)).to.equal(true, "K");
+        if (expectData.BaseReal) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.001)).to.equal(true, "BaseReal");
+        if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.001)).to.equal(true, "QuoteReal");
+        if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.001)).to.equal(true, "K");
 
     }
 
