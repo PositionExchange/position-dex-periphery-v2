@@ -73,13 +73,13 @@ describe("Integration-Case01", async function() {
     Id: 2
     Asset: base
     Side: 1
-    Quantity: 120.00001
+    Quantity: 121
     Price: 190000
   Expect:
     PendingOrder:
       OrderId: 1
       Price: 190000
-      Size : 120.00001
+      Size : 121
       Side: 1
 - S4: OpenMarket
   Action:
@@ -158,14 +158,21 @@ describe("Integration-Case01", async function() {
     Id: 2
     Asset: base
     Side: 1
-    Quantity: 120.00065
+    Quantity: 121
     Price: 220000
   Expect:
     PendingOrder:
       OrderId: 1
       Price: 220000
-      Size : 120.00065
+      Size : 121
       Side: 1
+      
+- S7.1: CancelLimitOrder
+  Action:
+    Id: 2
+    Price: 190000
+    OrderId: 0
+    
 - S8: OpenMarket
   Action:
     Id: 3
@@ -186,8 +193,8 @@ describe("Integration-Case01", async function() {
       FeeGrowthQuote: 0
     User:
       Id: 3
-      BalanceBase: 10146.00000
-      BalanceQuote: 7166.07783
+      BalanceBase: 10145.50000
+      BalanceQuote: 7175.57783
 - S9: AddLiquidity
   Action:
     Id: 1
@@ -226,7 +233,12 @@ describe("Integration-Case01", async function() {
     User:
       Id: 3
       BalanceBase: 10262.40000
-      BalanceQuote: 4527.57783
+      BalanceQuote: 4535.57783
+- S10.1: CancelLimitOrder
+  Action:
+    Id: 2
+    Price: 220000
+    OrderId: 1
 - S11: AddLiquidity
   Action:
     Id: 1
@@ -288,7 +300,7 @@ describe("Integration-Case01", async function() {
     Id: 2
     asset: base
     Side: 1
-    Quantity: 23.4695867742
+    Quantity: 23.46959
   Expect:
     Pool: 
       Liquidity: 1187.2538394491
@@ -299,12 +311,12 @@ describe("Integration-Case01", async function() {
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
-      FeeGrowthBase: 0.0002015
+      FeeGrowthBase: 0.0002015518332
       FeeGrowthQuote: 0.003952325006
     User:
       Id: 2
-      BalanceBase: 9736.53041
-      BalanceQuote: 10488.79834
+      BalanceBase: 9735.53041
+      BalanceQuote: 12768.79834
 - S14: RemoveLiquidity
   Action:
     Id: 1
@@ -343,8 +355,8 @@ describe("Integration-Case01", async function() {
       FeeGrowthQuote: 0.002213785712
     User:
       Id: 3
-      BalanceBase: 9715.14706
-      BalanceQuote: 10871.24286
+      BalanceBase: 9714.14706
+      BalanceQuote: 13151.24286
 - S16: AddLiquidity
   Action:
     Id: 1
@@ -484,8 +496,8 @@ describe("Integration-Case01", async function() {
       FeeGrowthQuote: 0.006371482183
     User:
       Id: 3
-      BalanceBase: 10268.24273
-      BalanceQuote: 4415.85990
+      BalanceBase: 10268.74273
+      BalanceQuote: 4423.85990
 - S23: RemoveLiquidity
   Action:
     Id: 1

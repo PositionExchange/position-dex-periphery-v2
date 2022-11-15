@@ -283,16 +283,24 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
-
     async openLimitOrder(pip: number, side: number, size: number,idSender : number, opts?: CallOptions) {
         console.group(`OpenLimitOrder`);
         await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
         console.groupEnd();
     }
 
-    async cancelLimitOrder(pip: number, orderId: number, idSender : number, opts?: CallOptions) {
+    async cancelLimitOrder(pip: number, orderId: SNumber, idSender : number, opts?: CallOptions) {
+
         console.group(`CancelLimitOrder`);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[cancelLimitOrder] listOrderUser before: ", listOrderUser);
+        console.log("orderId, pip: ", orderId, pip)
         await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, orderId, pip);
+        const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[cancelLimitOrder] listOrderUser after: ", listOrderUserAf);
+        console.log("orderId, pip: ", orderId, pip)
         console.groupEnd();
     }
 

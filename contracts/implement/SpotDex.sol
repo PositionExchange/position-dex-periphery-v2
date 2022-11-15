@@ -254,6 +254,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     true
                 );
             }
+            console.log("[SpotHouse][CancelLimitOrder] refundQuantity Base, partialFilled, quote transferred: ", refundQuantity, partialFilled, _baseToQuote(partialFilled, _order.pip, basicPoint) );
         }
         delete _orders[_orderIdx];
         // = blankLimitOrderData;
@@ -369,6 +370,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
         for (uint256 i = 0; i < listPendingOrderData.length; i++) {
             if (listPendingOrderData[i].quantity != 0) {
+                console.log("listPendingOrderData quantity orderId : ", listPendingOrderData[0].quantity, listPendingOrderData[0].orderId);
                 return listPendingOrderData;
             }
         }
