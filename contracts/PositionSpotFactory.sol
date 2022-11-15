@@ -76,8 +76,8 @@ contract PositionSpotFactory is
         pathPairManagers[baseAsset][quoteAsset] = pair;
 
         allPairManager[pair] = Pair({
-        BaseAsset: baseAsset,
-        QuoteAsset: quoteAsset
+            BaseAsset: baseAsset,
+            QuoteAsset: quoteAsset
         });
 
         IMatchingEngineAMM(pair).initialize(
