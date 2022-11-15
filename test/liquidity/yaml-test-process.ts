@@ -242,6 +242,7 @@ export class YamlTestProcess {
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
     }
+
     async OpenMarket(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
         if (action) { await this.testHelper.openMarketOrder(  action.side, action.quantity, action.asset, action.id,{revert : action.revert})}
@@ -252,6 +253,15 @@ export class YamlTestProcess {
         }
 
     }
+
+    // async CancelLimitOrder(stepData) {
+    //
+    //     const action = this.extractAction(stepData.getProp("Action"));
+    //     if (action) { await this.testHelper.openLimitOrder( action.price, action.side, action.quantity, action.id, {revert : action.revert} )}
+    //     const expectData = stepData.getProp("Expect");
+    //     if (expectData) await this.expectTest(expectData);
+    // }
+
     async Expect(stepData) {
         if (stepData) await this.expectTest(stepData);
     }

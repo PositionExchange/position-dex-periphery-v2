@@ -290,6 +290,12 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
+    async cancelLimitOrder(pip: number, idx: number, idSender : number, opts?: CallOptions) {
+        console.group(`CancelLimitOrder`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, idx, pip);
+        console.groupEnd();
+    }
+
     async openMarketOrder( side: number, size: number, asset : String, idSender : number,opts?: CallOptions) {
         console.group(`OpenMarketOrder`);
         await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
