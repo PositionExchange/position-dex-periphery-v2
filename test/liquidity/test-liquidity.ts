@@ -155,7 +155,7 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
     await matching.setCounterParty02(spotHouse.address)
-    await approveAndMintToken(quote, base, dexNFT, users, 10000)
+    await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
     await  matching.approve()
     await  dexNFT.donatePool(matching.address, toWei(1), toWei(1));
@@ -310,17 +310,25 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
+    async claimAsset( idSender : number) {
+        console.group(`ClaimAsset`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).claimAsset(this.mockMatching.address);
+        console.groupEnd();
+    }
+
 
 
     async expectPool( expectData: ExpectedPoolData) {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
 
-        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote), fromWeiAndFormat(poolData.feeGrowthQuote, 10));
-        console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase, 10));
+        console.log(" START expectPool : ", expectData);
+        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
+        console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
         console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
-        console.log("QuoteReal: ", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
-        console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip)/10**24);
+        console.log("QuoteReal", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
+        console.log("K", sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK));
+        // console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip));
 
 
         if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**12),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
@@ -388,7 +396,7 @@ export class TestLiquidity {
             .getPendingOrderDetail(price, orderId)
         console.log("size: ", size,fromWeiAndFormat(size), _size );
 
-        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.01))
+        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
             .to
             .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
 

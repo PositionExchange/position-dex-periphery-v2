@@ -55,6 +55,7 @@ library LiquidityHelper {
         return
             uint128(
                 (uint256(quoteReal) *
+                    10**18 *
                     (uint256(sqrtPriceMax) - uint256(sqrtCurrentPrice))) /
                     (uint256(sqrtCurrentPrice**2 * sqrtPriceMax))
             );

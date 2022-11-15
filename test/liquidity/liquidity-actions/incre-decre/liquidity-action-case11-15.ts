@@ -1,4 +1,4 @@
-import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
+import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
 describe("LiquidityActionCase06-10", async function(){
     let testHelper: TestLiquidity
@@ -24,7 +24,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 50
       QuoteVirtual: 0
       BaseReal: 674.0570653049
-      QuoteReal: 0
+      QuoteReal: 12133.0271754882
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -52,7 +52,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 80
       QuoteVirtual: 0
       BaseReal: 1078.4913044878
-      QuoteReal: 0
+      QuoteReal: 19412.8434807812
       IndexPipRange: 6 
       MaxPip: 209999 
       MinPip: 180000 
@@ -88,7 +88,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 30
       QuoteVirtual: 0
       BaseReal: 404.4342391829
-      QuoteReal: 0
+      QuoteReal: 7279.8163052929
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -141,7 +141,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 50
       QuoteVirtual: 0
       BaseReal: 674.0570653049
-      QuoteReal: 0
+      QuoteReal: 12133.0271754882
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -169,7 +169,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 65
       QuoteVirtual: 0
       BaseReal: 876.2741848964
-      QuoteReal: 0
+      QuoteReal: 15772.9353281347
       IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
@@ -366,7 +366,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -404,7 +404,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 194.5772209533
       BaseVirtual: 0
       QuoteVirtual: 79.5565589448
-      BaseReal: 0
+      BaseReal: 50.2397898865
       QuoteReal: 753.5918243183
       IndexPipRange: 4
       MaxPip: 149999 
@@ -430,7 +430,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -483,7 +483,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -511,7 +511,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 244.5772209533
       BaseVirtual: 0
       QuoteVirtual: 100
-      BaseReal: 0
+      BaseReal: 63.1497774072
       QuoteReal: 947.2403461304
       IndexPipRange: 4
       MaxPip: 149999 
@@ -560,7 +560,7 @@ describe("LiquidityActionCase06-10", async function(){
     Id: 3
     asset: base
     Side: 1
-    Quantity: 5
+    Quantity: 15
   Expect:
     Pool:
       Liquidity: 214.5772209533
@@ -575,9 +575,14 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      BalanceBase: 9995
-      BalanceQuote: 10068.7913211474
-- S6: AddLiquidity
+      BalanceBase: 9985
+      BalanceQuote: 10198.7913211474
+- S6: Expect
+  User:
+    Id: 2
+    BalanceBase: 10010
+    BalanceQuote: 9820   
+- S7: AddLiquidity
   Action:
     Id: 3
     IndexPipRange: 4
@@ -603,9 +608,9 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0 
       BaseVirtual: 30
       QuoteVirtual: 113.6556853169
-      BalanceBase: 9965
-      BalanceQuote: 9955.1356358305
-- S7: DecreaseLiquidity
+      BalanceBase: 9955
+      BalanceQuote: 10085.1356358305
+- S8: DecreaseLiquidity
   Action:
     Id: 1
     TokenId: 1000001
@@ -615,7 +620,7 @@ describe("LiquidityActionCase06-10", async function(){
       Id: 1
       BalanceBase: 10001.2116850001
       BalanceQuote: 9966.8565609357
-- S8: DecreaseLiquidity
+- S9: DecreaseLiquidity
   Action:
     Id: 3
     TokenId: 1000003
@@ -623,9 +628,9 @@ describe("LiquidityActionCase06-10", async function(){
   Expect:
     User:
       Id: 3
-      BalanceBase: 9976.6508173090
-      BalanceQuote: 9999.2750233557
-- S9: RemoveLiquidity
+      BalanceBase: 9966.6508173090
+      BalanceQuote: 10129.2750233557
+- S10: RemoveLiquidity
   Action:
     Id: 1
     TokenId: 1000001
@@ -647,7 +652,7 @@ describe("LiquidityActionCase06-10", async function(){
       FeeGrowthQuote: 0 
       BalanceBase: 10002.1504754807
       BalanceQuote: 9970.4131901171
-- S10: RemoveLiquidity
+- S11: RemoveLiquidity
   Action:
     Id: 2
     TokenId: 1000002
@@ -667,9 +672,9 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 10002.8495245193
+      BalanceBase: 10012.8495245193
       BalanceQuote: 9830.7954887355
-- S11: RemoveLiquidity
+- S12: RemoveLiquidity
   Action:
     Id: 3
     TokenId: 1000003
@@ -689,8 +694,8 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 9995
-      BalanceQuote: 10068.7913211474
+      BalanceBase: 9985
+      BalanceQuote: 10198.7913211474
 `)
     })
     it ("Case #15", async () => {
@@ -709,7 +714,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -776,7 +781,7 @@ describe("LiquidityActionCase06-10", async function(){
       BaseVirtual: 15
       QuoteVirtual: 0
       BaseReal: 202.2171195915
-      QuoteReal: 0
+      QuoteReal: 3639.9081526465
       IndexPipRange: 6 
       MaxPip: 209999 
       MinPip: 180000 

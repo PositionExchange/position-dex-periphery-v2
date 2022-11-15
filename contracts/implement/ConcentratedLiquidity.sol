@@ -576,6 +576,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 currentPrice;
         uint128 maxPip;
         uint128 minPip;
+        uint128 basicPoint;
     }
 
     function _addLiquidity(
@@ -597,6 +598,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             indexedPipRange,
             _getPipRange(pool)
         );
+
+        console.log("state.minPip, state.maxPip: ", state.minPip, state.maxPip);
 
         //        console.log("state.pipRange: ", state.pipRange);
         ////
@@ -645,6 +648,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
 
             if (isBase) {
+                uint128 baseReal = LiquidityMath.calculateBaseReal(
+                    state.maxPip,
+                    amountModify,
+                    state.currentPrice
+                );
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] baseReal: ",
+                    baseReal
+                );
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
                     .calculateQuoteVirtualFromBaseReal(
@@ -663,17 +676,41 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                     state.quoteAmountModify
                 );
             } else {
+                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
+                    state.minPip,
+                    amountModify,
+                    state.currentPrice
+                );
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] quoteRael, state.minPip, state.currentPrice: ",
+                    quoteReal,
+                    state.minPip,
+                    state.currentPrice
+                );
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] amountModify: ",
+                    amountModify
+                );
+
                 state.quoteAmountModify = amountModify;
-                state.baseAmountModify = LiquidityHelper
-                    .calculateBaseVirtualFromQuoteReal(
+                state.baseAmountModify =
+                    LiquidityHelper.calculateBaseVirtualFromQuoteReal(
                         LiquidityMath.calculateQuoteReal(
-                            uint128(Math.sqrt(uint256(state.minPip))),
+                            state.minPip,
                             amountModify,
-                            uint128(Math.sqrt(uint256(state.currentPrice)))
+                            state.currentPrice
                         ),
                         state.currentPrice,
                         state.maxPip
-                    );
+                    ) *
+                    uint128(pool.basisPoint());
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify state.quoteAmountModify with quote: ",
+                    state.baseAmountModify,
+                    state.quoteAmountModify
+                );
             }
         }
 
@@ -709,6 +746,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         UserLiquidity.Data memory liquidityData,
         uint128 liquidity
     ) internal returns (uint128 baseAmount, uint128 quoteAmount) {
+        if (liquidity == 0) return (baseAmount, quoteAmount);
         return
             liquidityData.pool.removeLiquidity(
                 IAutoMarketMakerCore.RemoveLiquidity({
