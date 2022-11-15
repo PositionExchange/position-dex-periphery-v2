@@ -739,12 +739,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         ) = pool.liquidityInfo(indexedPipRange);
 
         _feeData.feeBaseAmount = Math.mulDiv(
-            _feeData.newFeeGrowthBase,
+            _feeData.newFeeGrowthBase - feeGrowthBase,
             liquidity,
             FixedPoint128.Q_POW18
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
-            _feeData.newFeeGrowthQuote,
+            _feeData.newFeeGrowthQuote - feeGrowthQuote,
             liquidity,
             FixedPoint128.Q_POW18
         );

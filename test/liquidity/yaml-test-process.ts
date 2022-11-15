@@ -144,7 +144,6 @@ export class YamlTestProcess {
 
         if (expectUser) {
             const extractUser = this.extractUser(expectUser)
-
             await  this.testHelper.expectUserLiquidity({
                 BalanceQuote: extractUser.balanceQuote,
                 BalanceBase : extractUser.balanceBase,
@@ -202,6 +201,15 @@ export class YamlTestProcess {
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
     }
+
+    //
+    // async ClaimAsset(stepData) {
+    //     const action = this.extractAction(stepData.getProp("Action"));
+    //     if (action) { await this.testHelper.claimAsset( action.tokenId, action.id)}
+    //     const expectData = stepData.getProp("Expect");
+    //     if (expectData) await this.expectTest(expectData);
+    // }
+    //
 
 
     async IncreaseLiquidity(stepData) {
