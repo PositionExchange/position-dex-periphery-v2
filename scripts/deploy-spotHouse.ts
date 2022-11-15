@@ -18,7 +18,7 @@ task('spot-house-testnet', 'How is your girl friend?', async (taskArgs, hre) => 
     await instance.deployed();
 
     const address = instance.address
-    console.log("SpotHouse deployed address: ",  address);
+    console.log("SpotHouse deployed address: ", address);
 
 
     const upgraded = await hre.upgrades.upgradeProxy(
