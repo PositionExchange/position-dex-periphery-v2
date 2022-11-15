@@ -135,16 +135,21 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
 
 
     await matching.initialize(
-        quote.address,
-        base.address,
-        BASIS_POINT,
-        BASIS_POINT**2,
-        1000,
-        100000,
-        30_000,
-        1,
-        deployer.address,
-        dexNFT.address);
+
+
+        {
+            quoteAsset: quote.address,
+            baseAsset: base.address,
+            basisPoint: BASIS_POINT,
+            maxFindingWordsIndex: 1000,
+            initialPip: 100000,
+            pipRange: 30_000,
+            tickSpace: 1,
+            owner: deployer.address,
+            positionLiquidity: dexNFT.address,
+            spotHouse: spotHouse.address,
+            feeShareAmm: 6000
+        });
 
     await spotHouse.initialize();
 
@@ -154,14 +159,14 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
-    await matching.setCounterParty02(spotHouse.address)
+    // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
     await  matching.approve()
     await  dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
-        matching.resetFeeShareAmm();
-        spotHouse.setFee(0);
+        await matching.resetFeeShareAmm();
+        await spotHouse.setFee(0);
     }
 
 

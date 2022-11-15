@@ -37,16 +37,19 @@ describe("manage liquidity", async () => {
             console.log("TTT", quote, base)
 
             await matching.initialize(
-                quote.address,
-                base.address,
-                BASIS_POINT,
-                BASIS_POINT ** 2,
-                1000,
-                100000,
-                30_000,
-                1,
-                deployer.address,
-                dexNFT.address
+                {
+                    quoteAsset: quote.address,
+                    baseAsset: base.address,
+                    basisPoint: BASIS_POINT,
+                    maxFindingWordsIndex: 1000,
+                    initialPip: 100000,
+                    pipRange: 30_000,
+                    tickSpace: 1,
+                    owner: deployer.address,
+                    positionLiquidity: deployer.address,
+                    spotHouse: deployer.address,
+                    feeShareAmm: 0
+                }
             );
 
             await spotHouse.initialize();
