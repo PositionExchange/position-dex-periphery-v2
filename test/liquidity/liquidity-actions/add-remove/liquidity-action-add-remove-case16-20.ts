@@ -984,13 +984,13 @@ describe("LiquidityActionAddRemoveCase16-20", async function(){
     Id: 2
     Asset: base
     Side: 1
-    Quantity: 10
+    Quantity: 10.001
     Price: 190000
   Expect:
     PendingOrder:
       OrderId: 1
       Price: 190000
-      Size : 10
+      Size : 10.001
       Side: 1
     User:
       Id: 2
