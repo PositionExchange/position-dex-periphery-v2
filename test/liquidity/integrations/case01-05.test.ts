@@ -1,6 +1,6 @@
 import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
 
-describe("Integration-Case01", async function(){
+describe("Integration-Case01-Case05", async function(){
     let testHelper: TestLiquidity
 
     beforeEach(async () => {
@@ -58,7 +58,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 513.32195038742
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -115,7 +115,7 @@ describe("Integration-Case01", async function(){
 - S7: RemoveLiquidity
   Action:
     Id: 3
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 0
@@ -198,7 +198,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 39.68118785069
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -246,7 +246,7 @@ describe("Integration-Case01", async function(){
 - S6: RemoveLiquidity
   Action:
     Id: 3
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 0
@@ -316,7 +316,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 1
+      TokenId: 1000001
       Liquidity: 513.32195038742
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -344,7 +344,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 2
+      TokenId: 1000002
       Liquidity: 769.98292558113
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -372,7 +372,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 2
-      TokenId: 3
+      TokenId: 1000003
       Liquidity: 58.07126941179
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
@@ -400,8 +400,8 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 1
-      TokenId: 4
-      Liquidity: 81.29977717650
+      TokenId: 1000004
+      Liquidity: 23.22850776472
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
       BaseVirtual: 0
@@ -430,19 +430,19 @@ describe("Integration-Case01", async function(){
       FeeQuote: 20.77936326
     User:
       Id: 3
-      BalanceBase: 970.00000
+      BalanceBase: 812.44658
       BalanceQuote: 1671.86608
 - S7: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 1
+    TokenId: 1000001
   Expect:
     Pool:
       Liquidity: 769.98292558113
       BaseVirtual: 130.20301673297
       QuoteVirtual: 0
-      BaseReal: 34.49257425028
-      QuoteReal: 68.98514850055
+      BaseReal: 444.54984935568
+      QuoteReal: 1333.64954806704
       IndexPipRange: 1 
       MaxPip: 59999 
       MinPip: 30000
@@ -453,7 +453,7 @@ describe("Integration-Case01", async function(){
 - S8: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 2
+    TokenId: 1000002
   Expect:
     Pool:
       Liquidity: 0
@@ -471,7 +471,7 @@ describe("Integration-Case01", async function(){
 - S9: RemoveLiquidity
   Action:
     Id: 2
-    TokenId: 3
+    TokenId: 1000003
   Expect:
     Pool:
       Liquidity: 23.22850776472
@@ -489,7 +489,7 @@ describe("Integration-Case01", async function(){
 - S10: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 4
+    TokenId: 1000004
   Expect:
     Pool:
       Liquidity: 0
@@ -503,6 +503,398 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 1103.21684
-      BalanceQuote: 557.03379`)
+      BalanceQuote: 589.65157`)
+    })
+    it ("Case #4", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action:
+    Price: 50000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 21
+    Price: 80000
+  Expect:
+    PendingOrder:
+      OrderId: 1
+      Price: 80000
+      Size : 21
+      Side: 1
+- S2: AddLiquidity
+  Action:
+    Id: 2
+    IndexPipRange: 1
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      Liquidity: 256.66097519371
+      BaseVirtual: 10
+      QuoteVirtual: 129.3615383
+      BaseReal: 114.7822775409
+      QuoteReal: 573.9113877045
+      IndexPipRange: 1 
+      MaxPip: 59999 
+      MinPip: 30000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 2
+      TokenId: 1000001
+      Liquidity: 256.66097519371
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 10
+      QuoteVirtual: 129.3615383
+      BalanceBase: 990.00000
+      BalanceQuote: 870.63846
+- S3: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    Asset: base
+    AmountVirtual: 20
+  Expect:
+    Pool:
+      Liquidity: 769.98292558113
+      BaseVirtual: 30
+      QuoteVirtual: 388.084615
+      BaseReal: 344.3468326227
+      QuoteReal: 1721.7341631136
+      IndexPipRange: 1 
+      MaxPip: 59999 
+      MinPip: 30000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 1
+      TokenId: 1000002
+      Liquidity: 513.32195
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 20
+      QuoteVirtual: 258.7230767
+      BalanceBase: 959.00000
+      BalanceQuote: 741.27692
+- S4: AddLiquidity
+  Action:
+    Id: 2
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 80
+  Expect:
+    Pool:
+      Liquidity: 1067.90393641912
+      BaseVirtual: 80
+      QuoteVirtual: 0
+      BaseReal: 435.96995642274
+      QuoteReal: 0
+      IndexPipRange: 2 
+      MaxPip: 89999 
+      MinPip: 60000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 2
+      TokenId: 1000003
+      Liquidity: 1067.90393641912
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 80
+      QuoteVirtual: 0
+      BalanceBase: 910.00000
+      BalanceQuote: 870.63846
+- S5: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 40
+  Expect:
+    Pool:
+      Liquidity: 1601.85590462868
+      BaseVirtual: 120
+      QuoteVirtual: 0
+      BaseReal: 653.9549346341
+      QuoteReal: 0
+      IndexPipRange: 2 
+      MaxPip: 89999 
+      MinPip: 60000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 1
+      TokenId: 1000004
+      Liquidity: 533.95196820956
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 40
+      QuoteVirtual: 0
+      BalanceBase: 919.00000
+      BalanceQuote: 741.27692
+- S6: OpenMarket
+  Action:
+    Id: 3
+    asset: base
+    Side: 0
+    Quantity: 137.61334831078
+  Expect:
+    Pool: 
+      Liquidity: 1601.85590462868
+      BaseVirtual: 32.3866516892
+      QuoteVirtual: 607.0030827820
+      BaseReal: 566.3415863233
+      QuoteReal: 4530.7326905866
+      IndexPipRange: 2
+      MaxPip: 89999 
+      MinPip: 60000 
+      FeeGrowthBase: 0.0009845081977
+      FeeGrowthQuote: 0
+    User:
+      Id: 3
+      BalanceBase: 1133.48495
+      BalanceQuote: 68.68152
+- S7: RemoveLiquidity
+  Action:
+    Id: 2
+    TokenId: 1000001
+  Expect:
+    Pool:
+      Liquidity: 513.32195038742
+      BaseVirtual: 0
+      QuoteVirtual: 368.26667532398
+      BaseReal: 209.56455508181
+      QuoteReal: 1257.36637403534
+      IndexPipRange: 1 
+      MaxPip: 59999 
+      MinPip: 30000
+    User:
+      Id: 2
+      BalanceBase: 910.18000
+      BalanceQuote: 1054.77180
+- S8: RemoveLiquidity
+  Action:
+    Id: 1
+    TokenId: 1000002
+  Expect:
+    Pool:
+      Liquidity: 0
+      BaseVirtual: 0
+      QuoteVirtual: 0
+      BaseReal: 0
+      QuoteReal: 0
+      IndexPipRange: 1 
+      MaxPip: 59999 
+      MinPip: 30000
+    User:
+      Id: 1
+      BalanceBase: 919.36000
+      BalanceQuote: 1109.54360
+- S9: RemoveLiquidity
+  Action:
+    Id: 2
+    TokenId: 1000003
+  Expect:
+    Pool:
+      Liquidity: 533.95196820956
+      BaseVirtual: 10.79555056307
+      QuoteVirtual: 202.33436092733
+      BaseReal: 188.78052877444
+      QuoteReal: 1510.24423019554
+      IndexPipRange: 2 
+      MaxPip: 89999 
+      MinPip: 60000
+    User:
+      Id: 2
+      BalanceBase: 932.82246
+      BalanceQuote: 1459.44052
+- S10: RemoveLiquidity
+  Action:
+    Id: 1
+    TokenId: 1000004
+  Expect:
+    Pool:
+      Liquidity: 0
+      BaseVirtual: 0
+      QuoteVirtual: 0
+      BaseReal: 0
+      QuoteReal: 0
+      IndexPipRange: 2 
+      MaxPip: 89999 
+      MinPip: 60000
+    User:
+      Id: 1
+      BalanceBase: 930.68123
+      BalanceQuote: 1311.87796`)
+    })
+    it ("Case #5", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action:
+    Price: 179999
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 5
+    Asset: quote
+    AmountVirtual: 100.00000000000
+  Expect:
+    Pool:
+      Liquidity: 270.52942592077
+      BaseVirtual: 0
+      QuoteVirtual: 100.00000000000
+      BaseReal: 0
+      QuoteReal: 1147.75596125021
+      IndexPipRange: 5 
+      MaxPip: 179999 
+      MinPip: 150000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 1
+      TokenId: 1000001
+      Liquidity: 270.52942592077
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 0
+      QuoteVirtual: 100.00000000000
+      BalanceBase: 1000.00000000000
+      BalanceQuote: 900.00000
+- S2: AddLiquidity
+  Action:
+    Id: 2
+    IndexPipRange: 5
+    Asset: quote
+    AmountVirtual: 200.00000000000
+  Expect:
+    Pool:
+      Liquidity: 811.58827776232
+      BaseVirtual: 0
+      QuoteVirtual: 300.00000000000
+      BaseReal: 0
+      QuoteReal: 3443.26788375064
+      IndexPipRange: 5 
+      MaxPip: 179999 
+      MinPip: 150000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 2
+      TokenId: 1000002
+      Liquidity: 541.05885184155
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 0
+      QuoteVirtual: 200.00000000000
+      BalanceBase: 1000.00000000000
+      BalanceQuote: 800.00000
+- S3: RemoveLiquidity
+  Action:
+    Id: 1
+    TokenId: 1000001
+  Expect:
+    Pool:
+      Liquidity: 270.52942592077
+      BaseVirtual: 0
+      QuoteVirtual: 200.00000000000
+      BaseReal: 0
+      QuoteReal: 2295.51192250042
+      IndexPipRange: 5
+      MaxPip: 179999 
+      MinPip: 150000
+    User:
+      Id: 1
+      BalanceBase: 1000.00000
+      BalanceQuote: 1000.00000
+- S4: AddLiquidity
+  Action:
+    Id: 2
+    IndexPipRange: 6
+    Asset: base
+    AmountVirtual: 55
+  Expect:
+    Pool:
+      Liquidity: 3145.76012377308
+      BaseVirtual: 55
+      QuoteVirtual: 0
+      BaseReal: 741.46277183539
+      QuoteReal: 0
+      IndexPipRange: 6 
+      MaxPip: 209999 
+      MinPip: 180000 
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+    User:
+      Id: 2
+      TokenId: 1000003
+      Liquidity: 3145.76012377308
+      FeeGrowthBase: 0 
+      FeeGrowthQuote: 0
+      BaseVirtual: 55
+      QuoteVirtual: 0
+      BalanceBase: 945.00000
+      BalanceQuote: 800.00000
+- S5: OpenMarket
+  Action:
+    Id: 3
+    asset: base
+    Side: 0
+    Quantity: 4.08522542399
+  Expect:
+    Pool: 
+      Liquidity: 3145.76012377308
+      BaseVirtual: 50.91477457601
+      QuoteVirtual: 73.94145165038
+      BaseReal: 737.37754641140
+      QuoteReal: 13420.27134468740
+      IndexPipRange: 6
+      MaxPip: 209999 
+      MinPip: 180000 
+      FeeGrowthBase: 0.00002337560867
+      FeeGrowthQuote: 0
+    User:
+      Id: 3
+      BalanceBase: 1003.96267
+      BalanceQuote: 926.05855
+- S6: RemoveLiquidity
+  Action:
+    Id: 2
+    TokenId: 1000002
+  Expect:
+    Pool:
+      Liquidity: 0
+      BaseVirtual: 0
+      QuoteVirtual: 0
+      BaseReal: 0
+      QuoteReal: 0
+      IndexPipRange: 5
+      MaxPip: 179999 
+      MinPip: 150000
+    User:
+      Id: 2
+      BalanceBase: 945.01265
+      BalanceQuote: 1000.00000
+- S7: RemoveLiquidity
+  Action:
+    Id: 2
+    TokenId: 1000003
+  Expect:
+    Pool:
+      Liquidity: 0
+      BaseVirtual: 0
+      QuoteVirtual: 0
+      BaseReal: 0
+      QuoteReal: 0
+      IndexPipRange: 6
+      MaxPip: 209999 
+      MinPip: 180000
+    User:
+      Id: 2
+      BalanceBase: 996.00096
+      BalanceQuote: 1073.94145`
+        )
     })
 })

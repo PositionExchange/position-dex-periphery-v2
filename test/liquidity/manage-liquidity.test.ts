@@ -37,16 +37,19 @@ describe("manage liquidity", async () => {
             console.log("TTT", quote, base)
 
             await matching.initialize(
-                quote.address,
-                base.address,
-                BASIS_POINT,
-                BASIS_POINT ** 2,
-                1000,
-                100000,
-                30_000,
-                1,
-                deployer.address,
-                dexNFT.address
+                {
+                    quoteAsset: quote.address,
+                    baseAsset: base.address,
+                    basisPoint: BASIS_POINT,
+                    maxFindingWordsIndex: 1000,
+                    initialPip: 100000,
+                    pipRange: 30_000,
+                    tickSpace: 1,
+                    owner: deployer.address,
+                    positionLiquidity: deployer.address,
+                    spotHouse: deployer.address,
+                    feeShareAmm: 0
+                }
             );
 
             await spotHouse.initialize();
@@ -76,8 +79,6 @@ describe("manage liquidity", async () => {
 
             const data = await dexNFT.concentratedLiquidity(1000001)
             console.log(data.toString());
-            console.log("baseAmount: ", data.baseVirtual.toString());
-            console.log("quoteAmount: ", data.quoteVirtual.toString());
             console.log("liquidity: ", data.liquidity.toString());
             expect(data.pool).to.equal(matching.address)
         })
@@ -99,8 +100,6 @@ describe("manage liquidity", async () => {
 
             const data = await dexNFT.concentratedLiquidity(1000001)
             console.log(data.toString());
-            console.log("baseAmount: ", data.baseVirtual.toString());
-            console.log("quoteAmount: ", data.quoteVirtual.toString());
             console.log("liquidity: ", data.liquidity.toString());
             expect(data.pool).to.equal(matching.address)
             await dexNFT.removeLiquidity( 1000001
@@ -124,8 +123,6 @@ describe("manage liquidity", async () => {
 
             const dataBefore = await dexNFT.concentratedLiquidity(1000001)
             console.log(dataBefore.toString());
-            console.log("baseAmount: ", dataBefore.baseVirtual.toString());
-            console.log("quoteAmount: ", dataBefore.quoteVirtual.toString());
             console.log("liquidity: ", dataBefore.liquidity.toString());
             expect(dataBefore.pool).to.equal(matching.address)
             console.log("dexNFT: ", dexNFT.address)
@@ -135,8 +132,6 @@ describe("manage liquidity", async () => {
 
             const dataAfter = await dexNFT.concentratedLiquidity(1000001)
             console.log('dataAfter', dataAfter.toString());
-            console.log("baseAmount: ", dataAfter.baseVirtual.toString());
-            console.log("quoteAmount: ", dataAfter.quoteVirtual.toString());
             console.log("liquidity: ", dataAfter.liquidity.toString());
         })
     })
@@ -154,8 +149,6 @@ describe("manage liquidity", async () => {
 
             const dataBefore = await dexNFT.concentratedLiquidity(1000001)
             console.log(dataBefore.toString());
-            console.log("baseAmount: ", dataBefore.baseVirtual.toString());
-            console.log("quoteAmount: ", dataBefore.quoteVirtual.toString());
             console.log("liquidity: ", dataBefore.liquidity.toString());
             expect(dataBefore.pool).to.equal(matching.address)
 
@@ -163,8 +156,6 @@ describe("manage liquidity", async () => {
 
             const dataAfter = await dexNFT.concentratedLiquidity(1000001)
             console.log(dataAfter.toString());
-            console.log("baseAmount: ", dataAfter.baseVirtual.toString());
-            console.log("quoteAmount: ", dataAfter.quoteVirtual.toString());
             console.log("liquidity: ", dataAfter.liquidity.toString());
         })
     })

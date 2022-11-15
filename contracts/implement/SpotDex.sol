@@ -254,6 +254,12 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     true
                 );
             }
+            console.log(
+                "[SpotHouse][CancelLimitOrder] refundQuantity Base, partialFilled, quote transferred: ",
+                refundQuantity,
+                partialFilled,
+                _baseToQuote(partialFilled, _order.pip, basicPoint)
+            );
         }
         delete _orders[_orderIdx];
         // = blankLimitOrderData;
@@ -369,6 +375,11 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
         for (uint256 i = 0; i < listPendingOrderData.length; i++) {
             if (listPendingOrderData[i].quantity != 0) {
+                console.log(
+                    "listPendingOrderData quantity orderId : ",
+                    listPendingOrderData[0].quantity,
+                    listPendingOrderData[0].orderId
+                );
                 return listPendingOrderData;
             }
         }
@@ -641,6 +652,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         //        uint256 quoteAmount;
         uint16 fee = _getFee();
 
+        console.log("[SpotDex][_openMarketOrder]_quantity", _quantity);
+        console.log("[SpotDex][_openMarketOrder]fee", fee);
+
         if (_side == Side.BUY) {
             (
                 state.mainSideOut,
@@ -652,9 +666,19 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
-            console.log("_mainSideOut", state.mainSideOut);
+            console.log(
+                "[SpotDex][_openMarketOrder]_mainSideOut",
+                state.mainSideOut
+            );
+            console.log(
+                "[SpotDex][_openMarketOrder]state.feeAmount",
+                state.feeAmount
+            );
 
-            console.log("flipSideOut Balance", state.flipSideOut);
+            console.log(
+                "[SpotDex][_openMarketOrder]flipSideOut ",
+                state.flipSideOut
+            );
 
             // deposit quote asset
             uint256 amountTransferred = _deposit(
@@ -663,9 +687,17 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 state.flipSideOut
             );
-            console.log("_amountTransferred", amountTransferred);
+            console.log(
+                "[SpotDex][_openMarketOrder]_amountTransferred: ",
+                amountTransferred
+            );
 
             require(amountTransferred == state.flipSideOut, "!RFI");
+
+            console.log(
+                "[SpotDex][_openMarketOrder] transfer to trader: _quantity - state.feeAmount  ",
+                _quantity - state.feeAmount
+            );
 
             // withdraw base asset
             // after BUY done, transfer base back to trader

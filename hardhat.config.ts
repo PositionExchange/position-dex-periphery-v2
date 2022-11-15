@@ -3,6 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-contract-sizer";
 import "@nomicfoundation/hardhat-chai-matchers";
 import '@openzeppelin/hardhat-upgrades';
+import "hardhat-log-remover";
 import "./scripts/deploy";
 
 const config: HardhatUserConfig = {
@@ -24,9 +25,9 @@ const config: HardhatUserConfig = {
       accounts: [],
     },
     bsc_testnet: {
-      url: "https://data-seed-prebsc-2-s3.binance.org:8545/",
+      url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
       chainId: 97,
-      accounts: [""]
+      accounts: []
     },
   },
   solidity: {

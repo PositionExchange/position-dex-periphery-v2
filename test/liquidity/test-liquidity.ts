@@ -135,16 +135,21 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
 
 
     await matching.initialize(
-        quote.address,
-        base.address,
-        BASIS_POINT,
-        BASIS_POINT**2,
-        1000,
-        100000,
-        30_000,
-        1,
-        deployer.address,
-        dexNFT.address);
+
+
+        {
+            quoteAsset: quote.address,
+            baseAsset: base.address,
+            basisPoint: BASIS_POINT,
+            maxFindingWordsIndex: 1000,
+            initialPip: 100000,
+            pipRange: 30_000,
+            tickSpace: 1,
+            owner: deployer.address,
+            positionLiquidity: dexNFT.address,
+            spotHouse: spotHouse.address,
+            feeShareAmm: 6000
+        });
 
     await spotHouse.initialize();
 
@@ -154,14 +159,14 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
-    await matching.setCounterParty02(spotHouse.address)
+    // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
     await  matching.approve()
     await  dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
-        matching.resetFeeShareAmm();
-        spotHouse.setFee(0);
+        await matching.resetFeeShareAmm();
+        await spotHouse.setFee(0);
     }
 
 
@@ -283,10 +288,24 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
-
     async openLimitOrder(pip: number, side: number, size: number,idSender : number, opts?: CallOptions) {
         console.group(`OpenLimitOrder`);
         await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
+        console.groupEnd();
+    }
+
+    async cancelLimitOrder(pip: number, orderId: SNumber, idSender : number, opts?: CallOptions) {
+
+        console.group(`CancelLimitOrder`);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[cancelLimitOrder] listOrderUser before: ", listOrderUser);
+        console.log("orderId, pip: ", orderId, pip)
+        await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, orderId, pip);
+        const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        console.log("[cancelLimitOrder] listOrderUser after: ", listOrderUserAf);
+        console.log("orderId, pip: ", orderId, pip)
         console.groupEnd();
     }
 
@@ -296,28 +315,37 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
+    async claimAsset( idSender : number) {
+        console.group(`ClaimAsset`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).claimAsset(this.mockMatching.address);
+        console.groupEnd();
+    }
+
 
 
     async expectPool( expectData: ExpectedPoolData) {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
 
+        console.log(" START expectPool : ", expectData);
         console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
         console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
         console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
+        console.log("QuoteReal", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
+        console.log("K", sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK));
         // console.log("MaxPip: ", Number(expectData.MaxPip), Number(poolData.sqrtMaxPip)*Number(poolData.sqrtMaxPip));
 
 
-        if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**9),Number(poolData.sqrtMaxPip), 0.01)).to.equal(true, "MaxPip");
-        if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**9),Number( poolData.sqrtMinPip), 0.01)).to.equal(true, "MinPip");
-        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.01)).to.equal(true, "FeeGrowthBase");
-        if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.01)).to.equal(true, "FeeGrowthQuote")
+        if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**12),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
+        if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**12),Number( poolData.sqrtMinPip), 0.001)).to.equal(true, "MinPip");
+        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase, 15), 0.01)).to.equal(true, "FeeGrowthBase");
+        if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote, 15), 0.001)).to.equal(true, "FeeGrowthQuote")
 
 
 
-        if (expectData.BaseReal) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.01)).to.equal(true, "BaseReal");
-        if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.01)).to.equal(true, "QuoteReal");
-        if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.01)).to.equal(true, "K");
+        if (expectData.BaseReal) expect(this.expectDataInRange(Number(expectData.BaseReal),fromWeiAndFormat(poolData.baseReal), 0.001)).to.equal(true, "BaseReal");
+        if (expectData.QuoteReal) expect(this.expectDataInRange(Number(expectData.QuoteReal),fromWeiAndFormat(poolData.quoteReal), 0.001)).to.equal(true, "QuoteReal");
+        if (expectData.K) expect(this.expectDataInRange(sqrt(Number(expectData.K)),fromWeiAndFormat(poolData.sqrtK), 0.001)).to.equal(true, "K");
 
     }
 
@@ -373,7 +401,7 @@ export class TestLiquidity {
             .getPendingOrderDetail(price, orderId)
         console.log("size: ", size,fromWeiAndFormat(size), _size );
 
-        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.01))
+        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
             .to
             .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
 
@@ -390,11 +418,12 @@ export class TestLiquidity {
 
             const liquidityInfo = await this.dexNFT.concentratedLiquidity(expectData.TokenId);
             console.log("liquidityInfo feeGrowthBase: ",fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase));
+            console.log("liquidityInfo feeGrowthQuote: ",fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote));
             console.log("liquidityInfo liquidity: ",fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity));
 
             if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
-            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.01)).to.equal(true, "FeeGrowthBase user");
-            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.01)).to.equal(true, "FeeGrowthQuote user");
+            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.001)).to.equal(true, "FeeGrowthBase user");
+            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.001)).to.equal(true, "FeeGrowthQuote user");
             // if (expectData.QuoteVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
             // if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
 
@@ -403,8 +432,8 @@ export class TestLiquidity {
         const balanceQuote = await this.quoteToken.balanceOf(this.users[expectData.Id].address);
         console.log("balance base and expect:" , fromWeiAndFormat(balanceBase.toString()), Number(expectData.BalanceBase));
         console.log("balance quote and expect:" , fromWeiAndFormat(balanceQuote.toString()), Number(expectData.BalanceQuote));
-        if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.01)).to.equal(true, "BalanceBase user");
-        if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.01)).to.equal(true, "BalanceQuote user");
+        if ( expectData.BalanceBase) expect(this.expectDataInRange( fromWeiAndFormat(await this.baseToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceBase) , 0.0001)).to.equal(true, "BalanceBase user");
+        if ( expectData.BalanceQuote)    expect(this.expectDataInRange( fromWeiAndFormat(await this.quoteToken.balanceOf(this.users[expectData.Id].address)) ,Number(expectData.BalanceQuote) , 0.0001)).to.equal(true, "BalanceQuote user");
 
     }
 

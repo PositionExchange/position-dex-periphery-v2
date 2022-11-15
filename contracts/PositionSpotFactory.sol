@@ -31,6 +31,7 @@ contract PositionSpotFactory is
     }
 
     address public templatePair;
+    uint32 public feeShareAmm;
 
     function createPairManager(
         address quoteAsset,
@@ -72,17 +73,28 @@ contract PositionSpotFactory is
 
         pair = Clones.cloneDeterministic(templatePair, salt);
 
+        // save
+        pathPairManagers[baseAsset][quoteAsset] = pair;
+
+        allPairManager[pair] = Pair({
+            BaseAsset: baseAsset,
+            QuoteAsset: quoteAsset
+        });
+
         IMatchingEngineAMM(pair).initialize(
-            IERC20(quoteAsset),
-            IERC20(baseAsset),
-            basisPoint,
-            baseBasisPoint,
-            maxFindingWordsIndex,
-            initialPip,
-            pipRange,
-            tickSpace,
-            creator,
-            positionLiquidity
+            IMatchingEngineAMM.InitParams({
+                quoteAsset: IERC20(quoteAsset),
+                baseAsset: IERC20(baseAsset),
+                basisPoint: basisPoint,
+                maxFindingWordsIndex: maxFindingWordsIndex,
+                initialPip: initialPip,
+                pipRange: pipRange,
+                tickSpace: tickSpace,
+                feeShareAmm: 6000,
+                owner: msg.sender,
+                positionLiquidity: positionLiquidity,
+                spotHouse: spotHouse
+            })
         );
 
         emit PairManagerInitialized(
@@ -152,6 +164,10 @@ contract PositionSpotFactory is
 
     function setSpotHouse(address newSpotHouse) external onlyOwner {
         spotHouse = newSpotHouse;
+    }
+
+    function setFeeShareAmm(uint32 _feeShareAmm) external onlyOwner {
+        feeShareAmm = _feeShareAmm;
     }
 
     function setPositionLiquidity(address _positionLiquidity)

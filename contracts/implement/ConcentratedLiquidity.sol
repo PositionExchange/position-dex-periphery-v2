@@ -19,7 +19,9 @@ import "../staking/PositionStakingDexManager.sol";
 abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     using UserLiquidity for UserLiquidity.Data;
 
-    mapping(uint256 => UserLiquidity.Data) public concentratedLiquidity;
+    mapping(uint256 => UserLiquidity.Data)
+        public
+        override concentratedLiquidity;
     IPositionStakingDexManager stakingManager;
 
     struct AddLiquidityParams {
@@ -29,19 +31,20 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         bool isBase;
     }
 
-    // 1.1 Add Liquidity
-    // 1.1.1 Add Liquidity for token
-    // 1.1.2 Add liquidity for native coin
-    // 1.2 Mint an NFT
-    // 1.3 Store Liquidity Info to storage
-    // 1.4 Transfer assets
-    // 1.5 Emit Event
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
         virtual
     {
         address user = _msgSender();
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] amountVirtual: ",
+            params.amountVirtual
+        );
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] isBase: ",
+            params.isBase
+        );
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
             user,
@@ -79,6 +82,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 : _resultAddLiquidity.baseAmountAdded
         );
 
+        console.log(
+            "[ConcentratedLiquidity][addLiquidity] amountModifySecondAsset: ",
+            amountModifySecondAsset
+        );
         require(
             params.isBase
                 ? amountModifySecondAsset >=
@@ -89,6 +96,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         uint256 nftTokenId = mint(user);
+        console.log("[ConcentratedLiquidity]added nftTokenId: ", nftTokenId);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             //            baseVirtual: _resultAddLiquidity.baseAmountAdded,
@@ -101,7 +109,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         });
 
         console.log(
-            "[ConcentratedLiquidity]addLiquidity: ",
+            "[ConcentratedLiquidity]added addLiquidity: ",
             concentratedLiquidity[nftTokenId].liquidity
         );
 
@@ -115,29 +123,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    function depositLiquidity(
-        IMatchingEngineAMM _pairManager,
-        address _payer,
-        SpotHouseStorage.Asset _asset,
-        uint256 _amount
-    ) internal virtual returns (uint256 amount) {}
-
-    function withdrawLiquidity(
-        IMatchingEngineAMM _pairManager,
-        address _recipient,
-        SpotHouseStorage.Asset _asset,
-        uint256 _amount
-    ) internal virtual {}
-
-    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
-        internal
-        view
-        virtual
-        returns (SpotFactoryStorage.Pair memory pair)
-    {}
-
-    function _getWBNBAddress() internal view virtual returns (address) {}
-
     // 1. Burn NFT
     // 2. Update liquidity data
     // 3. Transfer assets
@@ -149,9 +134,20 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
 
-        console.log("start burn: ", nftTokenId);
+        console.log(
+            "[ConcentratedLiquidity][removeLiquidity] user liquidity : ",
+            concentratedLiquidity[nftTokenId].liquidity
+        );
+
+        console.log(
+            "[ConcentratedLiquidity][removeLiquidity] start burn: ",
+            nftTokenId
+        );
         burn(nftTokenId);
-        console.log("end burn: ", nftTokenId);
+        console.log(
+            "[ConcentratedLiquidity][removeLiquidity] end burn: ",
+            nftTokenId
+        );
 
         delete concentratedLiquidity[nftTokenId];
 
@@ -172,7 +168,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         address user = _msgSender();
         console.log(
-            "base receive: ",
+            "[ConcentratedLiquidity][removeLiquidity] base receive: ",
             baseAmountRemoved + _collectFeeData.feeBaseAmount,
             _collectFeeData.feeBaseAmount
         );
@@ -182,12 +178,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             user,
             SpotHouseStorage.Asset.Base,
             baseAmountRemoved + _collectFeeData.feeBaseAmount
-        );
-
-        console.log(
-            "quote receive: ",
-            quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
-            _collectFeeData.feeQuoteAmount
         );
 
         withdrawLiquidity(
@@ -204,7 +194,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             quoteAmountRemoved,
             liquidityData.indexedPipRange
         );
-        console.log("end remove: ");
     }
 
     function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
@@ -214,9 +203,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
-
-        console.log("liquidityData.liquidity: ", liquidityData.liquidity);
-        console.log("liquidity: ", liquidity);
 
         //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
@@ -229,36 +215,48 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        console.log(" baseAmountRemoved: ", baseAmountRemoved);
-        console.log(" quoteAmountRemoved: ", quoteAmountRemoved);
+        console.log(
+            " [ConcentratedLiquidity][decreaseLiquidity] baseAmountRemoved: ",
+            baseAmountRemoved
+        );
+        console.log(
+            " [ConcentratedLiquidity][decreaseLiquidity] quoteAmountRemoved: ",
+            quoteAmountRemoved
+        );
         //        console.log(" liquidityData.baseVirtual: ", liquidityData.baseVirtual );
         //        console.log(" liquidityData.quoteVirtual: ", liquidityData.quoteVirtual );
 
-        concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity - liquidity,
-            //            liquidityData.baseVirtual - baseAmountRemoved,
-            //            liquidityData.quoteVirtual - quoteAmountRemoved,
-            liquidityData.indexedPipRange,
-            0,
-            0
+        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
+            liquidityData.pool,
+            liquidityData.feeGrowthBase,
+            liquidityData.feeGrowthQuote,
+            liquidityData.liquidity,
+            liquidityData.indexedPipRange
         );
 
-        // curretn 5
+        concentratedLiquidity[nftTokenId].updateLiquidity(
+            liquidityData.liquidity - liquidity,
+            liquidityData.indexedPipRange,
+            _collectFeeData.newFeeGrowthBase,
+            _collectFeeData.feeQuoteAmount
+        );
+
+        // current 5
         address user = _msgSender();
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Base,
-            baseAmountRemoved
+            baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
             SpotHouseStorage.Asset.Quote,
-            quoteAmountRemoved
+            quoteAmountRemoved + _collectFeeData.feeQuoteAmount
         );
-        _updateLiquidity(
+        _updateStakingLiquidity(
             user,
             nftTokenId,
             address(liquidityData.pool),
@@ -296,7 +294,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             )
         );
         console.log(
-            "increaseLiquidity; amountModify, isbase, nftTokenId: ",
+            "[ConcentratedLiquidity][increaseLiquidity] amountModify, isbase, nftTokenId: ",
             amountModify,
             isBase,
             nftTokenId
@@ -325,16 +323,36 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             "not support"
         );
 
-        concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity + uint128(_addLiquidity.liquidity),
-            //            liquidityData.baseVirtual + _addLiquidity.baseAmountAdded,
-            //            liquidityData.quoteVirtual + _addLiquidity.quoteAmountAdded,
-            liquidityData.indexedPipRange,
-            0,
-            0
+        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
+            liquidityData.pool,
+            liquidityData.feeGrowthBase,
+            liquidityData.feeGrowthQuote,
+            liquidityData.liquidity,
+            liquidityData.indexedPipRange
         );
 
-        _updateLiquidity(
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Base,
+            _collectFeeData.feeBaseAmount
+        );
+
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Quote,
+            _collectFeeData.feeQuoteAmount
+        );
+
+        concentratedLiquidity[nftTokenId].updateLiquidity(
+            liquidityData.liquidity + uint128(_addLiquidity.liquidity),
+            liquidityData.indexedPipRange,
+            _collectFeeData.newFeeGrowthBase,
+            _collectFeeData.newFeeGrowthQuote
+        );
+
+        _updateStakingLiquidity(
             user,
             nftTokenId,
             address(liquidityData.pool),
@@ -447,8 +465,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
             uint128(_addLiquidity.liquidity),
-            //            _addLiquidity.baseAmountAdded,
-            //            _addLiquidity.quoteAmountAdded,
             targetIndex,
             _addLiquidity.feeGrowthBase,
             _addLiquidity.feeGrowthBase
@@ -526,15 +542,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    function getDataNonfungibleToken(uint256 nftTokenId)
-        external
-        view
-        returns (UserLiquidity.Data memory)
-    {
-        UserLiquidity.Data memory LiquidityData;
-        return LiquidityData;
-    }
-
     function getAllDataTokens(uint256[] memory tokens)
         public
         view
@@ -567,6 +574,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 currentPrice;
         uint128 maxPip;
         uint128 minPip;
+        uint128 basicPoint;
     }
 
     function _addLiquidity(
@@ -588,6 +596,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             indexedPipRange,
             _getPipRange(pool)
         );
+
+        console.log("state.minPip, state.maxPip: ", state.minPip, state.maxPip);
 
         //        console.log("state.pipRange: ", state.pipRange);
         ////
@@ -636,6 +646,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
 
             if (isBase) {
+                uint128 baseReal = LiquidityMath.calculateBaseReal(
+                    state.maxPip,
+                    amountModify,
+                    state.currentPrice
+                );
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] baseReal: ",
+                    baseReal
+                );
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
                     .calculateQuoteVirtualFromBaseReal(
@@ -654,17 +674,41 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                     state.quoteAmountModify
                 );
             } else {
+                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
+                    state.minPip,
+                    amountModify,
+                    state.currentPrice
+                );
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] quoteRael, state.minPip, state.currentPrice: ",
+                    quoteReal,
+                    state.minPip,
+                    state.currentPrice
+                );
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] amountModify: ",
+                    amountModify
+                );
+
                 state.quoteAmountModify = amountModify;
-                state.baseAmountModify = LiquidityHelper
-                    .calculateBaseVirtualFromQuoteReal(
+                state.baseAmountModify =
+                    LiquidityHelper.calculateBaseVirtualFromQuoteReal(
                         LiquidityMath.calculateQuoteReal(
-                            uint128(Math.sqrt(uint256(state.minPip))),
+                            state.minPip,
                             amountModify,
-                            uint128(Math.sqrt(uint256(state.currentPrice)))
+                            state.currentPrice
                         ),
                         state.currentPrice,
                         state.maxPip
-                    );
+                    ) *
+                    uint128(pool.basisPoint());
+
+                console.log(
+                    "[ConcentratedLiquidity][_addLiquidity] state.baseAmountModify state.quoteAmountModify with quote: ",
+                    state.baseAmountModify,
+                    state.quoteAmountModify
+                );
             }
         }
 
@@ -690,12 +734,17 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 indexedPipRange: indexedPipRange
             })
         );
+        console.log(
+            "[ConcentratedLiquidity][_addLiquidity] result.liquidity: ",
+            result.liquidity
+        );
     }
 
     function _removeLiquidity(
         UserLiquidity.Data memory liquidityData,
         uint128 liquidity
     ) internal returns (uint128 baseAmount, uint128 quoteAmount) {
+        if (liquidity == 0) return (baseAmount, quoteAmount);
         return
             liquidityData.pool.removeLiquidity(
                 IAutoMarketMakerCore.RemoveLiquidity({
@@ -726,14 +775,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         ) = pool.liquidityInfo(indexedPipRange);
 
         _feeData.feeBaseAmount = Math.mulDiv(
-            _feeData.newFeeGrowthBase,
+            _feeData.newFeeGrowthBase - feeGrowthBase,
             liquidity,
-            FixedPoint128.BUFFER
+            FixedPoint128.Q_POW18
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
-            _feeData.newFeeGrowthQuote,
+            _feeData.newFeeGrowthQuote - feeGrowthQuote,
             liquidity,
-            FixedPoint128.BUFFER
+            FixedPoint128.Q_POW18
         );
     }
 
@@ -756,7 +805,30 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         returns (uint128)
     {}
 
-    function _updateLiquidity(
+    function depositLiquidity(
+        IMatchingEngineAMM _pairManager,
+        address _payer,
+        SpotHouseStorage.Asset _asset,
+        uint256 _amount
+    ) internal virtual returns (uint256 amount) {}
+
+    function withdrawLiquidity(
+        IMatchingEngineAMM _pairManager,
+        address _recipient,
+        SpotHouseStorage.Asset _asset,
+        uint256 _amount
+    ) internal virtual {}
+
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        virtual
+        returns (SpotFactoryStorage.Pair memory pair)
+    {}
+
+    function _getWBNBAddress() internal view virtual returns (address) {}
+
+    function _updateStakingLiquidity(
         address user,
         uint256 tokenId,
         address poolId,
@@ -772,13 +844,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 modifyType
             );
         }
-        //        stakingManager.updateLiquidity(
-        //            user,
-        //            tokenId,
-        //            poolId,
-        //            deltaLiquidityModify,
-        //            modifyType
-        //        );
     }
 
     function mint(address user) internal virtual returns (uint256 tokenId) {}

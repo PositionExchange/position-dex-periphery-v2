@@ -29,3 +29,17 @@ task('spot-factory-testnet', 'How is your girl friend?', async (taskArgs, hre) =
     configData.spotFactory = address
     await writeConfig('config-testnet.json', configData);
 })
+
+task('upgrade-spot-factory-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config-testnet.json');
+
+    const PositionSpotFactory = await hre.ethers.getContractFactory("PositionSpotFactory")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.spotFactory,
+        PositionSpotFactory
+    );
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionSpotFactory.sol:PositionSpotFactory");
+    await writeConfig('config-testnet.json', configData);
+})

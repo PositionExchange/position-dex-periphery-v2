@@ -1,4 +1,4 @@
-import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
+import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
 describe("LiquidityActionCase06-10", async function(){
     let testHelper: TestLiquidity
@@ -23,7 +23,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4 
       MaxPip: 149999 
@@ -62,7 +62,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 366.8658314300
       BaseVirtual: 0
       QuoteVirtual: 150
-      BaseReal: 0
+      BaseReal: 94.7246661108
       QuoteReal: 1420.8605191955
       IndexPipRange: 4 
       MaxPip: 149999 
@@ -88,7 +88,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4 
       MaxPip: 149999 
@@ -141,7 +141,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 122.2886104767
       BaseVirtual: 0
       QuoteVirtual: 50
-      BaseReal: 0
+      BaseReal: 31.5748887036
       QuoteReal: 473.6201730652
       IndexPipRange: 4
       MaxPip: 149999 
@@ -169,7 +169,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 220.1194988580
       BaseVirtual: 0
       QuoteVirtual: 90
-      BaseReal: 0
+      BaseReal: 56.8347996665
       QuoteReal: 852.5163115173
       IndexPipRange: 4
       MaxPip: 149999 
@@ -197,7 +197,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 342.4081093347
       BaseVirtual: 0
       QuoteVirtual: 140
-      BaseReal: 0
+      BaseReal: 88.4096883701
       QuoteReal: 1326.1364845825
       IndexPipRange: 4
       MaxPip: 149999 
@@ -344,7 +344,7 @@ describe("LiquidityActionCase06-10", async function(){
       Liquidity: 0
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0 
-      BalanceBase: 9896.2353555845
+      BalanceBase: 9986.5620499526
       BalanceQuote: 10178.0410043634
 `)
     })
