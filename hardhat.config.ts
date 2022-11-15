@@ -3,6 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-contract-sizer";
 import "@nomicfoundation/hardhat-chai-matchers";
 import '@openzeppelin/hardhat-upgrades';
+import "hardhat-log-remover";
 import "./scripts/deploy";
 
 const config: HardhatUserConfig = {
