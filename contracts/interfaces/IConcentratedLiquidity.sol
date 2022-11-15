@@ -16,17 +16,23 @@ interface IConcentratedLiquidity {
     // FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    // @dev get data of nft
-    function getDataNonfungibleToken(uint256 nftTokenId)
-        external
-        view
-        returns (UserLiquidity.Data memory);
-
     // @dev get all data of nft
     function getAllDataTokens(uint256[] memory tokens)
         external
         view
         returns (UserLiquidity.Data[] memory);
+
+    // @dev get data of nft
+    function concentratedLiquidity(uint256 tokenId)
+        external
+        view
+        returns (
+            uint128 liquidity,
+            uint32 indexedPipRange,
+            uint256 feeGrowthBase,
+            uint256 feeGrowthQuote,
+            IMatchingEngineAMM pool
+        );
 
     //------------------------------------------------------------------------------------------------------------------
     // EVENTS

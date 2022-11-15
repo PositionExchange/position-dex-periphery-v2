@@ -402,8 +402,7 @@ contract PositionStakingDexManager is
     }
 
     function _stake(uint256 _nftId, address _referrer) internal {
-        UserLiquidity.Data memory nftData = concentratedLiquidityNft
-            .getDataNonfungibleToken(_nftId);
+        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
         address poolAddress = address(nftData.pool);
         require(poolAddress != address(0x0), "invalid liquidity pool");
         uint256[] storage nftIds = userNft[msg.sender][poolAddress];
@@ -441,8 +440,7 @@ contract PositionStakingDexManager is
     }
 
     function _unstake(uint256 _nftId) internal {
-        UserLiquidity.Data memory nftData = concentratedLiquidityNft
-            .getDataNonfungibleToken(_nftId);
+        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
         address poolAddress = address(nftData.pool);
 
         PoolInfo storage pool = poolInfo[poolAddress];
@@ -703,5 +701,19 @@ contract PositionStakingDexManager is
         override
     {
         position.transfer(_to, _amount);
+    }
+
+    function _getConcentratedLiquidity(uint256 tokenId)
+        internal
+        view
+        returns (UserLiquidity.Data memory data)
+    {
+        (
+            data.liquidity,
+            data.indexedPipRange,
+            data.feeGrowthBase,
+            data.feeGrowthQuote,
+            data.pool
+        ) = concentratedLiquidityNft.concentratedLiquidity(tokenId);
     }
 }
