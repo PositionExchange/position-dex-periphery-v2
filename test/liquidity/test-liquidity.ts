@@ -312,6 +312,8 @@ export class TestLiquidity {
     async openMarketOrder( side: number, size: number, asset : String, idSender : number,opts?: CallOptions) {
         console.group(`OpenMarketOrder`);
         await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
+        const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[4].address);
+        console.log("[cancelLimitOrder] listOrderUser after: ", listOrderUserAf);
         console.groupEnd();
     }
 

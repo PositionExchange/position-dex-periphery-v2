@@ -133,7 +133,7 @@ describe("Integration-Case01-Case05", async function(){
 - S8: Expect
   User:
     Id: 1
-    BalanceBase: 1009.70000
+    BalanceBase: 1000
     BalanceQuote: 970
 - S9: Expect
   User:
@@ -242,7 +242,7 @@ describe("Integration-Case01-Case05", async function(){
     User:
       Id: 3
       BalanceBase: 1043.60362
-      BalanceQuote: 695.53658
+      BalanceQuote: 701.53648
 - S6: RemoveLiquidity
   Action:
     Id: 3
@@ -260,7 +260,7 @@ describe("Integration-Case01-Case05", async function(){
     User:
       Id: 3
       BalanceBase: 1043.63145
-      BalanceQuote: 724.00460
+      BalanceQuote: 730.00450
 - S7: Expect
   User:
     Id: 1
@@ -274,7 +274,7 @@ describe("Integration-Case01-Case05", async function(){
 - S9: Expect
   User:
     Id: 4
-    BalanceBase: 985.00000
+    BalanceBase: 984.00000
     BalanceQuote: 1000.00000`
         )
     })
@@ -351,7 +351,7 @@ describe("Integration-Case01-Case05", async function(){
       BaseVirtual: 30
       QuoteVirtual: 388.084615
       BalanceBase: 970.00000
-      BalanceQuote: 591.91538
+      BalanceQuote: 589.91538
 - S4: AddLiquidity
   Action:
     Id: 2
@@ -407,7 +407,7 @@ describe("Integration-Case01-Case05", async function(){
       BaseVirtual: 0
       QuoteVirtual: 140
       BalanceBase: 970.00000
-      BalanceQuote: 551.91538
+      BalanceQuote: 549.91538
 - S6: OpenMarket
   Action:
     Id: 3
