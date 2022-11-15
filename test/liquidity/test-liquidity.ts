@@ -290,9 +290,9 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
-    async cancelLimitOrder(pip: number, idx: number, idSender : number, opts?: CallOptions) {
+    async cancelLimitOrder(pip: number, orderId: number, idSender : number, opts?: CallOptions) {
         console.group(`CancelLimitOrder`);
-        await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, idx, pip);
+        await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, orderId, pip);
         console.groupEnd();
     }
 

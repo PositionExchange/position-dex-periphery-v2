@@ -30,6 +30,7 @@ export class YamlTestProcess {
 
         const amountVirtual = action.getProp("AmountVirtual")
         const tokenId = action.getProp("tokenId")
+        const orderId = action.getProp("orderId")
 
 
 
@@ -45,7 +46,8 @@ export class YamlTestProcess {
             liquidity,
             revert,
             amountVirtual,
-            tokenId
+            tokenId,
+            orderId
         }
     }
 
@@ -254,13 +256,13 @@ export class YamlTestProcess {
 
     }
 
-    // async CancelLimitOrder(stepData) {
-    //
-    //     const action = this.extractAction(stepData.getProp("Action"));
-    //     if (action) { await this.testHelper.openLimitOrder( action.price, action.side, action.quantity, action.id, {revert : action.revert} )}
-    //     const expectData = stepData.getProp("Expect");
-    //     if (expectData) await this.expectTest(expectData);
-    // }
+    async CancelLimitOrder(stepData) {
+
+        const action = this.extractAction(stepData.getProp("Action"));
+        if (action) { await this.testHelper.cancelLimitOrder(action.price, action.tokenId, action.id, {revert : action.revert} )}
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
+    }
 
     async Expect(stepData) {
         if (stepData) await this.expectTest(stepData);
