@@ -7,6 +7,7 @@ pragma solidity ^0.8.9;
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
+import "./libraries/helper/Errors.sol";
 import "../interfaces/IConcentratedLiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
@@ -386,7 +387,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         // TODO update liquidity in Farm/Pool
         require(
             targetIndex != liquidityData.indexedPipRange,
-            "IndexRange is not different!"
+            Errors.LQ_INDEX_RANGE_NOT_DIFF
         );
 
         UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
@@ -407,8 +408,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             // targetIndex > liquidityData.indexedPipRange
             // else Calculate based on QuoteAmount. Keep the amount of Quote
             targetIndex > liquidityData.indexedPipRange
-                ? baseAmountRemoved
-                : quoteAmountRemoved,
+                ? baseAmountRemoved + _collectFeeData.feeBaseAmount
+                : quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
             targetIndex > liquidityData.indexedPipRange ? true : false,
             targetIndex,
             liquidityData.pool
@@ -470,7 +471,15 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _addLiquidity.feeGrowthBase
         );
 
-        // TODO Update farm/pool
+        _updateStakingLiquidity(
+            user,
+            nftTokenId,
+            address(liquidityData.pool),
+            uint128(_addLiquidity.liquidity),
+            _addLiquidity.liquidity > liquidityData.liquidity
+                ? ModifyType.INCREASE
+                : ModifyType.DECREASE
+        );
     }
 
     function collectFee(uint256 nftTokenId) public virtual {
