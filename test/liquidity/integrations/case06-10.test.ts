@@ -1,6 +1,6 @@
 import {deployAndCreateRouterHelper, TestLiquidity} from "../test-liquidity";
 
-describe("Integration-Case01", async function() {
+describe("Integration-Case06-Case10", async function() {
     let testHelper: TestLiquidity
 
     beforeEach(async () => {
