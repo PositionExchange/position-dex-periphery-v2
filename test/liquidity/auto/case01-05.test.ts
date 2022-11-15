@@ -572,20 +572,12 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       TokenId: 1000002
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      Liquidity: 513.32195038742
-=======
       Liquidity: 513.32195
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
       FeeGrowthBase: 0 
       FeeGrowthQuote: 0
       BaseVirtual: 20
       QuoteVirtual: 258.7230767
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BalanceBase: 960.00000
-=======
       BalanceBase: 959.00000
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
       BalanceQuote: 741.27692
 - S4: AddLiquidity
   Action:
@@ -615,37 +607,6 @@ describe("Integration-Case01", async function(){
       QuoteVirtual: 0
       BalanceBase: 910.00000
       BalanceQuote: 870.63846
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-- S4: AddLiquidity
-  Action:
-    Id: 2
-    IndexPipRange: 2
-    Asset: base
-    AmountVirtual: 80
-  Expect:
-    Pool:
-      Liquidity: 1067.90393641912
-      BaseVirtual: 80
-      QuoteVirtual: 0
-      BaseReal: 435.96995642274
-      QuoteReal: 0
-      IndexPipRange: 2 
-      MaxPip: 89999 
-      MinPip: 60000 
-      FeeGrowthBase: 0 
-      FeeGrowthQuote: 0
-    User:
-      Id: 2
-      TokenId: 1000003
-      Liquidity: 1067.90393641912
-      FeeGrowthBase: 0 
-      FeeGrowthQuote: 0
-      BaseVirtual: 80
-      QuoteVirtual: 0
-      BalanceBase: 910.00000
-      BalanceQuote: 870.63846
-=======
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
 - S5: AddLiquidity
   Action:
     Id: 1
@@ -672,11 +633,7 @@ describe("Integration-Case01", async function(){
       FeeGrowthQuote: 0
       BaseVirtual: 40
       QuoteVirtual: 0
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BalanceBase: 920.00000
-=======
       BalanceBase: 919.00000
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
       BalanceQuote: 741.27692
 - S6: OpenMarket
   Action:
@@ -699,11 +656,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 3
       BalanceBase: 1133.48495
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BalanceQuote: 65.72152
-=======
       BalanceQuote: 68.68152
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
 - S7: RemoveLiquidity
   Action:
     Id: 2
@@ -713,13 +666,8 @@ describe("Integration-Case01", async function(){
       Liquidity: 513.32195038742
       BaseVirtual: 0
       QuoteVirtual: 368.26667532398
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BaseReal: 377.56105754889
-      QuoteReal: 3020.48846039108
-=======
       BaseReal: 209.56455508181
       QuoteReal: 1257.36637403534
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
       IndexPipRange: 1 
       MaxPip: 59999 
       MinPip: 30000
@@ -744,11 +692,7 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 919.36000
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BalanceQuote: 1128.94360
-=======
       BalanceQuote: 1109.54360
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
 - S9: RemoveLiquidity
   Action:
     Id: 2
@@ -784,9 +728,6 @@ describe("Integration-Case01", async function(){
     User:
       Id: 1
       BalanceBase: 930.68123
-<<<<<<< HEAD:test/liquidity/auto/case01-03.test.ts
-      BalanceQuote: 1331.27796`)
-=======
       BalanceQuote: 1311.87796`)
     })
     it ("Case #5", async () => {
@@ -955,6 +896,5 @@ describe("Integration-Case01", async function(){
       BalanceBase: 996.00096
       BalanceQuote: 1073.94145`
         )
->>>>>>> 2abbbfa0ccc46cebea74384bb1f82bd460751a5c:test/liquidity/auto/case01-05.test.ts
     })
 })
