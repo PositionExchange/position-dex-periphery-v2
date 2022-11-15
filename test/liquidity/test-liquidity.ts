@@ -296,6 +296,12 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
+    async claimAsset( idSender : number) {
+        console.group(`ClaimAsset`);
+        await  this.mockSpotHouse.connect(this.users[idSender]).claimAsset(this.mockMatching.address);
+        console.groupEnd();
+    }
+
 
 
     async expectPool( expectData: ExpectedPoolData) {
@@ -313,8 +319,8 @@ export class TestLiquidity {
 
         if (expectData.MaxPip !== undefined) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**12),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
         if (expectData.MinPip !== undefined) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**12),Number( poolData.sqrtMinPip), 0.001)).to.equal(true, "MinPip");
-        if (expectData.FeeGrowthBase !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase), 0.001)).to.equal(true, "FeeGrowthBase");
-        if (expectData.FeeGrowthQuote !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote), 0.001)).to.equal(true, "FeeGrowthQuote")
+        if (expectData.FeeGrowthBase !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase, 10), 0.001)).to.equal(true, "FeeGrowthBase");
+        if (expectData.FeeGrowthQuote !== undefined) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote, 10), 0.001)).to.equal(true, "FeeGrowthQuote")
 
 
         console.log("BaseReal: ", fromWeiAndFormat(poolData.baseReal), expectData.BaseReal);
