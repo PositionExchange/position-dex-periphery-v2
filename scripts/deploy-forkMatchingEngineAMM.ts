@@ -2,7 +2,6 @@ import {task} from "hardhat/config";
 import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 import {ForkMatchingEngineAMM} from "../typeChain";
-import {BASIS_POINT} from "../test/liquidity/test-liquidity";
 
 
 task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
@@ -46,7 +45,7 @@ task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (
         {
             quoteAsset: "0x33e36E5C0Ed6d2615E678c095A5Be582a1E01844",
             baseAsset: "0xe18dcB644768f7e511a0476ed366Ed8dE523793E",
-            basisPoint: BASIS_POINT,
+            basisPoint: 10000,
             maxFindingWordsIndex: 1000,
             initialPip: 100000,
             pipRange: 30_000,
