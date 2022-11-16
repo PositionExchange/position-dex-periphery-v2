@@ -142,7 +142,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint128[] memory _listPips = new uint128[](
             _listPendingLimitOrder.length
         );
+
         uint64[] memory _orderIds = new uint64[](_listPendingLimitOrder.length);
+
+        Side[] memory _listSides = new Side[](_listPendingLimitOrder.length);
 
         for (uint64 i = 0; i < _listPendingLimitOrder.length; i++) {
             PendingLimitOrder
@@ -154,6 +157,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
             _listPips[i] = _pendingLimitOrder.pip;
             _orderIds[i] = _pendingLimitOrder.orderId;
+            _listSides[i] = _pendingLimitOrder.isBuy ? Side.BUY : Side.SELL;
 
             (uint256 refundQuantity, uint256 partialFilled) = _pairManager
                 .cancelLimitOrder(
@@ -194,6 +198,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _pairManager,
             _listPips,
             _orderIds,
+            _listSides,
             _blockTimestamp()
         );
     }
@@ -268,6 +273,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _trader,
             _pairManager,
             _order.pip,
+            _order.isBuy ? Side.BUY : Side.SELL,
             _order.orderId,
             _blockTimestamp()
         );

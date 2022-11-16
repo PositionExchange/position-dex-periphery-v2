@@ -38,6 +38,7 @@ interface ISpotDex {
         address trader,
         IMatchingEngineAMM spotManager,
         uint128 pip,
+        SpotHouseStorage.Side _side,
         uint64 orderId,
         uint256 blockTimestamp
     );
@@ -47,6 +48,7 @@ interface ISpotDex {
         IMatchingEngineAMM spotManager,
         uint128[] pips,
         uint64[] orderIds,
+        SpotHouseStorage.Side[] sides,
         uint256 blockTimestamp
     );
 
