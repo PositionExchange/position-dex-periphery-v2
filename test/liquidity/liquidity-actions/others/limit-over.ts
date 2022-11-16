@@ -75,13 +75,13 @@ describe("LimitOver", async function(){
     Id: 2
     Asset: base
     Side: 1
-    Quantity: 120
+    Quantity: 121
     Price: 190000
   Expect:
     PendingOrder:
       OrderId: 1
       Price: 190000
-      Size : 120
+      Size : 121
       Side: 1
 - S4: OpenLimit
   Action:
@@ -118,9 +118,6 @@ describe("LimitOver", async function(){
       Id: 3
       BalanceBase: 10135.80000
       BalanceQuote: 7375.32720
-- S5.1: ClaimAsset
-  Action:
-    Id: 2
 - S6: AddLiquidity
   Action:
     Id: 1
@@ -154,21 +151,31 @@ describe("LimitOver", async function(){
     Id: 2
     Asset: base
     Side: 1
-    Quantity: 120
+    Quantity: 121
     Price: 220000
   Expect:
     PendingOrder:
       OrderId: 1
       Price: 220000
-      Size : 120
+      Size : 121
       Side: 1
+- S7.1: CancelLimitOrder
+  Action:
+    Id: 2
+    Price: 190000
+    OrderId: 0
+  Expect:
+    User:
+      Id: 2
+      BalanceBase: 9759.00000
+      BalanceQuote: 12211.60000
 - S8: OpenLimit
   Action:
     Id: 3
     Asset: base
     Side: 0
     Quantity: 10
-    Price: 200000
+    Price: 210000
   Expect:
     Pool: 
       Liquidity: 893.0705176328
@@ -183,7 +190,7 @@ describe("LimitOver", async function(){
       FeeGrowthQuote: 0
     User:
       Id: 3
-      BalanceBase: 10140.83216
+      BalanceBase: 10145.50000
       BalanceQuote: 7175.57783
 - S9: AddLiquidity
   Action:
@@ -223,11 +230,18 @@ describe("LimitOver", async function(){
   Expect:
     User:
       Id: 3
-      BalanceBase: 10257.23216
+      BalanceBase: 10261.90000
       BalanceQuote: 4535.57783
-- S10.1: ClaimAsset
+- S10.1: CancelLimitOrder
   Action:
     Id: 2
+    Price: 220000
+    OrderId: 1
+  Expect:
+    User:
+      Id: 2
+      BalanceBase: 9760.00000
+      BalanceQuote: 14772.40000
 - S11: AddLiquidity
   Action:
     Id: 1
@@ -302,11 +316,11 @@ describe("LimitOver", async function(){
       MaxPip: 239999 
       MinPip: 210000 
       FeeGrowthBase: 0
-      FeeGrowthQuote: 0.001986800857
+      FeeGrowthQuote: 0.001941121168
     User:
       Id: 2
       BalanceBase: 9748.94426
-      BalanceQuote: 10237.63405
+      BalanceQuote: 15002.90503
 - S14: OpenLimit
   Action:
     Id: 1
@@ -321,15 +335,15 @@ describe("LimitOver", async function(){
       QuoteVirtual: 338.4289412866
       BaseReal: 262.2205066572
       QuoteReal: 5375.5203864719
-      IndexPipRange: 7
+      IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
       FeeGrowthBase: 0.0002015518332
-      FeeGrowthQuote: 0.0009996700462
+      FeeGrowthQuote: 0.0009876998696
     User:
       Id: 1
       BalanceBase: 9937.00000
-      BalanceQuote: 9262.93323
+      BalanceQuote: 9260.97881
 - S15: OpenLimit
   Action:
     Id: 2
@@ -344,15 +358,15 @@ describe("LimitOver", async function(){
       QuoteVirtual: 272.4691379263
       BaseReal: 265.4780291556
       QuoteReal: 5309.5605831116
-      IndexPipRange: 7
+      IndexPipRange: 6
       MaxPip: 209999 
       MinPip: 180000 
       FeeGrowthBase: 0.0002015518332
-      FeeGrowthQuote: 0.002012112173
+      FeeGrowthQuote: 0.001987718923
     User:
       Id: 2
       BalanceBase: 9738.94426
-      BalanceQuote: 10399.83806
+      BalanceQuote: 15165.10904
 - S16: RemoveLiquidity
   Action:
     Id: 1
@@ -370,7 +384,7 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9952.52787
-      BalanceQuote: 9265.12226
+      BalanceQuote: 9263.11752
 - S17: OpenLimit
   Action:
     Id: 2
@@ -389,11 +403,11 @@ describe("LimitOver", async function(){
       MaxPip: 179999 
       MinPip: 150000 
       FeeGrowthBase: 0.000188641203
-      FeeGrowthQuote: 0.002213785712
+      FeeGrowthQuote: 0.002151418975
     User:
       Id: 2
       BalanceBase: 9711.54444
-      BalanceQuote: 10900.40360
+      BalanceQuote: 15665.67458
 - S18: AddLiquidity
   Action:
     Id: 1
@@ -417,11 +431,11 @@ describe("LimitOver", async function(){
       TokenId: 1000007
       Liquidity: 709.5560294933
       FeeGrowthBase: 0
-      FeeGrowthQuote: 0.001986800857
+      FeeGrowthQuote: 0.001941121168
       BaseVirtual: 10
       QuoteVirtual: 0
       BalanceBase: 9942.52787
-      BalanceQuote: 9265.12226
+      BalanceQuote: 9263.11752
 - S19: RemoveLiquidity
   Action:
     Id: 1
@@ -439,7 +453,7 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9958.05574
-      BalanceQuote: 9267.31130
+      BalanceQuote: 9265.25622
 - S20: AddLiquidity
   Action:
     Id: 1
@@ -457,17 +471,17 @@ describe("LimitOver", async function(){
       MaxPip: 209999 
       MinPip: 180000 
       FeeGrowthBase: 0.0002015518332
-      FeeGrowthQuote: 0.006371482183
+      FeeGrowthQuote: 0.006118633745
     User:
       Id: 1
       TokenId: 1000008
       Liquidity: 571.9563861406
       FeeGrowthBase: 0.0002015518332
-      FeeGrowthQuote: 0.006371482183
+      FeeGrowthQuote: 0.006118633745
       BaseVirtual: 10
       QuoteVirtual: 0
       BalanceBase: 9948.05574
-      BalanceQuote: 9267.31130
+      BalanceQuote: 9265.25622
 - S21: RemoveLiquidity
   Action:
     Id: 1
@@ -485,7 +499,7 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9954.75546
-      BalanceQuote: 9508.08845
+      BalanceQuote: 9505.97387
 - S22: RemoveLiquidity
   Action:
     Id: 1
@@ -494,7 +508,7 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9961.45518
-      BalanceQuote: 9748.86560
+      BalanceQuote: 9746.69151
 - S23: RemoveLiquidity
   Action:
     Id: 1
@@ -512,7 +526,7 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9977.24949
-      BalanceQuote: 9754.55132
+      BalanceQuote: 9752.15588
 - S24: OpenMarket
   Action:
     Id: 3
@@ -530,10 +544,10 @@ describe("LimitOver", async function(){
       MaxPip: 209999 
       MinPip: 180000 
       FeeGrowthBase: 0.0003267299244
-      FeeGrowthQuote: 0.006371482183
+      FeeGrowthQuote: 0.006118633745
     User:
       Id: 3
-      BalanceBase: 10263.07488
+      BalanceBase: 10267.74273
       BalanceQuote: 4423.85990
 - S25: RemoveLiquidity
   Action:
@@ -552,16 +566,16 @@ describe("LimitOver", async function(){
     User:
       Id: 1
       BalanceBase: 9980.38392
-      BalanceQuote: 9794.36909
+      BalanceQuote: 9791.90074
 - S26: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 10000038
+    TokenId: 1000008
   Expect:
     User:
       Id: 1
       BalanceBase: 9986.47794
-      BalanceQuote: 9868.14216
+      BalanceQuote: 9865.67381
 `)
     })
 })
