@@ -7,7 +7,7 @@ pragma solidity ^0.8.9;
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
-import "./libraries/helper/Errors.sol";
+import "../libraries/helper/Errors.sol";
 import "../interfaces/IConcentratedLiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
@@ -197,84 +197,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
-        public
-        virtual
-    {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
-            nftTokenId
-        ];
-
-        //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
-
-        if (liquidity > liquidityData.liquidity) {
-            liquidity = liquidityData.liquidity;
-        }
-
-        (
-            uint128 baseAmountRemoved,
-            uint128 quoteAmountRemoved
-        ) = _removeLiquidity(liquidityData, liquidity);
-
-        console.log(
-            " [ConcentratedLiquidity][decreaseLiquidity] baseAmountRemoved: ",
-            baseAmountRemoved
-        );
-        console.log(
-            " [ConcentratedLiquidity][decreaseLiquidity] quoteAmountRemoved: ",
-            quoteAmountRemoved
-        );
-        //        console.log(" liquidityData.baseVirtual: ", liquidityData.baseVirtual );
-        //        console.log(" liquidityData.quoteVirtual: ", liquidityData.quoteVirtual );
-
-        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
-        );
-
-        concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity - liquidity,
-            liquidityData.indexedPipRange,
-            _collectFeeData.newFeeGrowthBase,
-            _collectFeeData.feeQuoteAmount
-        );
-
-        // current 5
-        address user = _msgSender();
-        withdrawLiquidity(
-            liquidityData.pool,
-            user,
-            SpotHouseStorage.Asset.Base,
-            baseAmountRemoved + _collectFeeData.feeBaseAmount
-        );
-
-        withdrawLiquidity(
-            liquidityData.pool,
-            user,
-            SpotHouseStorage.Asset.Quote,
-            quoteAmountRemoved + _collectFeeData.feeQuoteAmount
-        );
-        _updateStakingLiquidity(
-            user,
-            nftTokenId,
-            address(liquidityData.pool),
-            liquidity,
-            ModifyType.DECREASE
-        );
-
-        emit LiquidityModified(
-            user,
-            address(liquidityData.pool),
-            baseAmountRemoved,
-            quoteAmountRemoved,
-            ModifyType.DECREASE,
-            liquidityData.indexedPipRange
-        );
-    }
-
     function increaseLiquidity(
         uint256 nftTokenId,
         uint128 amountModify,
@@ -371,6 +293,84 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
+        public
+        virtual
+    {
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
+            nftTokenId
+        ];
+
+        //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
+
+        if (liquidity > liquidityData.liquidity) {
+            liquidity = liquidityData.liquidity;
+        }
+
+        (
+            uint128 baseAmountRemoved,
+            uint128 quoteAmountRemoved
+        ) = _removeLiquidity(liquidityData, liquidity);
+
+        console.log(
+            " [ConcentratedLiquidity][decreaseLiquidity] baseAmountRemoved: ",
+            baseAmountRemoved
+        );
+        console.log(
+            " [ConcentratedLiquidity][decreaseLiquidity] quoteAmountRemoved: ",
+            quoteAmountRemoved
+        );
+        //        console.log(" liquidityData.baseVirtual: ", liquidityData.baseVirtual );
+        //        console.log(" liquidityData.quoteVirtual: ", liquidityData.quoteVirtual );
+
+        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
+            liquidityData.pool,
+            liquidityData.feeGrowthBase,
+            liquidityData.feeGrowthQuote,
+            liquidityData.liquidity,
+            liquidityData.indexedPipRange
+        );
+
+        concentratedLiquidity[nftTokenId].updateLiquidity(
+            liquidityData.liquidity - liquidity,
+            liquidityData.indexedPipRange,
+            _collectFeeData.newFeeGrowthBase,
+            _collectFeeData.feeQuoteAmount
+        );
+
+        // current 5
+        address user = _msgSender();
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Base,
+            baseAmountRemoved + _collectFeeData.feeBaseAmount
+        );
+
+        withdrawLiquidity(
+            liquidityData.pool,
+            user,
+            SpotHouseStorage.Asset.Quote,
+            quoteAmountRemoved + _collectFeeData.feeQuoteAmount
+        );
+        _updateStakingLiquidity(
+            user,
+            nftTokenId,
+            address(liquidityData.pool),
+            liquidity,
+            ModifyType.DECREASE
+        );
+
+        emit LiquidityModified(
+            user,
+            address(liquidityData.pool),
+            baseAmountRemoved,
+            quoteAmountRemoved,
+            ModifyType.DECREASE,
+            liquidityData.indexedPipRange
+        );
+    }
+
     function shiftRange(uint256 nftTokenId, uint32 targetIndex)
         public
         payable
@@ -408,15 +408,15 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             // targetIndex > liquidityData.indexedPipRange
             // else Calculate based on QuoteAmount. Keep the amount of Quote
             targetIndex > liquidityData.indexedPipRange
-                ? baseAmountRemoved + _collectFeeData.feeBaseAmount
-                : quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
+                ? baseAmountRemoved + uint128(_collectFeeData.feeBaseAmount)
+                : quoteAmountRemoved + uint128(_collectFeeData.feeQuoteAmount),
             targetIndex > liquidityData.indexedPipRange ? true : false,
             targetIndex,
             liquidityData.pool
         );
 
+        address user = _msgSender();
         {
-            address user = _msgSender();
             if (
                 quoteAmountRemoved + _collectFeeData.feeQuoteAmount <
                 _addLiquidity.quoteAmountAdded
@@ -479,6 +479,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _addLiquidity.liquidity > liquidityData.liquidity
                 ? ModifyType.INCREASE
                 : ModifyType.DECREASE
+        );
+
+        emit LiquidityShiftRange(
+            user,
+            address(liquidityData.pool),
+            liquidityData.indexedPipRange,
+            baseAmountRemoved,
+            quoteAmountRemoved,
+            targetIndex,
+            uint128(_addLiquidity.liquidity),
+            _addLiquidity.baseAmountAdded,
+            _addLiquidity.quoteAmountAdded
         );
     }
 
