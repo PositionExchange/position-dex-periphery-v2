@@ -64,6 +64,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128(_addedAmountVirtual),
             params.isBase,
             params.indexedPipRange,
+            _getCurrentIndexPipRange(params.pool),
             params.pool
         );
 
@@ -223,10 +224,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         );
 
-        ResultAddLiquidity memory _addLiquidity = _addLiquidity(
+        ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
             amountModify,
             isBase,
             liquidityData.indexedPipRange,
+            _getCurrentIndexPipRange(liquidityData.pool),
             liquidityData.pool
         );
 
@@ -235,14 +237,16 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             user,
             isBase ? SpotHouseStorage.Asset.Quote : SpotHouseStorage.Asset.Base,
             isBase
-                ? _addLiquidity.quoteAmountAdded
-                : _addLiquidity.baseAmountAdded
+                ? _resultAddLiquidity.quoteAmountAdded
+                : _resultAddLiquidity.baseAmountAdded
         );
 
         require(
             isBase
-                ? amountModifySecondAsset >= _addLiquidity.quoteAmountAdded
-                : amountModifySecondAsset >= _addLiquidity.baseAmountAdded,
+                ? amountModifySecondAsset >=
+                    _resultAddLiquidity.quoteAmountAdded
+                : amountModifySecondAsset >=
+                    _resultAddLiquidity.baseAmountAdded,
             "not support"
         );
 
@@ -269,7 +273,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity + uint128(_addLiquidity.liquidity),
+            liquidityData.liquidity + uint128(_resultAddLiquidity.liquidity),
             liquidityData.indexedPipRange,
             _collectFeeData.newFeeGrowthBase,
             _collectFeeData.newFeeGrowthQuote
@@ -279,15 +283,15 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             user,
             nftTokenId,
             address(liquidityData.pool),
-            uint128(_addLiquidity.liquidity),
+            uint128(_resultAddLiquidity.liquidity),
             ModifyType.INCREASE
         );
 
         emit LiquidityModified(
             user,
             address(liquidityData.pool),
-            _addLiquidity.baseAmountAdded,
-            _addLiquidity.quoteAmountAdded,
+            _resultAddLiquidity.baseAmountAdded,
+            _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange
         );
@@ -371,126 +375,188 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    function shiftRange(uint256 nftTokenId, uint32 targetIndex)
-        public
-        payable
-        virtual
-    {
-        UserLiquidity.Data memory liquidityData = concentratedLiquidity[
-            nftTokenId
-        ];
-        // 1. Check amount Base, Quote when removing liquidity
-        // 2. Check base, quote Amount of new liquidity range
-        // 3. Update liquidity info
-        // 4. Transfer token if needed
-        // 5. Push event
-        // TODO update liquidity in Farm/Pool
+    struct ShiftRangeState {
+        UserLiquidity.Data liquidityData;
+        UserLiquidity.CollectFeeData collectFeeData;
+        ResultAddLiquidity resultAddLiquidity;
+        address user;
+        uint256 currentIndexedPipRange;
+        uint128 baseReceiveEstimate;
+        uint128 quoteReceiveEstimate;
+    }
+
+    function shiftRange(
+        uint256 nftTokenId,
+        uint32 targetIndex,
+        uint128 amountNeeded,
+        bool isBase
+    ) public payable virtual {
+        ShiftRangeState memory state;
+
+        state.liquidityData = concentratedLiquidity[nftTokenId];
+
+        state.currentIndexedPipRange = _getCurrentIndexPipRange(
+            state.liquidityData.pool
+        );
+
         require(
-            targetIndex != liquidityData.indexedPipRange,
+            targetIndex != state.liquidityData.indexedPipRange,
             Errors.LQ_INDEX_RANGE_NOT_DIFF
         );
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
+        state.collectFeeData = _collectFee(
+            state.liquidityData.pool,
+            state.liquidityData.feeGrowthBase,
+            state.liquidityData.feeGrowthQuote,
+            state.liquidityData.liquidity,
+            state.liquidityData.indexedPipRange
+        );
+        console.log(
+            "[shiftRange]  _collectFeeData.feeBaseAmount, _collectFeeData.feeQuoteAmount :",
+            state.collectFeeData.feeBaseAmount,
+            state.collectFeeData.feeQuoteAmount
         );
 
         (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved
-        ) = _removeLiquidity(liquidityData, liquidityData.liquidity);
+        ) = _removeLiquidity(
+                state.liquidityData,
+                state.liquidityData.liquidity
+            );
+        console.log(
+            "[shiftRange] baseAmountRemoved, quoteAmountRemoved :",
+            baseAmountRemoved,
+            quoteAmountRemoved
+        );
 
-        ResultAddLiquidity memory _addLiquidity = _addLiquidity(
+        state.baseReceiveEstimate =
+            baseAmountRemoved +
+            uint128(state.collectFeeData.feeBaseAmount);
+        state.quoteReceiveEstimate =
+            quoteAmountRemoved +
+            uint128(state.collectFeeData.feeQuoteAmount);
+
+        if (isBase) {
+            state.baseReceiveEstimate += amountNeeded;
+        } else {
+            state.quoteReceiveEstimate += amountNeeded;
+        }
+        if (
+            (targetIndex > state.currentIndexedPipRange &&
+                state.baseReceiveEstimate == 0) ||
+            (targetIndex < state.currentIndexedPipRange &&
+                state.quoteReceiveEstimate == 0)
+        ) {
+            revert("Invalid amount");
+        }
+
+        state.resultAddLiquidity = _addLiquidity(
             // calculate based on BaseAmount. Keep the amount of Base if
             // targetIndex > liquidityData.indexedPipRange
             // else Calculate based on QuoteAmount. Keep the amount of Quote
-            targetIndex > liquidityData.indexedPipRange
-                ? baseAmountRemoved + uint128(_collectFeeData.feeBaseAmount)
-                : quoteAmountRemoved + uint128(_collectFeeData.feeQuoteAmount),
-            targetIndex > liquidityData.indexedPipRange ? true : false,
+            isBase ? state.baseReceiveEstimate : state.quoteReceiveEstimate,
+            isBase,
             targetIndex,
-            liquidityData.pool
+            state.currentIndexedPipRange,
+            state.liquidityData.pool
         );
 
-        address user = _msgSender();
+        console.log(
+            "[shiftRange] state.resultAddLiquidity.baseAmountAdded, state.resultAddLiquidity.quoteAmountAdded :",
+            state.resultAddLiquidity.baseAmountAdded,
+            state.resultAddLiquidity.quoteAmountAdded
+        );
+
+        state.user = _msgSender();
         {
+            console.log(
+                "< compare 1",
+                quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
+                    state.resultAddLiquidity.quoteAmountAdded
+            );
             if (
-                quoteAmountRemoved + _collectFeeData.feeQuoteAmount <
-                _addLiquidity.quoteAmountAdded
+                quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
+                state.resultAddLiquidity.quoteAmountAdded
             ) {
+                console.log("depositLiquidity");
+
                 depositLiquidity(
-                    liquidityData.pool,
-                    user,
+                    state.liquidityData.pool,
+                    state.user,
                     SpotHouseStorage.Asset.Quote,
-                    _addLiquidity.quoteAmountAdded -
+                    state.resultAddLiquidity.quoteAmountAdded -
                         quoteAmountRemoved -
-                        _collectFeeData.feeQuoteAmount
+                        state.collectFeeData.feeQuoteAmount
                 );
             } else {
+                console.log("withdrawLiquidity");
                 withdrawLiquidity(
-                    liquidityData.pool,
-                    user,
+                    state.liquidityData.pool,
+                    state.user,
                     SpotHouseStorage.Asset.Quote,
                     quoteAmountRemoved +
-                        _collectFeeData.feeQuoteAmount -
-                        _addLiquidity.quoteAmountAdded
+                        state.collectFeeData.feeQuoteAmount -
+                        state.resultAddLiquidity.quoteAmountAdded
                 );
             }
 
+            console.log(
+                "< compare 2",
+                quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
+                    state.resultAddLiquidity.quoteAmountAdded
+            );
             if (
-                baseAmountRemoved + _collectFeeData.feeBaseAmount <
-                _addLiquidity.baseAmountAdded
+                baseAmountRemoved + state.collectFeeData.feeBaseAmount <
+                state.resultAddLiquidity.baseAmountAdded
             ) {
                 depositLiquidity(
-                    liquidityData.pool,
-                    user,
+                    state.liquidityData.pool,
+                    state.user,
                     SpotHouseStorage.Asset.Base,
-                    _addLiquidity.baseAmountAdded -
+                    state.resultAddLiquidity.baseAmountAdded -
                         baseAmountRemoved -
-                        _collectFeeData.feeBaseAmount
+                        state.collectFeeData.feeBaseAmount
                 );
             } else {
                 withdrawLiquidity(
-                    liquidityData.pool,
-                    user,
+                    state.liquidityData.pool,
+                    state.user,
                     SpotHouseStorage.Asset.Base,
                     baseAmountRemoved +
-                        _collectFeeData.feeBaseAmount -
-                        _addLiquidity.baseAmountAdded
+                        state.collectFeeData.feeBaseAmount -
+                        state.resultAddLiquidity.baseAmountAdded
                 );
             }
         }
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
-            uint128(_addLiquidity.liquidity),
+            uint128(state.resultAddLiquidity.liquidity),
             targetIndex,
-            _addLiquidity.feeGrowthBase,
-            _addLiquidity.feeGrowthBase
+            state.resultAddLiquidity.feeGrowthBase,
+            state.resultAddLiquidity.feeGrowthBase
         );
 
         _updateStakingLiquidity(
-            user,
+            state.user,
             nftTokenId,
-            address(liquidityData.pool),
-            uint128(_addLiquidity.liquidity),
-            _addLiquidity.liquidity > liquidityData.liquidity
+            address(state.liquidityData.pool),
+            uint128(state.resultAddLiquidity.liquidity),
+            state.resultAddLiquidity.liquidity > state.liquidityData.liquidity
                 ? ModifyType.INCREASE
                 : ModifyType.DECREASE
         );
 
         emit LiquidityShiftRange(
-            user,
-            address(liquidityData.pool),
-            liquidityData.indexedPipRange,
+            state.user,
+            address(state.liquidityData.pool),
+            state.liquidityData.indexedPipRange,
             baseAmountRemoved,
             quoteAmountRemoved,
             targetIndex,
-            uint128(_addLiquidity.liquidity),
-            _addLiquidity.baseAmountAdded,
-            _addLiquidity.quoteAmountAdded
+            uint128(state.resultAddLiquidity.liquidity),
+            state.resultAddLiquidity.baseAmountAdded,
+            state.resultAddLiquidity.quoteAmountAdded
         );
     }
 
@@ -602,6 +668,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 amountModify,
         bool isBase,
         uint32 indexedPipRange,
+        uint256 currentIndexedPipRange,
         IMatchingEngineAMM pool
     ) internal returns (ResultAddLiquidity memory result) {
         console.log(
@@ -610,7 +677,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         State memory state;
-        state.currentIndexedPipRange = _getCurrentIndexPipRange(pool);
+        state.currentIndexedPipRange = currentIndexedPipRange;
         state.currentPrice = pool.getCurrentPip();
 
         (state.minPip, state.maxPip) = LiquidityMath.calculatePipRange(

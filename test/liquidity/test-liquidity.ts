@@ -334,13 +334,21 @@ export class TestLiquidity {
     }
 
 
+    async  shiftRange(tokenId : number,targetIndexPipRange :  number, amountVirtual : number, asset : string,  idSender: number){
+        console.group(`ShiftRange`);
+        await  this.dexNFT.connect(this.users[idSender]).shiftRange(tokenId, targetIndexPipRange, toWei(amountVirtual), asset.toLowerCase() === "base");
+        console.groupEnd();
+
+    }
+
+
 
     async expectPool( expectData: ExpectedPoolData) {
 
         const poolData = await this.mockMatching.liquidityInfo(expectData.IndexPipRange);
 
         console.log(" START expectPool : ", expectData);
-        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),poolData.feeGrowthQuote.toString());
+        console.log("FeeGrowthQuote: ", Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote.toString()));
         console.log("FeeGrowthBase: ", Number(expectData.FeeGrowthBase), fromWeiAndFormat(poolData.feeGrowthBase));
         console.log("BaseReal: ", Number(expectData.BaseReal), fromWeiAndFormat(poolData.baseReal));
         console.log("QuoteReal", Number(expectData.QuoteReal), fromWeiAndFormat(poolData.quoteReal));
