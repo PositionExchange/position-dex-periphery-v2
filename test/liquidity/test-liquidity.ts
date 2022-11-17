@@ -305,7 +305,7 @@ export class TestLiquidity {
     async cancelLimitOrder(pip: number, orderId: SNumber, idSender : number, opts?: CallOptions) {
 
         console.group(`CancelLimitOrder`);
-        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[2].address);
         console.log("[cancelLimitOrder] listOrderUser before: ", listOrderUser);
         console.log("orderId, pip: ", orderId, pip)
         await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, orderId, pip);
@@ -326,6 +326,8 @@ export class TestLiquidity {
         const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
         console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
         console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[removeLiquidity] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
@@ -411,8 +413,6 @@ export class TestLiquidity {
 
     async setPrice(price: number | string) {
     }
-
-
 
 
     async  expectPending(orderId : number, price : number, side : any, _size : number){
