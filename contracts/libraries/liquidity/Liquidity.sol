@@ -31,11 +31,7 @@ library UserLiquidity {
     ) internal {
         self.liquidity = liquidity;
         self.indexedPipRange = indexedPipRange;
-        if (feeGrowthBase != 0) {
-            self.feeGrowthBase = feeGrowthBase;
-        }
-        if (feeGrowthQuote != 0) {
-            self.feeGrowthQuote = feeGrowthQuote;
-        }
+        self.feeGrowthBase = feeGrowthBase;
+        self.feeGrowthQuote = feeGrowthQuote;
     }
 }

@@ -182,6 +182,12 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
+        console.log(
+            "[ConcentratedLiquidity][removeLiquidity] quote receive: ",
+            quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
+            _collectFeeData.feeQuoteAmount
+        );
+
         withdrawLiquidity(
             liquidityData.pool,
             user,
@@ -258,6 +264,11 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.indexedPipRange
         );
 
+        console.log(
+            "_collectFeeData.feeBaseAmount: ",
+            _collectFeeData.feeBaseAmount
+        );
+
         withdrawLiquidity(
             liquidityData.pool,
             user,
@@ -265,6 +276,10 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _collectFeeData.feeBaseAmount
         );
 
+        console.log(
+            "_collectFeeData.feeQuoteAmount: ",
+            _collectFeeData.feeQuoteAmount
+        );
         withdrawLiquidity(
             liquidityData.pool,
             user,
@@ -530,11 +545,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             }
         }
 
+        console.log(
+            "targetIndex, state.resultAddLiquidity.feeGrowthBase, state.resultAddLiquidity.feeGrowthQuote: ",
+            targetIndex,
+            state.resultAddLiquidity.feeGrowthBase,
+            state.resultAddLiquidity.feeGrowthQuote
+        );
+        console.log("nftTokenId, targetIndex: ", nftTokenId, targetIndex);
         concentratedLiquidity[nftTokenId].updateLiquidity(
             uint128(state.resultAddLiquidity.liquidity),
             targetIndex,
             state.resultAddLiquidity.feeGrowthBase,
-            state.resultAddLiquidity.feeGrowthBase
+            state.resultAddLiquidity.feeGrowthQuote
         );
 
         _updateStakingLiquidity(
@@ -861,6 +883,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _feeData.newFeeGrowthQuote,
 
         ) = pool.liquidityInfo(indexedPipRange);
+        console.log(
+            "_feeData.newFeeGrowthBase, feeGrowthBase, indexedPipRange: ",
+            _feeData.newFeeGrowthBase,
+            feeGrowthBase,
+            indexedPipRange
+        );
+        console.log(
+            "_feeData.newFeeGrowthQuote, feeGrowthQuote, indexedPipRange: ",
+            _feeData.newFeeGrowthQuote,
+            feeGrowthQuote,
+            indexedPipRange
+        );
 
         _feeData.feeBaseAmount = Math.mulDiv(
             _feeData.newFeeGrowthBase - feeGrowthBase,
