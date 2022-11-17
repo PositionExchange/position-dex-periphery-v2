@@ -1,10 +1,11 @@
 import {expect, use} from "chai";
 import YAML from "js-yaml";
     import {
-        ForkMatchingEngineAMM,
+    ForkMatchingEngineAMM, MockReflexToken__factory,
     MockSpotHouse,
     MockToken,
-        PositionConcentratedLiquidity,
+        MockReflexToken,
+    PositionConcentratedLiquidity,
     PositionSpotFactory
 } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
@@ -21,7 +22,7 @@ import {
 import {BigNumber, ethers} from "ethers";
 import {YamlTestProcess} from "./yaml-test-process";
 import Decimal from "decimal.js";
-import {deployMockToken} from "../utils/mock";
+import {deployMockReflexToken, deployMockToken} from "../utils/mock";
 import {EventFragment} from "@ethersproject/abi";
 
 // import {waffle} from "hardhat";
@@ -112,12 +113,12 @@ function roundNumber(n, decimal = 6){
 }
 
 // useWBNB: 0 is not use, 1 is WBNB Quote, 2 is WBNB Base
-export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee = true) {
+export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee = true, isRFI = false) {
     let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
     let quote : MockToken;
-    let base : MockToken;
+    let base : any;
     let testHelper: TestLiquidity;
     let dexNFT : PositionConcentratedLiquidity;
 
@@ -131,12 +132,13 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     dexNFT = await deployContract("PositionConcentratedLiquidity", deployer );
 
     quote = await deployMockToken("Quote");
-    base = await deployMockToken("Base");
-
+    if (isRFI) {
+        base = await deployMockReflexToken("Base");
+    } else {
+        base = await deployMockToken("Base");
+    }
 
     await matching.initialize(
-
-
         {
             quoteAsset: quote.address,
             baseAsset: base.address,
@@ -270,6 +272,8 @@ export class TestLiquidity {
     async removeLiquidity(tokenId: SNumber,  idSender : number, opts: CallOptions = {}) {
         console.group(`RemoveLiquidity`);
         await this.dexNFT.connect(this.users[idSender]).removeLiquidity(tokenId)
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[removeLiquidity] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
@@ -306,6 +310,9 @@ export class TestLiquidity {
         const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
         console.log("[cancelLimitOrder] listOrderUser after: ", listOrderUserAf);
         console.log("orderId, pip: ", orderId, pip)
+        const balanceBase = await this.baseToken.balanceOf(this.users[2].address);
+        const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
+        console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
         console.groupEnd();
     }
 
@@ -313,7 +320,10 @@ export class TestLiquidity {
         console.group(`OpenMarketOrder`);
         await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
         const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[4].address);
-        console.log("[cancelLimitOrder] listOrderUser after: ", listOrderUserAf);
+        const balanceBase = await this.baseToken.balanceOf(this.users[2].address);
+        const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
+        console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
+        console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
         console.groupEnd();
     }
 
@@ -340,7 +350,7 @@ export class TestLiquidity {
 
         if (expectData.MaxPip) expect(this.expectDataInRange(Math.round(sqrt(Number(expectData.MaxPip))* 10**12),Number(poolData.sqrtMaxPip), 0.001)).to.equal(true, "MaxPip");
         if (expectData.MinPip) expect(this.expectDataInRange(Math.round( sqrt( Number(expectData.MinPip))* 10**12),Number( poolData.sqrtMinPip), 0.001)).to.equal(true, "MinPip");
-        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase, 15), 0.01)).to.equal(true, "FeeGrowthBase");
+        if (expectData.FeeGrowthBase) expect(this.expectDataInRange(Number(expectData.FeeGrowthBase),fromWeiAndFormat(poolData.feeGrowthBase, 15), 0.001)).to.equal(true, "FeeGrowthBase");
         if (expectData.FeeGrowthQuote) expect(this.expectDataInRange(Number(expectData.FeeGrowthQuote),fromWeiAndFormat(poolData.feeGrowthQuote, 15), 0.001)).to.equal(true, "FeeGrowthQuote")
 
 
@@ -419,13 +429,13 @@ export class TestLiquidity {
             // expect(await this.dexNFT.ownerOf(expectData.TokenId)).to.be.equal(this.users[expectData.Id].address);
 
             const liquidityInfo = await this.dexNFT.concentratedLiquidity(expectData.TokenId);
-            console.log("liquidityInfo feeGrowthBase: ",fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase));
-            console.log("liquidityInfo feeGrowthQuote: ",fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote));
+            console.log("liquidityInfo feeGrowthBase: ",fromWeiAndFormat(liquidityInfo.feeGrowthBase, 15) ,Number(expectData.FeeGrowthBase));
+            console.log("liquidityInfo feeGrowthQuote: ",fromWeiAndFormat(liquidityInfo.feeGrowthQuote, 15) ,Number(expectData.FeeGrowthQuote));
             console.log("liquidityInfo liquidity: ",fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity));
 
             if (expectData.Liquidity) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.liquidity) ,Number(expectData.Liquidity) , 0.01)).to.equal(true, "Liquidity user");
-            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase) ,Number(expectData.FeeGrowthBase) , 0.001)).to.equal(true, "FeeGrowthBase user");
-            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote) ,Number(expectData.FeeGrowthQuote) , 0.001)).to.equal(true, "FeeGrowthQuote user");
+            if (expectData.FeeGrowthBase) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthBase, 15) ,Number(expectData.FeeGrowthBase) , 0.001)).to.equal(true, "FeeGrowthBase user");
+            if (expectData.FeeGrowthQuote) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.feeGrowthQuote, 15) ,Number(expectData.FeeGrowthQuote) , 0.001)).to.equal(true, "FeeGrowthQuote user");
             // if (expectData.QuoteVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.quoteVirtual) ,Number(expectData.QuoteVirtual) , 0.01)).to.equal(true, "QuoteVirtual user");
             // if (expectData.BaseVirtual) expect(this.expectDataInRange( fromWeiAndFormat(liquidityInfo.baseVirtual) ,Number(expectData.BaseVirtual) , 0.01)).to.equal(true, "BaseVirtual user");
 
