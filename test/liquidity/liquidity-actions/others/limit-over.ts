@@ -9,7 +9,7 @@ describe("LimitOver", async function(){
 
 
 
-    it ("Case LimitOver", async () => {
+    it ("Case-LimitOver", async () => {
         return testHelper.process(`
 - S0: SetCurrentPrice
   Action:
@@ -174,8 +174,8 @@ describe("LimitOver", async function(){
     Id: 3
     Asset: base
     Side: 0
-    Quantity: 10
-    Price: 210000
+    Quantity: 14.812210
+    Price: 200000
   Expect:
     Pool: 
       Liquidity: 893.0705176328
@@ -191,7 +191,7 @@ describe("LimitOver", async function(){
     User:
       Id: 3
       BalanceBase: 10145.50000
-      BalanceQuote: 7175.57783
+      BalanceQuote: 7079.33362
 - S9: AddLiquidity
   Action:
     Id: 1
@@ -231,7 +231,7 @@ describe("LimitOver", async function(){
     User:
       Id: 3
       BalanceBase: 10261.90000
-      BalanceQuote: 4535.57783
+      BalanceQuote: 4439.33362
 - S10.1: CancelLimitOrder
   Action:
     Id: 2
@@ -548,7 +548,7 @@ describe("LimitOver", async function(){
     User:
       Id: 3
       BalanceBase: 10267.74273
-      BalanceQuote: 4423.85990
+      BalanceQuote: 4327.61570
 - S25: RemoveLiquidity
   Action:
     Id: 1

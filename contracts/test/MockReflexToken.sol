@@ -54,20 +54,20 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
      * @dev See {IERC20-balanceOf}.
      */
     function balanceOf(address account)
-    public
-    view
-    virtual
-    override
-    returns (uint256)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
     {
         return _balances[account];
     }
 
     function transfer(address to, uint256 amount)
-    public
-    virtual
-    override
-    returns (bool)
+        public
+        virtual
+        override
+        returns (bool)
     {
         address owner = _msgSender();
         _transfer(owner, to, amount);
@@ -78,20 +78,20 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
      * @dev See {IERC20-allowance}.
      */
     function allowance(address owner, address spender)
-    public
-    view
-    virtual
-    override
-    returns (uint256)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
     {
         return _allowances[owner][spender];
     }
 
     function approve(address spender, uint256 amount)
-    public
-    virtual
-    override
-    returns (bool)
+        public
+        virtual
+        override
+        returns (bool)
     {
         address owner = _msgSender();
         _approve(owner, spender, amount);
@@ -110,9 +110,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
     }
 
     function increaseAllowance(address spender, uint256 addedValue)
-    public
-    virtual
-    returns (bool)
+        public
+        virtual
+        returns (bool)
     {
         address owner = _msgSender();
         _approve(owner, spender, _allowances[owner][spender] + addedValue);
@@ -120,9 +120,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue)
-    public
-    virtual
-    returns (bool)
+        public
+        virtual
+        returns (bool)
     {
         address owner = _msgSender();
         uint256 currentAllowance = _allowances[owner][spender];
@@ -130,9 +130,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
             currentAllowance >= subtractedValue,
             "ERC20: decreased allowance below zero"
         );
-    unchecked {
-        _approve(owner, spender, currentAllowance - subtractedValue);
-    }
+        unchecked {
+            _approve(owner, spender, currentAllowance - subtractedValue);
+        }
 
         return true;
     }
@@ -152,9 +152,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
             fromBalance >= amount,
             "ERC20: transfer amount exceeds balance"
         );
-    unchecked {
-        _balances[from] = fromBalance - amount;
-    }
+        unchecked {
+            _balances[from] = fromBalance - amount;
+        }
 
         uint256 realAmount = (99 * amount) / 100;
 
@@ -184,9 +184,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-    unchecked {
-        _balances[account] = accountBalance - amount;
-    }
+        unchecked {
+            _balances[account] = accountBalance - amount;
+        }
         _totalSupply -= amount;
 
         emit Transfer(account, address(0), amount);
@@ -217,9 +217,9 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
                 currentAllowance >= amount,
                 "ERC20: insufficient allowance"
             );
-        unchecked {
-            _approve(owner, spender, currentAllowance - amount);
-        }
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
         }
     }
 

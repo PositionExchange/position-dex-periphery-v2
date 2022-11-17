@@ -240,7 +240,7 @@ export class YamlTestProcess {
 
     async ShiftRange(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await  this.testHelper.shiftRange(action.tokenId, action.targetIndexPipRange, action.id)}
+        if (action) { await  this.testHelper.shiftRange(action.tokenId, action.targetIndexPipRange, action.amountVirtual, action.asset, action.id)}
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
 

@@ -80,14 +80,19 @@ contract PositionConcentratedLiquidity is
         super.increaseLiquidity(nftTokenId, amountModify, isBase);
     }
 
-    function shiftRange(uint256 nftTokenId, uint32 targetIndex)
+    function shiftRange(
+        uint256 nftTokenId,
+        uint32 targetIndex,
+        uint128 amountNeeded,
+        bool isBase
+    )
         public
         payable
         override(ConcentratedLiquidity)
         nonReentrant
         nftOwner(nftTokenId)
     {
-        super.shiftRange(nftTokenId, targetIndex);
+        super.shiftRange(nftTokenId, targetIndex, amountNeeded, isBase);
     }
 
     function collectFee(uint256 nftTokenId)
