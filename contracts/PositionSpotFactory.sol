@@ -57,6 +57,7 @@ contract PositionSpotFactory is
 
         require(
             basisPoint > 0 &&
+                basisPoint % 2 == 0 &&
                 baseBasisPoint > 0 &&
                 maxFindingWordsIndex > 0 &&
                 initialPip > 0 &&
@@ -85,7 +86,7 @@ contract PositionSpotFactory is
             IMatchingEngineAMM.InitParams({
                 quoteAsset: IERC20(quoteAsset),
                 baseAsset: IERC20(baseAsset),
-                basisPoint: basisPoint,
+                basisPoint: 10**basisPoint,
                 maxFindingWordsIndex: maxFindingWordsIndex,
                 initialPip: initialPip,
                 pipRange: pipRange,
@@ -100,7 +101,7 @@ contract PositionSpotFactory is
         emit PairManagerInitialized(
             quoteAsset,
             baseAsset,
-            basisPoint,
+            10**basisPoint,
             baseBasisPoint,
             maxFindingWordsIndex,
             initialPip,
