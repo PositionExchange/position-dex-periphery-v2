@@ -297,6 +297,8 @@ export class TestLiquidity {
         await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
         const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
         console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[removeLiquidity] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
