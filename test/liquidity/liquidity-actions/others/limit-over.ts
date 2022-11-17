@@ -8,7 +8,6 @@ describe("LimitOver", async function(){
     })
 
 
-
     it ("Case-LimitOver", async () => {
         return testHelper.process(`
 - S0: SetCurrentPrice
@@ -174,8 +173,31 @@ describe("LimitOver", async function(){
     Id: 3
     Asset: base
     Side: 0
-    Quantity: 14.812210
+    Quantity: 10
     Price: 200000
+  Expect:
+    Pool: 
+      Liquidity: 893.0705176328
+      BaseVirtual: 4.8122104119
+      QuoteVirtual: 204.9554576801
+      BaseReal: 199.6966386128
+      QuoteReal: 3993.9327722556
+      IndexPipRange: 6
+      MaxPip: 209999 
+      MinPip: 180000 
+      FeeGrowthBase: 0.0001045608502
+      FeeGrowthQuote: 0
+    User:
+      Id: 3
+      BalanceBase: 10140.83216
+      BalanceQuote: 7177.95435
+- S8.1: OpenLimit
+  Action:
+    Id: 5
+    Asset: base
+    Side: 0
+    Quantity: 4.812210
+    Price: 210000
   Expect:
     Pool: 
       Liquidity: 893.0705176328
@@ -189,9 +211,9 @@ describe("LimitOver", async function(){
       FeeGrowthBase: 0.0002015518332
       FeeGrowthQuote: 0
     User:
-      Id: 3
-      BalanceBase: 10145.50000
-      BalanceQuote: 7079.33362
+      Id: 5
+      BalanceBase: 10004.66784
+      BalanceQuote: 9901.37926847985
 - S9: AddLiquidity
   Action:
     Id: 1
@@ -230,8 +252,8 @@ describe("LimitOver", async function(){
   Expect:
     User:
       Id: 3
-      BalanceBase: 10261.90000
-      BalanceQuote: 4439.33362
+      BalanceBase: 10257.23216
+      BalanceQuote: 4537.95435
 - S10.1: CancelLimitOrder
   Action:
     Id: 2
@@ -366,7 +388,7 @@ describe("LimitOver", async function(){
     User:
       Id: 2
       BalanceBase: 9738.94426
-      BalanceQuote: 15165.10904
+      BalanceQuote: 15160.24292
 - S16: RemoveLiquidity
   Action:
     Id: 1
@@ -407,7 +429,7 @@ describe("LimitOver", async function(){
     User:
       Id: 2
       BalanceBase: 9711.54444
-      BalanceQuote: 15665.67458
+      BalanceQuote: 15645.7667
 - S18: AddLiquidity
   Action:
     Id: 1
@@ -512,7 +534,7 @@ describe("LimitOver", async function(){
 - S23: RemoveLiquidity
   Action:
     Id: 1
-    TokenId: 1000004
+    TokenId: 1000003
   Expect:
     Pool:
       Liquidity: 866.13970795687
@@ -531,7 +553,7 @@ describe("LimitOver", async function(){
   Action:
     Id: 3
     asset: base
-    Side: 1
+    Side: 0
     Quantity: 6.023429
   Expect:
     Pool: 
@@ -547,8 +569,8 @@ describe("LimitOver", async function(){
       FeeGrowthQuote: 0.006118633745
     User:
       Id: 3
-      BalanceBase: 10267.74273
-      BalanceQuote: 4327.61570
+      BalanceBase: 10263.07488
+      BalanceQuote: 4426.23643
 - S25: RemoveLiquidity
   Action:
     Id: 1
