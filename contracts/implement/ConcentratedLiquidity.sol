@@ -170,7 +170,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         address user = _msgSender();
         console.log(
-            "[ConcentratedLiquidity][removeLiquidity] base receive: ",
+            "[ConcentratedLiquidity][removeLiquidity] base receive, _collectFeeData.feeBaseAmount: ",
             baseAmountRemoved + _collectFeeData.feeBaseAmount,
             _collectFeeData.feeBaseAmount
         );
@@ -183,7 +183,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
 
         console.log(
-            "[ConcentratedLiquidity][removeLiquidity] quote receive: ",
+            "[ConcentratedLiquidity][removeLiquidity] quote receive, _collectFeeData.feeQuoteAmount: ",
             quoteAmountRemoved + _collectFeeData.feeQuoteAmount,
             _collectFeeData.feeQuoteAmount
         );
