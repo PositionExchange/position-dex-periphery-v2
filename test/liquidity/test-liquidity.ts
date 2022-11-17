@@ -324,6 +324,14 @@ export class TestLiquidity {
     }
 
 
+    async  shiftRange(tokenId : number,targetIndexPipRange :  number,  idSender: number){
+        console.group(`ShiftRange`);
+        await  this.dexNFT.connect(this.users[idSender]).shiftRange(tokenId, targetIndexPipRange);
+        console.groupEnd();
+
+    }
+
+
 
     async expectPool( expectData: ExpectedPoolData) {
 
