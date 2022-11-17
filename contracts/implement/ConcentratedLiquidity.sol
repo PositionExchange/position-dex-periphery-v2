@@ -379,12 +379,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
-        // 1. Check amount Base, Quote when removing liquidity
-        // 2. Check base, quote Amount of new liquidity range
-        // 3. Update liquidity info
-        // 4. Transfer token if needed
-        // 5. Push event
-        // TODO update liquidity in Farm/Pool
+
         require(
             targetIndex != liquidityData.indexedPipRange,
             Errors.LQ_INDEX_RANGE_NOT_DIFF
@@ -397,11 +392,15 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.liquidity,
             liquidityData.indexedPipRange
         );
+        console.log("[shiftRange]  _collectFeeData.feeBaseAmount, _collectFeeData.feeQuoteAmount :",  _collectFeeData.feeBaseAmount, _collectFeeData.feeQuoteAmount);
 
-        (
+
+
+    (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidityData.liquidity);
+        console.log("[shiftRange] baseAmountRemoved, quoteAmountRemoved :",  baseAmountRemoved, quoteAmountRemoved);
 
         ResultAddLiquidity memory _addLiquidity = _addLiquidity(
             // calculate based on BaseAmount. Keep the amount of Base if

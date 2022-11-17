@@ -31,6 +31,7 @@ export class YamlTestProcess {
         const amountVirtual = action.getProp("AmountVirtual")
         const tokenId = action.getProp("TokenId")
         const orderId = action.getProp("OrderId")
+        const targetIndexPipRange = action.getProp("TargetIndexPipRange")
 
 
 
@@ -47,7 +48,8 @@ export class YamlTestProcess {
             revert,
             amountVirtual,
             tokenId,
-            orderId
+            orderId,
+            targetIndexPipRange
         }
     }
 
@@ -238,7 +240,7 @@ export class YamlTestProcess {
 
     async ShiftRange(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        // TODO implement call shiftRange
+        if (action) { await  this.testHelper.shiftRange(action.tokenId, action.targetIndexPipRange, action.id)}
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
 
