@@ -43,7 +43,6 @@ contract SpotHouse is
         _initStrategyFee(300);
 
         feeBasis = 10000;
-        //        fee = 20;
     }
 
     function openLimitOrder(
