@@ -340,7 +340,7 @@ export class TestLiquidity {
 
     async  shiftRange(tokenId : number,targetIndexPipRange :  number, amountVirtual : number, asset : string,  idSender: number){
         console.group(`ShiftRange`);
-        await  this.dexNFT.connect(this.users[idSender]).shiftRange(tokenId, targetIndexPipRange, toWei(amountVirtual), asset.toLowerCase() === "base");
+        await  this.dexNFT.connect(this.users[idSender]).shiftRange(tokenId, targetIndexPipRange, toWei(amountVirtual), asset.toLowerCase() === "base",);
         console.groupEnd();
 
     }
