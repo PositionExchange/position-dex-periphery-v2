@@ -4,8 +4,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@positionex/posi-token/contracts/VestingScheduleBase.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -47,8 +48,8 @@ interface IPositionStakingDexManager {
 }
 
 contract PositionStakingDexManager is
-    Ownable,
-    ReentrancyGuard,
+    ReentrancyGuardUpgradeable,
+    OwnableUpgradeable,
     VestingScheduleBase
 {
     using SafeMath for uint256;
@@ -162,12 +163,14 @@ contract PositionStakingDexManager is
         bytes data
     );
 
-    constructor(
+    function initialize(
         IERC20 _position,
         IPositionConcentratedLiquidity _positionConcentratedLiquidity,
-        IERC721 _liquidityNFT,
         uint256 _startBlock
-    ) {
+    ) external initializer {
+        __ReentrancyGuard_init();
+        __Ownable_init();
+
         position = _position;
         startBlock = _startBlock;
 
