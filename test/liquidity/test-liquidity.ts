@@ -327,7 +327,7 @@ export class TestLiquidity {
         console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
         console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
         const currentPrice = await this.getCurrentPrice();
-        console.log("[removeLiquidity] currentPrice : ", currentPrice)
+        console.log("[openMarketOrder] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
