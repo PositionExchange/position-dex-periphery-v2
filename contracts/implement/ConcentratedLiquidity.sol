@@ -64,7 +64,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 ? _resultAddLiquidity.quoteAmountAdded
                 : _resultAddLiquidity.baseAmountAdded
         );
-
         require(
             params.isBase
                 ? amountModifySecondAsset >=
@@ -77,8 +76,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint256 nftTokenId = mint(user);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
-            //            baseVirtual: _resultAddLiquidity.baseAmountAdded,
-            //            quoteVirtual: _resultAddLiquidity.quoteAmountAdded,
             liquidity: uint128(_resultAddLiquidity.liquidity),
             indexedPipRange: params.indexedPipRange,
             feeGrowthBase: _resultAddLiquidity.feeGrowthBase,
@@ -96,12 +93,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-    // 1. Burn NFT
-    // 2. Update liquidity data
-    // 3. Transfer assets
-    // 4. Get fee reward
-    // 5. Transfer fee reward
-    // 6. Emit Event
+
     function removeLiquidity(uint256 nftTokenId) public virtual {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -397,6 +389,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
                 state.resultAddLiquidity.quoteAmountAdded
             ) {
+
                 depositLiquidity(
                     state.liquidityData.pool,
                     state.user,
@@ -543,11 +536,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 })
             );
 
-        uint128 liquidity;
-        uint32 indexedPipRange;
-        uint256 feeGrowthBase;
-        uint256 feeGrowthQuote;
-
         return (
             baseAmountRemoved,
             quoteAmountRemoved,
@@ -601,6 +589,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint256 currentIndexedPipRange,
         IMatchingEngineAMM pool
     ) internal returns (ResultAddLiquidity memory result) {
+
         State memory state;
         state.currentIndexedPipRange = currentIndexedPipRange;
         state.currentPrice = pool.getCurrentPip();
@@ -610,6 +599,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _getPipRange(pool)
         );
 
+        ////
         state.pair = _getQuoteAndBase(pool);
 
         // TODO consider necessary to check it
