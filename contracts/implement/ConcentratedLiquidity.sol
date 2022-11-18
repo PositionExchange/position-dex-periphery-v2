@@ -623,6 +623,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 baseVirtual,
             uint128 quoteVirtual,
             uint128 liquidity,
+            uint256 indexedPipRange,
             uint256 feeBasePending,
             uint256 feeQuotePending,
             IMatchingEngineAMM pool
@@ -640,11 +641,29 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.indexedPipRange
         );
 
-        //TODO call estimate remove
+        (
+            uint128 baseAmountRemoved,
+            uint128 quoteAmountRemoved,
+
+        ) = liquidityData.pool.estimateRemoveLiquidity(
+                IAutoMarketMakerCore.RemoveLiquidity({
+                    liquidity: liquidityData.liquidity,
+                    indexedPipRange: liquidityData.indexedPipRange,
+                    feeGrowthBase: liquidityData.feeGrowthBase,
+                    feeGrowthQuote: liquidityData.feeGrowthQuote
+                })
+            );
+
+        uint128 liquidity;
+        uint32 indexedPipRange;
+        uint256 feeGrowthBase;
+        uint256 feeGrowthQuote;
+
         return (
-            0,
-            0,
+            baseAmountRemoved,
+            quoteAmountRemoved,
             liquidityData.liquidity,
+            liquidityData.indexedPipRange,
             _collectFeeData.feeBaseAmount,
             _collectFeeData.feeQuoteAmount,
             liquidityData.pool

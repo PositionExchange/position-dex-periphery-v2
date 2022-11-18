@@ -164,8 +164,8 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
-    await  matching.approve()
-    await  dexNFT.donatePool(matching.address, toWei(1), toWei(1));
+    await matching.approveForTest()
+    await dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
         await matching.resetFeeShareAmm();
         await spotHouse.setFee(0);
@@ -297,13 +297,15 @@ export class TestLiquidity {
         await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
         const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
         console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[removeLiquidity] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
     async cancelLimitOrder(pip: number, orderId: SNumber, idSender : number, opts?: CallOptions) {
 
         console.group(`CancelLimitOrder`);
-        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
+        const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[2].address);
         console.log("[cancelLimitOrder] listOrderUser before: ", listOrderUser);
         console.log("orderId, pip: ", orderId, pip)
         await  this.mockSpotHouse.connect(this.users[idSender]).cancelLimitOrder(this.mockMatching.address, orderId, pip);
@@ -324,6 +326,8 @@ export class TestLiquidity {
         const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
         console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
         console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[removeLiquidity] currentPrice : ", currentPrice)
         console.groupEnd();
     }
 
@@ -409,8 +413,6 @@ export class TestLiquidity {
 
     async setPrice(price: number | string) {
     }
-
-
 
 
     async  expectPending(orderId : number, price : number, side : any, _size : number){
