@@ -164,8 +164,8 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
-    await  matching.approve()
-    await  dexNFT.donatePool(matching.address, toWei(1), toWei(1));
+    await matching.approveForTest()
+    await dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
         await matching.resetFeeShareAmm();
         await spotHouse.setFee(0);
