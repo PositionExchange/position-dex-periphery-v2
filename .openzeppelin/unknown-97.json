@@ -3159,7 +3159,7 @@
             "label": "allPairManager",
             "offset": 0,
             "slot": "204",
-            "type": "t_mapping(t_address,t_struct(Pair)22725_storage)",
+            "type": "t_mapping(t_address,t_struct(Pair)2445_storage)",
             "contract": "SpotFactoryStorage",
             "src": "contracts/libraries/types/SpotFactoryStorage.sol:18"
           },
@@ -3225,11 +3225,11 @@
             "label": "mapping(address => mapping(address => address))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_struct(Pair)22725_storage)": {
+          "t_mapping(t_address,t_struct(Pair)2445_storage)": {
             "label": "mapping(address => struct SpotFactoryStorage.Pair)",
             "numberOfBytes": "32"
           },
-          "t_struct(Pair)22725_storage": {
+          "t_struct(Pair)2445_storage": {
             "label": "struct SpotFactoryStorage.Pair",
             "members": [
               {

@@ -97,10 +97,6 @@ contract PositionSpotFactory is
                 spotHouse: spotHouse
             })
         );
-        IMatchingEngineAMM(pair).approveCounterParty(IERC20(quoteAsset), spotHouse);
-        IMatchingEngineAMM(pair).approveCounterParty(IERC20(baseAsset), spotHouse);
-        IMatchingEngineAMM(pair).approveCounterParty(IERC20(quoteAsset), positionLiquidity);
-        IMatchingEngineAMM(pair).approveCounterParty(IERC20(baseAsset), positionLiquidity);
 
         emit PairManagerInitialized(
             quoteAsset,
