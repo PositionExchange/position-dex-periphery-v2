@@ -12,7 +12,6 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
-import "hardhat/console.sol";
 
 abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
@@ -259,12 +258,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     true
                 );
             }
-            console.log(
-                "[SpotHouse][CancelLimitOrder] refundQuantity Base, partialFilled, quote transferred: ",
-                refundQuantity,
-                partialFilled,
-                _baseToQuote(partialFilled, _order.pip, basicPoint)
-            );
         }
         delete _orders[_orderIdx];
         // = blankLimitOrderData;
@@ -381,11 +374,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
         for (uint256 i = 0; i < listPendingOrderData.length; i++) {
             if (listPendingOrderData[i].quantity != 0) {
-                console.log(
-                    "listPendingOrderData quantity orderId : ",
-                    listPendingOrderData[0].quantity,
-                    listPendingOrderData[0].orderId
-                );
                 return listPendingOrderData;
             }
         }
@@ -459,18 +447,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 //                    _pip
                 //                )
                 state.quoteAmountFilled;
-
-            console.log(
-                "isBuy quoteAmount, _quantity",
-                quoteAmount,
-                _quantity,
-                state.sizeOut
-            );
-            console.log(
-                "_pip, state.quoteAmountFilled",
-                _pip,
-                state.quoteAmountFilled
-            );
 
             //            quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
@@ -658,9 +634,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         //        uint256 quoteAmount;
         uint16 fee = _getFee();
 
-        console.log("[SpotDex][_openMarketOrder]_quantity", _quantity);
-        console.log("[SpotDex][_openMarketOrder]fee", fee);
-
         if (_side == Side.BUY) {
             (
                 state.mainSideOut,
@@ -672,20 +645,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
             );
 
-            console.log(
-                "[SpotDex][_openMarketOrder]_mainSideOut",
-                state.mainSideOut
-            );
-            console.log(
-                "[SpotDex][_openMarketOrder]state.feeAmount",
-                state.feeAmount
-            );
-
-            console.log(
-                "[SpotDex][_openMarketOrder]flipSideOut ",
-                state.flipSideOut
-            );
-
             // deposit quote asset
             uint256 amountTransferred = _deposit(
                 _pairManager,
@@ -693,17 +652,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 Asset.Quote,
                 state.flipSideOut
             );
-            console.log(
-                "[SpotDex][_openMarketOrder]_amountTransferred: ",
-                amountTransferred
-            );
 
             require(amountTransferred == state.flipSideOut, "!RFI");
-
-            console.log(
-                "[SpotDex][_openMarketOrder] transfer to trader: _quantity - state.feeAmount  ",
-                _quantity - state.feeAmount
-            );
 
             // withdraw base asset
             // after BUY done, transfer base back to trader
@@ -733,24 +683,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _payer,
                 fee
             );
-            console.log(
-                " SELL state.mainSideOut, baseAmountTransferred ",
-                state.mainSideOut,
-                baseAmountTransferred
-            );
-            console.log(
-                " SELL state.flipSideOut - state.feeAmount, state.feeAmount ",
-                state.flipSideOut - state.feeAmount,
-                state.feeAmount
-            );
             require(
                 state.mainSideOut == baseAmountTransferred,
                 Errors.VL_NOT_ENOUGH_LIQUIDITY
-            );
-            console.log(
-                " SELL state.flipSideOut ",
-                state.flipSideOut,
-                state.feeAmount
             );
 
             _withdraw(

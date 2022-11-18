@@ -17,8 +17,6 @@ import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
 import {Errors} from "./libraries/helper/Errors.sol";
 import {TransferHelper} from "./libraries/helper/TransferHelper.sol";
-
-import "hardhat/console.sol";
 import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
 import "./implement/SpotDex.sol";
@@ -291,7 +289,6 @@ contract SpotHouse is
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
         );
-        console.log("_deposit override; ", _pairAddress.QuoteAsset);
 
         address pairManagerAddress = address(_pairManager);
         uint256 _fee;
@@ -305,12 +302,6 @@ contract SpotHouse is
                     pairManagerAddress
                 );
 
-                console.log(
-                    "_QUOTE Balance",
-                    IERC20(_pairAddress.QuoteAsset).balanceOf(_payer)
-                );
-                console.log("_transfer amount", _amount);
-
                 TransferHelper.transferFrom(
                     quoteAsset,
                     _payer,
@@ -321,7 +312,6 @@ contract SpotHouse is
                     pairManagerAddress
                 );
                 _amount = _balanceAfter - _balanceBefore;
-                console.log("_deposit _balanceAfter:", _balanceAfter);
             }
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
@@ -368,7 +358,6 @@ contract SpotHouse is
             } else {
                 uint256 balanceOfPairManager = IERC20(_pairAddress.QuoteAsset)
                     .balanceOf(pairManagerAddress);
-                console.log("balanceOfPairManager quote", balanceOfPairManager);
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.QuoteAsset),
                     address(_pairManager),
