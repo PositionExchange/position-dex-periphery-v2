@@ -238,7 +238,6 @@ contract PositionConcentratedLiquidity is
             if (_pairAddress.BaseAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
-
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.BaseAsset),
                     address(_pairManager),
