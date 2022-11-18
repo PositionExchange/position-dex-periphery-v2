@@ -222,6 +222,15 @@ contract PositionStakingDexManager is
     //------------------------------------------------------------------------------------------------------------------
     // ONLY_OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
+
+    function setPositionTreasury(IPosiTreasury _posiTreasury) public onlyOwner {
+        posiTreasury = _posiTreasury;
+    }
+
+    function setPositionEarningToken(IERC20 _positionEarningToken) public onlyOwner {
+        position = _positionEarningToken;
+    }
+
     function updatePositionLiquidityPool(address _newLiquidityPool)
         public
         onlyOwner

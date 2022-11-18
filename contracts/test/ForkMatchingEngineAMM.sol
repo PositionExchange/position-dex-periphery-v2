@@ -13,6 +13,7 @@ contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
     function resetFeeShareAmm() public {
         feeShareAmm = 0;
     }
+
     function approveForTest() public {
         quoteAsset.approve(counterParty, type(uint256).max);
         baseAsset.approve(counterParty, type(uint256).max);
