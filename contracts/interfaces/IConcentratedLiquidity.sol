@@ -52,7 +52,8 @@ interface IConcentratedLiquidity {
         address pool,
         uint256 amountBaseRemoved,
         uint256 amountQuoteRemoved,
-        uint64 indexedPipRange
+        uint64 indexedPipRange,
+        uint128 removedLiquidity
     );
 
     event LiquidityModified(
@@ -63,7 +64,8 @@ interface IConcentratedLiquidity {
         // 0: increase
         // 1: decrease
         ModifyType modifyType,
-        uint64 indexedPipRange
+        uint64 indexedPipRange,
+        uint128 modifiedLiquidity
     );
 
     event LiquidityShiftRange(

@@ -200,7 +200,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             address(liquidityData.pool),
             baseAmountRemoved,
             quoteAmountRemoved,
-            liquidityData.indexedPipRange
+            liquidityData.indexedPipRange,
+            liquidityData.liquidity
         );
     }
 
@@ -308,7 +309,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
-            liquidityData.indexedPipRange
+            liquidityData.indexedPipRange,
+            uint128(_resultAddLiquidity.liquidity)
         );
     }
 
@@ -386,7 +388,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             baseAmountRemoved,
             quoteAmountRemoved,
             ModifyType.DECREASE,
-            liquidityData.indexedPipRange
+            liquidityData.indexedPipRange,
+            liquidity
         );
     }
 
