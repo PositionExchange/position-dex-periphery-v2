@@ -227,7 +227,10 @@ contract PositionStakingDexManager is
         posiTreasury = _posiTreasury;
     }
 
-    function setPositionEarningToken(IERC20 _positionEarningToken) public onlyOwner {
+    function setPositionEarningToken(IERC20 _positionEarningToken)
+        public
+        onlyOwner
+    {
         position = _positionEarningToken;
     }
 
