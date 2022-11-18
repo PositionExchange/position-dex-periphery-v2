@@ -93,7 +93,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         );
     }
 
-
     function removeLiquidity(uint256 nftTokenId) public virtual {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -387,7 +386,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
                 quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
                 state.resultAddLiquidity.quoteAmountAdded
             ) {
-
                 depositLiquidity(
                     state.liquidityData.pool,
                     state.user,
@@ -584,7 +582,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint256 currentIndexedPipRange,
         IMatchingEngineAMM pool
     ) internal returns (ResultAddLiquidity memory result) {
-
         State memory state;
         state.currentIndexedPipRange = currentIndexedPipRange;
         state.currentPrice = pool.getCurrentPip();
