@@ -63,7 +63,7 @@ describe("manage liquidity", async () => {
             await matching.setCounterParty02(spotHouse.address);
             await approveAndMintToken(quote, base, dexNFT, users)
             await approve(quote, base, spotHouse, users)
-            await matching.approve()
+            //await matching.approve()
         }
     )
 
