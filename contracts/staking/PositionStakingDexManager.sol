@@ -223,6 +223,11 @@ contract PositionStakingDexManager is
     // ONLY_OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    function setPositionPerBlock(uint256 _positionPerBlock) public onlyOwner {
+        massUpdatePools();
+        positionPerBlock = _positionPerBlock;
+    }
+
     function setPositionTreasury(IPosiTreasury _posiTreasury) public onlyOwner {
         posiTreasury = _posiTreasury;
     }
