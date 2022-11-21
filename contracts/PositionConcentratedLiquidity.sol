@@ -119,7 +119,7 @@ contract PositionConcentratedLiquidity is
         public
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(nftTokenId)
+        nftOwnerOrStaking(nftTokenId)
     {
         super.collectFee(nftTokenId);
     }
