@@ -72,6 +72,7 @@ interface IConcentratedLiquidity {
         address user,
         address pool,
         uint64 oldIndexedPipRange,
+        uint128 liquidityRemoved,
         uint256 amountBaseRemoved,
         uint256 amountQuoteRemoved,
         uint64 newIndexedPipRange,
