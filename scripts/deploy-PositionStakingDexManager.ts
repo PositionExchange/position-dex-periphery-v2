@@ -9,7 +9,7 @@ task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', asy
 
     const PositionStakingDexManager = await hre.ethers.getContractFactory("PositionStakingDexManager")
 
-    const contractArgs : string[] = [configData.tokenEarn, configData.positionConcentratedLiquidity, 1000];
+    const contractArgs : string[] = [configData.mockRewardToken, configData.positionConcentratedLiquidity, 1000];
 
     const instance = await hre.upgrades.deployProxy(
         PositionStakingDexManager,

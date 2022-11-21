@@ -39,6 +39,14 @@ contract PositionConcentratedLiquidity is
         spotFactory = _sportFactory;
     }
 
+    function setStakingManager(IPositionStakingDexManager _stakingManager) public onlyOwner {
+        stakingManager = _stakingManager;
+    }
+
+    function getStakingManager() public view returns (address) {
+        return address(stakingManager);
+    }
+
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
