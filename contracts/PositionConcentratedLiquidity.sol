@@ -35,8 +35,16 @@ contract PositionConcentratedLiquidity is
         tokenID = 1000000;
     }
 
-    function setFactory(ISpotFactory _sportFactory) public {
+    function setFactory(ISpotFactory _sportFactory) public onlyOwner {
         spotFactory = _sportFactory;
+    }
+
+    function setStakingManager(IPositionStakingDexManager _stakingManager) public onlyOwner {
+        stakingManager = _stakingManager;
+    }
+
+    function getStakingManager() public view returns (address) {
+        return address(stakingManager);
     }
 
     function addLiquidity(AddLiquidityParams calldata params)
@@ -165,10 +173,6 @@ contract PositionConcentratedLiquidity is
         SpotHouseStorage.Asset _asset,
         uint256 _amount
     ) internal override(ConcentratedLiquidity) returns (uint256 amount) {
-        console.log(
-            "[PositionConcentratedLiquidity][depositLiquidity]_amount: ",
-            _amount
-        );
         if (_amount == 0) return 0;
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
@@ -179,10 +183,6 @@ contract PositionConcentratedLiquidity is
                 _depositBNB(pairManagerAddress, _amount);
             } else {
                 IERC20 quoteAsset = IERC20(_pairAddress.QuoteAsset);
-                console.log(
-                    "[PositionConcentratedLiquidity][depositLiquidity]_user balance  quote before transfer : ",
-                    quoteAsset.balanceOf(_payer)
-                );
                 uint256 _balanceBefore = quoteAsset.balanceOf(
                     pairManagerAddress
                 );
@@ -191,10 +191,6 @@ contract PositionConcentratedLiquidity is
                     _payer,
                     pairManagerAddress,
                     _amount
-                );
-                console.log(
-                    "[PositionConcentratedLiquidity][depositLiquidity]_user balance  quote : ",
-                    quoteAsset.balanceOf(_payer)
                 );
                 uint256 _balanceAfter = quoteAsset.balanceOf(
                     pairManagerAddress
@@ -206,10 +202,6 @@ contract PositionConcentratedLiquidity is
                 _depositBNB(pairManagerAddress, _amount);
             } else {
                 IERC20 baseAsset = IERC20(_pairAddress.BaseAsset);
-                console.log(
-                    "[PositionConcentratedLiquidity][depositLiquidity]_user balance  base before transfer : ",
-                    baseAsset.balanceOf(_payer)
-                );
                 uint256 _balanceBefore = baseAsset.balanceOf(
                     pairManagerAddress
                 );
@@ -218,10 +210,6 @@ contract PositionConcentratedLiquidity is
                     _payer,
                     pairManagerAddress,
                     _amount
-                );
-                console.log(
-                    "[PositionConcentratedLiquidity][depositLiquidity]_user balance  base after transfer : ",
-                    baseAsset.balanceOf(_payer)
                 );
                 uint256 _balanceAfter = baseAsset.balanceOf(pairManagerAddress);
                 _amount = _balanceAfter - _balanceBefore;
@@ -247,12 +235,6 @@ contract PositionConcentratedLiquidity is
             if (_pairAddress.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
-                console.log(
-                    "balance quote pair: ",
-                    IERC20(_pairAddress.QuoteAsset).balanceOf(
-                        address(_pairManager)
-                    )
-                );
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.QuoteAsset),
                     address(_pairManager),
@@ -264,13 +246,6 @@ contract PositionConcentratedLiquidity is
             if (_pairAddress.BaseAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
-                console.log(
-                    "balance base pair: ",
-                    IERC20(_pairAddress.BaseAsset).balanceOf(
-                        address(_pairManager)
-                    )
-                );
-
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.BaseAsset),
                     address(_pairManager),

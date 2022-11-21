@@ -223,11 +223,19 @@ contract PositionStakingDexManager is
     // ONLY_OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    function setPositionPerBlock(uint256 _positionPerBlock) public onlyOwner {
+        massUpdatePools();
+        positionPerBlock = _positionPerBlock;
+    }
+
     function setPositionTreasury(IPosiTreasury _posiTreasury) public onlyOwner {
         posiTreasury = _posiTreasury;
     }
 
-    function setPositionEarningToken(IERC20 _positionEarningToken) public onlyOwner {
+    function setPositionEarningToken(IERC20 _positionEarningToken)
+        public
+        onlyOwner
+    {
         position = _positionEarningToken;
     }
 
@@ -267,7 +275,7 @@ contract PositionStakingDexManager is
             _harvestInterval <= MAXIMUM_HARVEST_INTERVAL,
             "add: invalid harvest interval"
         );
-        require(poolInfo[_poolId].lastRewardBlock == 0, "pool created");
+        require(poolInfo[_poolId].poolId == address(0x00), "pool created");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -416,6 +424,7 @@ contract PositionStakingDexManager is
     function _stake(uint256 _nftId, address _referrer) internal {
         UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
         address poolAddress = address(nftData.pool);
+        require(poolInfo[poolAddress].poolId != address(0x00), "pool not created");
         require(poolAddress != address(0x0), "invalid liquidity pool");
         uint256[] storage nftIds = userNft[msg.sender][poolAddress];
         if (nftIds.length == 0) {

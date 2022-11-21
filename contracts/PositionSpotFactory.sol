@@ -37,7 +37,6 @@ contract PositionSpotFactory is
         address quoteAsset,
         address baseAsset,
         uint256 basisPoint,
-        uint256 baseBasisPoint,
         uint128 maxFindingWordsIndex,
         uint128 initialPip,
         uint128 pipRange,
@@ -58,7 +57,6 @@ contract PositionSpotFactory is
         require(
             basisPoint > 0 &&
                 basisPoint % 2 == 0 &&
-                baseBasisPoint > 0 &&
                 maxFindingWordsIndex > 0 &&
                 initialPip > 0 &&
                 pipRange > 0 &&
@@ -91,7 +89,7 @@ contract PositionSpotFactory is
                 initialPip: initialPip,
                 pipRange: pipRange,
                 tickSpace: tickSpace,
-                feeShareAmm: 6000,
+                feeShareAmm: feeShareAmm,
                 owner: msg.sender,
                 positionLiquidity: positionLiquidity,
                 spotHouse: spotHouse
@@ -102,7 +100,6 @@ contract PositionSpotFactory is
             quoteAsset,
             baseAsset,
             10**basisPoint,
-            baseBasisPoint,
             maxFindingWordsIndex,
             initialPip,
             creator,
