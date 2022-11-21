@@ -22,6 +22,15 @@ contract PositionConcentratedLiquidity is
         _;
     }
 
+    modifier nftOwnerOrStaking(uint256 nftId) {
+        require(
+            (_msgSender() == ownerOf(nftId)) ||
+                _isOwnerWhenStaking(_msgSender(), nftId),
+            "!Owner"
+        );
+        _;
+    }
+
     ISpotFactory public spotFactory;
     IWithdrawBNB withdrawBNB;
     address WBNB;
@@ -39,7 +48,10 @@ contract PositionConcentratedLiquidity is
         spotFactory = _sportFactory;
     }
 
-    function setStakingManager(IPositionStakingDexManager _stakingManager) public onlyOwner {
+    function setStakingManager(IPositionStakingDexManager _stakingManager)
+        public
+        onlyOwner
+    {
         stakingManager = _stakingManager;
     }
 
@@ -69,7 +81,7 @@ contract PositionConcentratedLiquidity is
         public
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(nftTokenId)
+        nftOwnerOrStaking(nftTokenId)
     {
         super.decreaseLiquidity(nftTokenId, liquidity);
     }
@@ -83,7 +95,7 @@ contract PositionConcentratedLiquidity is
         payable
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(nftTokenId)
+        nftOwnerOrStaking(nftTokenId)
     {
         super.increaseLiquidity(nftTokenId, amountModify, isBase);
     }
@@ -98,7 +110,7 @@ contract PositionConcentratedLiquidity is
         payable
         override(ConcentratedLiquidity)
         nonReentrant
-        nftOwner(nftTokenId)
+        nftOwnerOrStaking(nftTokenId)
     {
         super.shiftRange(nftTokenId, targetIndex, amountNeeded, isBase);
     }

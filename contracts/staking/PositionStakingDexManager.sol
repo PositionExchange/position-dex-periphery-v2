@@ -45,6 +45,11 @@ interface IPositionStakingDexManager {
         uint128 deltaLiquidityModify,
         IPositionConcentratedLiquidity.ModifyType modifyType
     ) external;
+
+    function isOwnerWhenStaking(address user, uint256 tokenId)
+        external
+        view
+        returns (bool);
 }
 
 contract PositionStakingDexManager is
@@ -424,7 +429,10 @@ contract PositionStakingDexManager is
     function _stake(uint256 _nftId, address _referrer) internal {
         UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
         address poolAddress = address(nftData.pool);
-        require(poolInfo[poolAddress].poolId != address(0x00), "pool not created");
+        require(
+            poolInfo[poolAddress].poolId != address(0x00),
+            "pool not created"
+        );
         require(poolAddress != address(0x0), "invalid liquidity pool");
         uint256[] storage nftIds = userNft[msg.sender][poolAddress];
         if (nftIds.length == 0) {
@@ -535,6 +543,16 @@ contract PositionStakingDexManager is
                 emit EmergencyWithdraw(msg.sender, _pid, _nftId);
             }
         }
+    }
+
+    function isOwnerWhenStaking(address user, uint256 nftId)
+        external
+        view
+        returns (bool)
+    {
+        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(nftId);
+        uint256 indexNftId = nftOwnedIndex[nftId][address(nftData.pool)];
+        return userNft[user][address(nftData.pool)][indexNftId] == nftId;
     }
 
     function updateLiquidity(
