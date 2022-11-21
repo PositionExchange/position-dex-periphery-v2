@@ -793,6 +793,18 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         }
     }
 
+    function _isOwnerWhenStaking(address user, uint256 nftId)
+        internal
+        view
+        returns (bool)
+    {
+        if (address(stakingManager) != address(0)) {
+            return stakingManager.isOwnerWhenStaking(user, nftId);
+        }
+
+        return false;
+    }
+
     function mint(address user) internal virtual returns (uint256 tokenId) {}
 
     function burn(uint256 tokenId) internal virtual {}
