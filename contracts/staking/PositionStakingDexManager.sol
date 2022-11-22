@@ -37,20 +37,7 @@ interface IPosiTreasury {
     function mint(address recipient, uint256 amount) external;
 }
 
-interface IPositionStakingDexManager {
-    function updateLiquidity(
-        address user,
-        uint256 tokenId,
-        address poolId,
-        uint128 deltaLiquidityModify,
-        IPositionConcentratedLiquidity.ModifyType modifyType
-    ) external;
-
-    function isOwnerWhenStaking(address user, uint256 tokenId)
-        external
-        view
-        returns (bool);
-}
+interface IPositionStakingDexManager {}
 
 contract PositionStakingDexManager is
     ReentrancyGuardUpgradeable,
@@ -547,21 +534,23 @@ contract PositionStakingDexManager is
 
     function isOwnerWhenStaking(address user, uint256 nftId)
         external
-        view
-        returns (bool)
+        returns (bool, address)
     {
         UserLiquidity.Data memory nftData = _getConcentratedLiquidity(nftId);
         uint256 indexNftId = nftOwnedIndex[nftId][address(nftData.pool)];
-        return userNft[user][address(nftData.pool)][indexNftId] == nftId;
+        return (
+            userNft[user][address(nftData.pool)][indexNftId] == nftId,
+            msg.sender
+        );
     }
 
-    function updateLiquidity(
+    function updateStakingLiquidity(
         address user,
         uint256 tokenId,
         address poolId,
         uint128 deltaLiquidityModify,
         IPositionConcentratedLiquidity.ModifyType modifyType
-    ) external {
+    ) external returns (address caller) {
         require(
             msg.sender == address(concentratedLiquidityNft),
             "only concentrated liquidity"
@@ -589,6 +578,8 @@ contract PositionStakingDexManager is
                 ? pool.totalStaked + deltaLiquidityModify
                 : pool.totalStaked - deltaLiquidityModify;
         }
+
+        return msg.sender;
     }
 
     // Pay or lockup pending Positions.

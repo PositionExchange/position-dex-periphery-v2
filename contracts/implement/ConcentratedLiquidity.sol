@@ -13,6 +13,8 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 import "../interfaces/IConcentratedLiquidity.sol";
+import "../interfaces/IUpdateStakingManager.sol";
+import "../interfaces/ICheckOwnerWhenStaking.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../staking/PositionStakingDexManager.sol";
 
@@ -286,6 +288,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             SpotHouseStorage.Asset.Quote,
             quoteAmountRemoved + _collectFeeData.feeQuoteAmount
         );
+
         _updateStakingLiquidity(
             user,
             nftTokenId,
@@ -783,25 +786,36 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         ModifyType modifyType
     ) internal {
         if (address(stakingManager) != address(0)) {
-            stakingManager.updateLiquidity(
-                user,
-                tokenId,
-                poolId,
-                deltaLiquidityModify,
-                modifyType
+            require(
+                IUpdateStakingManager(address(stakingManager))
+                    .updateStakingLiquidity(
+                        user,
+                        tokenId,
+                        poolId,
+                        deltaLiquidityModify,
+                        modifyType
+                    ) == address(this),
+                "Not implement yet"
             );
+        } else {
+            revert("Empty staking manger");
         }
     }
 
     function _isOwnerWhenStaking(address user, uint256 nftId)
         internal
-        view
         returns (bool)
     {
         if (address(stakingManager) != address(0)) {
-            return stakingManager.isOwnerWhenStaking(user, nftId);
-        }
+            (bool isOwner, address caller) = ICheckOwnerWhenStaking(
+                address(stakingManager)
+            ).isOwnerWhenStaking(user, nftId);
 
+            require(caller == address(this), "Not implement yet");
+            return isOwner;
+        } else {
+            revert("Empty staking manger");
+        }
         return false;
     }
 
