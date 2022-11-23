@@ -111,7 +111,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
 
         UserLiquidity.CollectFeeData memory _collectFeeData;
 
-        _collectFeeData = _collectFee(
+        _collectFeeData = estimateCollectFee(
             liquidityData.pool,
             liquidityData.feeGrowthBase,
             liquidityData.feeGrowthQuote,
@@ -191,7 +191,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             "not support"
         );
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
+        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
             liquidityData.pool,
             liquidityData.feeGrowthBase,
             liquidityData.feeGrowthQuote,
@@ -258,7 +258,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = _collectFee(
+        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
             liquidityData.pool,
             liquidityData.feeGrowthBase,
             liquidityData.feeGrowthQuote,
@@ -270,7 +270,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.liquidity - liquidity,
             liquidityData.indexedPipRange,
             _collectFeeData.newFeeGrowthBase,
-            _collectFeeData.feeQuoteAmount
+            _collectFeeData.newFeeGrowthQuote
         );
 
         // current 5
@@ -337,7 +337,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             Errors.LQ_INDEX_RANGE_NOT_DIFF
         );
 
-        state.collectFeeData = _collectFee(
+        state.collectFeeData = estimateCollectFee(
             state.liquidityData.pool,
             state.liquidityData.feeGrowthBase,
             state.liquidityData.feeGrowthQuote,
@@ -470,7 +470,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
         UserLiquidity.CollectFeeData memory _collectFeeData;
-        _collectFeeData = _collectFee(
+        _collectFeeData = estimateCollectFee(
             liquidityData.pool,
             liquidityData.feeGrowthBase,
             liquidityData.feeGrowthQuote,
@@ -516,7 +516,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             nftTokenId
         ];
         UserLiquidity.CollectFeeData memory _collectFeeData;
-        _collectFeeData = _collectFee(
+        _collectFeeData = estimateCollectFee(
             liquidityData.pool,
             liquidityData.feeGrowthBase,
             liquidityData.feeGrowthQuote,
@@ -706,13 +706,13 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             );
     }
 
-    function _collectFee(
+    function estimateCollectFee(
         IMatchingEngineAMM pool,
         uint256 feeGrowthBase,
         uint256 feeGrowthQuote,
         uint128 liquidity,
         uint32 indexedPipRange
-    ) internal view returns (UserLiquidity.CollectFeeData memory _feeData) {
+    ) public view returns (UserLiquidity.CollectFeeData memory _feeData) {
         (
             ,
             ,
