@@ -306,4 +306,13 @@ contract PositionConcentratedLiquidity is
     {
         return WBNB;
     }
+
+    function _owner(uint256 tokenId)
+        internal
+        view
+        override(ConcentratedLiquidity)
+        returns (address)
+    {
+        return ownerOf(tokenId);
+    }
 }

@@ -555,29 +555,27 @@ contract PositionStakingDexManager is
             msg.sender == address(concentratedLiquidityNft),
             "only concentrated liquidity"
         );
+        PoolInfo storage pool = poolInfo[poolId];
+        UserInfo storage user = userInfo[poolId][user];
 
-        if (concentratedLiquidityNft.ownerOf(tokenId) == address(this)) {
-            PoolInfo storage pool = poolInfo[poolId];
-            UserInfo storage user = userInfo[poolId][user];
+        updatePool(poolId);
 
-            updatePool(poolId);
+        payOrLockupPendingPosition(poolId);
 
-            payOrLockupPendingPosition(poolId);
+        user.amount = modifyType == IConcentratedLiquidity.ModifyType.INCREASE
+            ? user.amount.add(deltaLiquidityModify)
+            : user.amount.sub(deltaLiquidityModify);
 
-            user.amount = modifyType ==
-                IConcentratedLiquidity.ModifyType.INCREASE
-                ? user.amount.add(deltaLiquidityModify)
-                : user.amount.sub(deltaLiquidityModify);
+        user.rewardDebt = uint128(
+            user.amount.mul(pool.accPositionPerShare).div(1e12)
+        );
 
-            user.rewardDebt = uint128(
-                user.amount.mul(pool.accPositionPerShare).div(1e12)
-            );
+        pool.totalStaked = modifyType ==
+            IConcentratedLiquidity.ModifyType.INCREASE
+            ? pool.totalStaked + deltaLiquidityModify
+            : pool.totalStaked - deltaLiquidityModify;
 
-            pool.totalStaked = modifyType ==
-                IConcentratedLiquidity.ModifyType.INCREASE
-                ? pool.totalStaked + deltaLiquidityModify
-                : pool.totalStaked - deltaLiquidityModify;
-        }
+        if (concentratedLiquidityNft.ownerOf(tokenId) == address(this)) {}
 
         return msg.sender;
     }

@@ -38,6 +38,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
+        require(params.amountVirtual != 0, "!0");
         address user = _msgSender();
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
@@ -150,6 +151,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
+        require(amountModify != 0, "!0");
+
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
@@ -191,13 +194,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             "not support"
         );
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
-        );
+        UserLiquidity.CollectFeeData
+            memory _collectFeeData = estimateCollectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
 
         withdrawLiquidity(
             liquidityData.pool,
@@ -243,6 +247,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         public
         virtual
     {
+        require(liquidity != 0, "!0");
+
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
@@ -258,13 +264,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
-        );
+        UserLiquidity.CollectFeeData
+            memory _collectFeeData = estimateCollectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
@@ -786,19 +793,21 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         ModifyType modifyType
     ) internal {
         if (address(stakingManager) != address(0)) {
-            require(
-                IUpdateStakingManager(address(stakingManager))
-                    .updateStakingLiquidity(
-                        user,
-                        tokenId,
-                        poolId,
-                        deltaLiquidityModify,
-                        modifyType
-                    ) == address(this),
-                "Not implement yet"
-            );
+            if (_owner(tokenId) == address(stakingManager)) {
+                require(
+                    IUpdateStakingManager(address(stakingManager))
+                        .updateStakingLiquidity(
+                            user,
+                            tokenId,
+                            poolId,
+                            deltaLiquidityModify,
+                            modifyType
+                        ) == address(this),
+                    "Not implement yet"
+                );
+            }
         } else {
-            revert("Empty staking manger");
+            //            revert("Empty staking manger");
         }
     }
 
@@ -814,7 +823,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             require(caller == address(this), "Not implement yet");
             return isOwner;
         } else {
-            revert("Empty staking manger");
+            //            revert("Empty staking manger");
         }
         return false;
     }
@@ -822,4 +831,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     function mint(address user) internal virtual returns (uint256 tokenId) {}
 
     function burn(uint256 tokenId) internal virtual {}
+
+    function _owner(uint256 tokenId) internal view virtual returns (address) {}
 }
