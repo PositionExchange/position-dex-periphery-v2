@@ -6,7 +6,7 @@ import "../libraries/liquidity/Liquidity.sol";
 //import "../spot-exchange/libraries/liquidity/PoolLiquidity.sol";
 //import "../spot-exchange/libraries/liquidity/LiquidityInfo.sol";
 
-interface IConcentratedLiquidity {
+interface ILiquidityManager {
     enum ModifyType {
         INCREASE,
         DECREASE

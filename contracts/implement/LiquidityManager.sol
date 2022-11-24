@@ -8,17 +8,17 @@ pragma solidity ^0.8.9;
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/helper/Errors.sol";
-import "../interfaces/IConcentratedLiquidityNFT.sol";
+import "../interfaces/ILiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
-import "../interfaces/IConcentratedLiquidity.sol";
+import "../interfaces/ILiquidityManager.sol";
 import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../staking/PositionStakingDexManager.sol";
 
-abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
+abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
 
     mapping(uint256 => UserLiquidity.Data)
@@ -530,7 +530,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.liquidity,
             liquidityData.indexedPipRange
         );
-
         (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved,

@@ -7,7 +7,7 @@ task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskAr
 
     const configData = await readConfig('config-testnet.json');
 
-    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionConcentratedLiquidity")
+    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
 
     const contractArgs : string[] = [];
 
@@ -24,7 +24,7 @@ task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskAr
         address,
         PositionConcentratedLiquidity
     );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionConcentratedLiquidity.sol:PositionConcentratedLiquidity");
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
     configData.positionConcentratedLiquidity = address
     await writeConfig('config-testnet.json', configData);
 })
@@ -34,12 +34,12 @@ task('upgrade-concentrated-liquidity-testnet', 'How is your girl friend?', async
 
     const configData = await readConfig('config-testnet.json');
 
-    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionConcentratedLiquidity")
+    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
 
     const upgraded = await hre.upgrades.upgradeProxy(
         configData.positionConcentratedLiquidity,
         PositionConcentratedLiquidity
     );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionConcentratedLiquidity.sol:PositionConcentratedLiquidity");
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
     await writeConfig('config-testnet.json', configData);
 })

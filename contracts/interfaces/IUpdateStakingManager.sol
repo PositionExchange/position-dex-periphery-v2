@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./IPositionConcentratedLiquidity.sol";
+import "./IPositionNondisperseLiquidity.sol";
 
 interface IUpdateStakingManager {
     // TODO add guard
@@ -13,6 +13,6 @@ interface IUpdateStakingManager {
         uint256 tokenId,
         address poolId,
         uint128 deltaLiquidityModify,
-        IPositionConcentratedLiquidity.ModifyType modifyType
+        ILiquidityManager.ModifyType modifyType
     ) external returns (address caller);
 }

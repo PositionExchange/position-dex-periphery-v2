@@ -4,6 +4,6 @@ pragma solidity ^0.8.9;
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./ISpotDex.sol";
-import "./IConcentratedLiquidity.sol";
+import "./ILiquidityManager.sol";
 
-interface ISpotHouse is ISpotDex, IConcentratedLiquidity {}
+interface ISpotHouse is ISpotDex {}

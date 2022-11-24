@@ -38,5 +38,5 @@ library Errors {
     string public constant LQ_NO_LIQUIDITY_QUOTE = "31";
     string public constant LQ_NO_LIQUIDITY = "32";
     string public constant LQ_POOL_EXIST = "33";
-    string public constant LQ_INDEX_RANGE_NOT_DIFF = "34"
+    string public constant LQ_INDEX_RANGE_NOT_DIFF = "34";
 }
