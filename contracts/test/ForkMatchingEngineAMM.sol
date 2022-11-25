@@ -17,7 +17,7 @@ contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
     function approveForTest() public {
         quoteAsset.approve(counterParty, type(uint256).max);
         baseAsset.approve(counterParty, type(uint256).max);
-        quoteAsset.approve(positionConcentratedLiquidity, type(uint256).max);
-        baseAsset.approve(positionConcentratedLiquidity, type(uint256).max);
+        quoteAsset.approve(positionManagerLiquidity, type(uint256).max);
+        baseAsset.approve(positionManagerLiquidity, type(uint256).max);
     }
 }

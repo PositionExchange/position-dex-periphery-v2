@@ -12,6 +12,7 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
+import "hardhat/console.sol";
 
 abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
@@ -502,6 +503,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 false
             );
         }
+        console.log("state.sizeOut: ", state.sizeOut);
+        console.log("_quantity: ", _quantity);
 
         emit LimitOrderOpened(
             state.orderId,
@@ -698,6 +701,9 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
             _quantity = baseAmountTransferred;
         }
+
+        console.log("state.mainSideOut: ", state.mainSideOut);
+        console.log("state.flipSideOut: ", state.flipSideOut);
 
         emit MarketOrderOpened(
             _payer,

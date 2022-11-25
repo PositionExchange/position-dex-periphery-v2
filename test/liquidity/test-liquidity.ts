@@ -189,7 +189,7 @@ export class TestLiquidity {
     mockSpotHouse: MockSpotHouse;
     mockMatching : ForkMatchingEngineAMM;
     factory : PositionSpotFactory;
-    dexNFT : PositionConcentratedLiquidity;
+    dexNFT : PositionNondisperseLiquidity;
     quote : MockToken;
     base : MockToken;
 
@@ -207,7 +207,7 @@ export class TestLiquidity {
         _mockSpotHouse: MockSpotHouse,
         _mockMatching : ForkMatchingEngineAMM,
         _factory :PositionSpotFactory,
-        _dexNFT : PositionConcentratedLiquidity,
+        _dexNFT : PositionNondisperseLiquidity,
         _quote : MockToken,
         _base : MockToken,
         _defaultSender: SignerWithAddress,

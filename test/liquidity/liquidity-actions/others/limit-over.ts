@@ -600,4 +600,49 @@ describe("LimitOver", async function(){
       BalanceQuote: 9865.67381
 `)
     })
+    it ("Case-LimitSamePrice", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 60000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 100
+- S2: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    Asset: quote
+    AmountVirtual: 990
+- S3: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 10
+    Price: 60000
+- S4: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 10
+- S5: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 10
+    Price: 60000
+- S6: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 20
+`)
+    })
 })
