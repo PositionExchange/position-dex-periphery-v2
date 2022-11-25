@@ -4,10 +4,9 @@ import YAML from "js-yaml";
     ForkMatchingEngineAMM, MockReflexToken__factory,
     MockSpotHouse,
     MockToken,
-        MockReflexToken,
-    PositionConcentratedLiquidity,
-    PositionSpotFactory
-} from "../../typeChain";
+    MockReflexToken,
+    PositionSpotFactory, PositionNondisperseLiquidity
+    } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {
     approve,
@@ -120,7 +119,7 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     let quote : MockToken;
     let base : any;
     let testHelper: TestLiquidity;
-    let dexNFT : PositionConcentratedLiquidity;
+    let dexNFT : PositionNondisperseLiquidity;
 
 
     let users  : any[] = [];
@@ -129,7 +128,7 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     matching = await deployContract("ForkMatchingEngineAMM", deployer );
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
-    dexNFT = await deployContract("PositionConcentratedLiquidity", deployer );
+    dexNFT = await deployContract("PositionNondisperseLiquidity", deployer );
 
     quote = await deployMockToken("Quote");
     if (isRFI) {
