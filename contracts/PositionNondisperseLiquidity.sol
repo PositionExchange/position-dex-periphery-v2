@@ -6,14 +6,15 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "./implement/ConcentratedLiquidity.sol";
-import "./implement/ConcentratedLiquidityNFT.sol";
+import "./implement/LiquidityManager.sol";
+import "./implement/LiquidityManagerNFT.sol";
 
 import "./libraries/helper/TransferHelper.sol";
+import "./implement/LiquidityManager.sol";
 
-contract PositionConcentratedLiquidity is
-    ConcentratedLiquidity,
-    ConcentratedLiquidityNFT,
+contract PositionNondisperseLiquidity is
+    LiquidityManager,
+    LiquidityManagerNFT,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable
 {
@@ -40,7 +41,7 @@ contract PositionConcentratedLiquidity is
     function initialize() external initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
-        __ERC721_init("Position Liquidity Pool", "PLP");
+        __ERC721_init("Position Nondisperse Liquidity", "PNL");
         tokenID = 1000000;
     }
 
@@ -62,7 +63,7 @@ contract PositionConcentratedLiquidity is
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
     {
         super.addLiquidity(params);
@@ -70,7 +71,7 @@ contract PositionConcentratedLiquidity is
 
     function removeLiquidity(uint256 nftTokenId)
         public
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
         nftOwner(nftTokenId)
     {
@@ -79,7 +80,7 @@ contract PositionConcentratedLiquidity is
 
     function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
         public
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
         nftOwnerOrStaking(nftTokenId)
     {
@@ -93,7 +94,7 @@ contract PositionConcentratedLiquidity is
     )
         public
         payable
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
         nftOwnerOrStaking(nftTokenId)
     {
@@ -108,7 +109,7 @@ contract PositionConcentratedLiquidity is
     )
         public
         payable
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
         nftOwnerOrStaking(nftTokenId)
     {
@@ -117,7 +118,7 @@ contract PositionConcentratedLiquidity is
 
     function collectFee(uint256 nftTokenId)
         public
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         nonReentrant
         nftOwnerOrStaking(nftTokenId)
     {
@@ -126,7 +127,7 @@ contract PositionConcentratedLiquidity is
 
     function mint(address user)
         internal
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         returns (uint256 tokenId)
     {
         tokenId = tokenID + 1;
@@ -134,7 +135,7 @@ contract PositionConcentratedLiquidity is
         tokenID = tokenId;
     }
 
-    function burn(uint256 tokenId) internal override(ConcentratedLiquidity) {
+    function burn(uint256 tokenId) internal override(LiquidityManager) {
         _burnNFT(tokenId);
     }
 
@@ -172,7 +173,7 @@ contract PositionConcentratedLiquidity is
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         returns (SpotFactoryStorage.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
@@ -184,7 +185,7 @@ contract PositionConcentratedLiquidity is
         address _payer,
         SpotHouseStorage.Asset _asset,
         uint256 _amount
-    ) internal override(ConcentratedLiquidity) returns (uint256 amount) {
+    ) internal override(LiquidityManager) returns (uint256 amount) {
         if (_amount == 0) return 0;
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             _pairManager
@@ -235,7 +236,7 @@ contract PositionConcentratedLiquidity is
         address _recipient,
         SpotHouseStorage.Asset _asset,
         uint256 _amount
-    ) internal override(ConcentratedLiquidity) {
+    ) internal override(LiquidityManager) {
         address user = _msgSender();
         if (_amount == 0) return;
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
@@ -292,7 +293,7 @@ contract PositionConcentratedLiquidity is
     function _msgSender()
         internal
         view
-        override(ContextUpgradeable, ConcentratedLiquidity)
+        override(ContextUpgradeable, LiquidityManager)
         returns (address)
     {
         return msg.sender;
@@ -301,9 +302,18 @@ contract PositionConcentratedLiquidity is
     function _getWBNBAddress()
         internal
         view
-        override(ConcentratedLiquidity)
+        override(LiquidityManager)
         returns (address)
     {
         return WBNB;
+    }
+
+    function _owner(uint256 tokenId)
+        internal
+        view
+        override(LiquidityManager)
+        returns (address)
+    {
+        return ownerOf(tokenId);
     }
 }

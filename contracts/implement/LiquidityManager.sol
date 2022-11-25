@@ -8,17 +8,17 @@ pragma solidity ^0.8.9;
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/helper/Errors.sol";
-import "../interfaces/IConcentratedLiquidityNFT.sol";
+import "../interfaces/ILiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
-import "../interfaces/IConcentratedLiquidity.sol";
+import "../interfaces/ILiquidityManager.sol";
 import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../staking/PositionStakingDexManager.sol";
 
-abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
+abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
 
     mapping(uint256 => UserLiquidity.Data)
@@ -38,6 +38,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         payable
         virtual
     {
+        require(params.amountVirtual != 0, "!0");
         address user = _msgSender();
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
@@ -150,6 +151,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
+        require(amountModify != 0, "!0");
+
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
@@ -191,13 +194,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             "not support"
         );
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
-        );
+        UserLiquidity.CollectFeeData
+            memory _collectFeeData = estimateCollectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
 
         withdrawLiquidity(
             liquidityData.pool,
@@ -243,6 +247,8 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         public
         virtual
     {
+        require(liquidity != 0, "!0");
+
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
@@ -258,13 +264,14 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             uint128 quoteAmountRemoved
         ) = _removeLiquidity(liquidityData, liquidity);
 
-        UserLiquidity.CollectFeeData memory _collectFeeData = estimateCollectFee(
-            liquidityData.pool,
-            liquidityData.feeGrowthBase,
-            liquidityData.feeGrowthQuote,
-            liquidityData.liquidity,
-            liquidityData.indexedPipRange
-        );
+        UserLiquidity.CollectFeeData
+            memory _collectFeeData = estimateCollectFee(
+                liquidityData.pool,
+                liquidityData.feeGrowthBase,
+                liquidityData.feeGrowthQuote,
+                liquidityData.liquidity,
+                liquidityData.indexedPipRange
+            );
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
             liquidityData.liquidity - liquidity,
@@ -523,7 +530,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             liquidityData.liquidity,
             liquidityData.indexedPipRange
         );
-
         (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved,
@@ -786,19 +792,21 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
         ModifyType modifyType
     ) internal {
         if (address(stakingManager) != address(0)) {
-            require(
-                IUpdateStakingManager(address(stakingManager))
-                    .updateStakingLiquidity(
-                        user,
-                        tokenId,
-                        poolId,
-                        deltaLiquidityModify,
-                        modifyType
-                    ) == address(this),
-                "Not implement yet"
-            );
+            if (_owner(tokenId) == address(stakingManager)) {
+                require(
+                    IUpdateStakingManager(address(stakingManager))
+                        .updateStakingLiquidity(
+                            user,
+                            tokenId,
+                            poolId,
+                            deltaLiquidityModify,
+                            modifyType
+                        ) == address(this),
+                    "Not implement yet"
+                );
+            }
         } else {
-            revert("Empty staking manger");
+            //            revert("Empty staking manger");
         }
     }
 
@@ -814,7 +822,7 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
             require(caller == address(this), "Not implement yet");
             return isOwner;
         } else {
-            revert("Empty staking manger");
+            //            revert("Empty staking manger");
         }
         return false;
     }
@@ -822,4 +830,6 @@ abstract contract ConcentratedLiquidity is IConcentratedLiquidity {
     function mint(address user) internal virtual returns (uint256 tokenId) {}
 
     function burn(uint256 tokenId) internal virtual {}
+
+    function _owner(uint256 tokenId) internal view virtual returns (address) {}
 }

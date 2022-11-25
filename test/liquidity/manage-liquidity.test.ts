@@ -3,7 +3,7 @@ import {
     MockMatchingEngineAMM,
     MockSpotHouse,
     MockToken,
-    PositionConcentratedLiquidity,
+    PositionNondisperseLiquidity,
     PositionSpotFactory
 } from "../../typeChain";
 import {BASIS_POINT, TestLiquidity} from "./test-liquidity";
@@ -19,7 +19,7 @@ describe("manage liquidity", async () => {
     let quote: MockToken;
     let base: MockToken;
     let testHelper: TestLiquidity;
-    let dexNFT: PositionConcentratedLiquidity;
+    let dexNFT: PositionNondisperseLiquidity;
 
 
     let users: any[] = [];
@@ -29,7 +29,7 @@ describe("manage liquidity", async () => {
             matching = await deployContract("ForkMatchingEngineAMM", deployer);
             spotHouse = await deployContract("MockSpotHouse", deployer);
             factory = await deployContract("PositionSpotFactory", deployer);
-            dexNFT = await deployContract("PositionConcentratedLiquidity", deployer);
+            dexNFT = await deployContract("PositionNondisperseLiquidity", deployer);
             quote = await deployMockToken("Quote");
             base = await deployMockToken("Base");
 

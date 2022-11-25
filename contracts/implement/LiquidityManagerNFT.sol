@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/governance/utils/VotesUpgradeable.so
 
 /// @title Manage the Liquidity NFT
 /// @notice This NFT is voteable
-abstract contract ConcentratedLiquidityNFT is
+abstract contract LiquidityManagerNFT is
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable
 {

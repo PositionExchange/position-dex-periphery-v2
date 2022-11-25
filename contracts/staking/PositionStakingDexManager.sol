@@ -12,8 +12,9 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "../interfaces/IPositionConcentratedLiquidity.sol";
+import "../interfaces/IPositionNondisperseLiquidity.sol";
 import "../libraries/helper/U128Math.sol";
+import "../libraries/liquidity/Liquidity.sol";
 
 interface IPositionReferral {
     /**
@@ -82,7 +83,7 @@ contract PositionStakingDexManager is
     IPosiTreasury public posiTreasury;
 
     //    IPosiStakingManager public posiStakingManager;
-    IPositionConcentratedLiquidity public concentratedLiquidityNft;
+    IPositionNondisperseLiquidity public positionNondisperseLiquidity;
     //    IERC721 public liquidityNFT;
     // Dev address.
     address public devAddress;
@@ -157,7 +158,7 @@ contract PositionStakingDexManager is
 
     function initialize(
         IERC20 _position,
-        IPositionConcentratedLiquidity _positionConcentratedLiquidity,
+        IPositionNondisperseLiquidity _positionLiquidityManager,
         uint256 _startBlock
     ) external initializer {
         __ReentrancyGuard_init();
@@ -166,7 +167,7 @@ contract PositionStakingDexManager is
         position = _position;
         startBlock = _startBlock;
 
-        concentratedLiquidityNft = _positionConcentratedLiquidity;
+        positionNondisperseLiquidity = _positionLiquidityManager;
 
         devAddress = _msgSender();
         feeAddress = _msgSender();
@@ -235,7 +236,7 @@ contract PositionStakingDexManager is
         public
         onlyOwner
     {
-        concentratedLiquidityNft = IPositionConcentratedLiquidity(
+        positionNondisperseLiquidity = IPositionNondisperseLiquidity(
             _newLiquidityPool
         );
     }
@@ -414,7 +415,7 @@ contract PositionStakingDexManager is
     }
 
     function _stake(uint256 _nftId, address _referrer) internal {
-        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
         address poolAddress = address(nftData.pool);
         require(
             poolInfo[poolAddress].poolId != address(0x00),
@@ -456,7 +457,7 @@ contract PositionStakingDexManager is
     }
 
     function _unstake(uint256 _nftId) internal {
-        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(_nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
         address poolAddress = address(nftData.pool);
 
         PoolInfo storage pool = poolInfo[poolAddress];
@@ -536,7 +537,7 @@ contract PositionStakingDexManager is
         external
         returns (bool, address)
     {
-        UserLiquidity.Data memory nftData = _getConcentratedLiquidity(nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityManager(nftId);
         uint256 indexNftId = nftOwnedIndex[nftId][address(nftData.pool)];
         return (
             userNft[user][address(nftData.pool)][indexNftId] == nftId,
@@ -549,35 +550,33 @@ contract PositionStakingDexManager is
         uint256 tokenId,
         address poolId,
         uint128 deltaLiquidityModify,
-        IPositionConcentratedLiquidity.ModifyType modifyType
+        IPositionNondisperseLiquidity.ModifyType modifyType
     ) external returns (address caller) {
         require(
-            msg.sender == address(concentratedLiquidityNft),
+            msg.sender == address(positionNondisperseLiquidity),
             "only concentrated liquidity"
         );
+        PoolInfo storage pool = poolInfo[poolId];
+        UserInfo storage user = userInfo[poolId][user];
 
-        if (concentratedLiquidityNft.ownerOf(tokenId) == address(this)) {
-            PoolInfo storage pool = poolInfo[poolId];
-            UserInfo storage user = userInfo[poolId][user];
+        updatePool(poolId);
 
-            updatePool(poolId);
+        payOrLockupPendingPosition(poolId);
 
-            payOrLockupPendingPosition(poolId);
+        user.amount = modifyType == ILiquidityManager.ModifyType.INCREASE
+            ? user.amount.add(deltaLiquidityModify)
+            : user.amount.sub(deltaLiquidityModify);
 
-            user.amount = modifyType ==
-                IConcentratedLiquidity.ModifyType.INCREASE
-                ? user.amount.add(deltaLiquidityModify)
-                : user.amount.sub(deltaLiquidityModify);
+        user.rewardDebt = uint128(
+            user.amount.mul(pool.accPositionPerShare).div(1e12)
+        );
 
-            user.rewardDebt = uint128(
-                user.amount.mul(pool.accPositionPerShare).div(1e12)
-            );
+        pool.totalStaked = modifyType ==
+            ILiquidityManager.ModifyType.INCREASE
+            ? pool.totalStaked + deltaLiquidityModify
+            : pool.totalStaked - deltaLiquidityModify;
 
-            pool.totalStaked = modifyType ==
-                IConcentratedLiquidity.ModifyType.INCREASE
-                ? pool.totalStaked + deltaLiquidityModify
-                : pool.totalStaked - deltaLiquidityModify;
-        }
+        if (positionNondisperseLiquidity.ownerOf(tokenId) == address(this)) {}
 
         return msg.sender;
     }
@@ -711,7 +710,7 @@ contract PositionStakingDexManager is
     }
 
     function _transferNFTOut(uint256 id) internal {
-        concentratedLiquidityNft.safeTransferFrom(
+        positionNondisperseLiquidity.safeTransferFrom(
             address(this),
             msg.sender,
             id
@@ -719,7 +718,7 @@ contract PositionStakingDexManager is
     }
 
     function _transferNFTIn(uint256 id) internal {
-        concentratedLiquidityNft.safeTransferFrom(
+        positionNondisperseLiquidity.safeTransferFrom(
             msg.sender,
             address(this),
             id
@@ -733,7 +732,7 @@ contract PositionStakingDexManager is
         position.transfer(_to, _amount);
     }
 
-    function _getConcentratedLiquidity(uint256 tokenId)
+    function _getLiquidityManager(uint256 tokenId)
         internal
         view
         returns (UserLiquidity.Data memory data)
@@ -744,6 +743,6 @@ contract PositionStakingDexManager is
             data.feeGrowthBase,
             data.feeGrowthQuote,
             data.pool
-        ) = concentratedLiquidityNft.concentratedLiquidity(tokenId);
+        ) = positionNondisperseLiquidity.concentratedLiquidity(tokenId);
     }
 }
