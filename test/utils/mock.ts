@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 export async function deployMockToken(name: string): Promise<any> {
-  const mockToken = await ethers.getContractFactory("MockToken");
+  const mockToken = await ethers.getContractFactory("MockToken02");
   const instance = await mockToken.deploy(name, name);
   await instance.deployed();
   return instance;
