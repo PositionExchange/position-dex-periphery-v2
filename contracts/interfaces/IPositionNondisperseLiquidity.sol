@@ -7,7 +7,4 @@ pragma solidity ^0.8.9;
 import "./ILiquidityManager.sol";
 import "./ILiquidityNFT.sol";
 
-interface IPositionNondisperseLiquidity is
-    ILiquidityManager,
-    ILiquidityNFT
-{}
+interface IPositionNondisperseLiquidity is ILiquidityManager, ILiquidityNFT {}

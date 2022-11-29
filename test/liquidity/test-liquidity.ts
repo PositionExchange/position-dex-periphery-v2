@@ -323,8 +323,21 @@ export class TestLiquidity {
         const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[4].address);
         const balanceBase = await this.baseToken.balanceOf(this.users[2].address);
         const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
-        console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
-        console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
+        // console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
+        // console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
+        const currentPrice = await this.getCurrentPrice();
+        console.log("[openMarketOrder] currentPrice : ", currentPrice)
+        console.groupEnd();
+    }
+
+    async openMarketOrderWithQuote( side: number, size: number, asset : String, idSender : number,opts?: CallOptions) {
+        console.group(`openMarketOrderWithQuote`);
+        await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrderWithQuote(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
+        // const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[4].address);
+        // const balanceBase = await this.baseToken.balanceOf(this.users[2].address);
+        // const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
+        // console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
+        // console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
         const currentPrice = await this.getCurrentPrice();
         console.log("[openMarketOrder] currentPrice : ", currentPrice)
         console.groupEnd();
@@ -418,13 +431,17 @@ export class TestLiquidity {
 
         console.log("price: ", price);
 
-        const  {isFilled, isBuy, size} =  await this.mockMatching
+        const  {isFilled, isBuy, size, partialFilled} =  await this.mockMatching
             .getPendingOrderDetail(price, orderId)
+
+
+        console.log("isFilled, isBuy, size, partialFilled: ", isFilled.toString(), isBuy.toString(), size.toString(), partialFilled.toString());
+
         console.log("size: ", size,fromWeiAndFormat(size), _size );
 
-        expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
-            .to
-            .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
+        // expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
+        //     .to
+        //     .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
 
         await expect( side == SIDE.BUY).to.eq(isBuy);
 

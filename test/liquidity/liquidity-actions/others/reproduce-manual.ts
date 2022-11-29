@@ -9,7 +9,7 @@ describe("ReproduceManual", async function(){
 
 
 
-    it ("Case", async () => {
+    it ("Case 01", async () => {
         return testHelper.process(`
 - S0: SetCurrentPrice
   Action:
@@ -42,6 +42,65 @@ describe("ReproduceManual", async function(){
       QuoteVirtual: 23.42365149747
       BalanceBase: 9990.00000000000
       BalanceQuote: 9976.33974596216
+`)
+    })
+})
+
+
+
+describe("ReproduceManualPTX", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(1_000, false)
+    })
+
+
+
+    it ("Limit PTX", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 5104
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 1
+    Price: 6000
+  Expect:
+    PendingOrder:
+      OrderId: 1
+      Price: 6000
+      Size : 1
+      Side: 1
+- S2: OpenMarket
+  Action:
+    id: 2
+    asset: base
+    Side: 0
+    Quantity: 0.1
+- S3: OpenLimit
+  Action:
+    Id: 3
+    Asset: base
+    Side: 0
+    Quantity: 0.1
+    Price: 6000
+- S4: OpenMarket
+  Action:
+    Id: 3
+    Asset: base
+    Side: 0
+    Quantity: 0.1
+    Price: 6000
+- S5: Expect
+  PendingOrder:
+    OrderId: 1
+    Price: 6000
+    Size : 0.7
+    Side: 1
 `)
     })
 })

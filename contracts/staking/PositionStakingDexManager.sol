@@ -571,8 +571,7 @@ contract PositionStakingDexManager is
             user.amount.mul(pool.accPositionPerShare).div(1e12)
         );
 
-        pool.totalStaked = modifyType ==
-            ILiquidityManager.ModifyType.INCREASE
+        pool.totalStaked = modifyType == ILiquidityManager.ModifyType.INCREASE
             ? pool.totalStaked + deltaLiquidityModify
             : pool.totalStaked - deltaLiquidityModify;
 
