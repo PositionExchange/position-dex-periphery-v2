@@ -256,7 +256,13 @@ export class YamlTestProcess {
 
     async OpenMarket(stepData) {
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await this.testHelper.openMarketOrder(  action.side, action.quantity, action.asset, action.id,{revert : action.revert})}
+        if (action) {
+            if (action.asset == "base"){
+                await this.testHelper.openMarketOrder( action.side, action.quantity, action.asset, action.id,{revert : action.revert})
+            }else {
+                await this.testHelper.openMarketOrderWithQuote( action.side, action.quantity, action.asset, action.id,{revert : action.revert})
+            }
+        }
 
         if (action.revert === undefined){
             const expectData = stepData.getProp("Expect");
