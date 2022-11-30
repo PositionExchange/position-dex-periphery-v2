@@ -17,6 +17,8 @@ library DexErrors {
     string public constant DEX_MUST_BNB = "DEX_13";
     string public constant DEX_ONLY_COUNTER_PARTY = "DEX_14";
     string public constant DEX_INVALID_PAIR_INFO = "DEX_15";
+    string public constant DEX_ONLY_ROUTER = "DEX_16";
+    string public constant DEX_MAX_FEE = "DEX_17";
 
     string public constant LQ_NOT_IMPLEMENT_YET = "LQ_01";
     string public constant LQ_EMPTY_STAKING_MANAGER = "LQ_02";

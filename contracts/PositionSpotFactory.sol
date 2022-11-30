@@ -11,6 +11,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "./interfaces/ISpotFactory.sol";
 import "./libraries/types/SpotFactoryStorage.sol";
@@ -43,20 +44,20 @@ contract PositionSpotFactory is
     ) external nonReentrant {
         address creator = msg.sender;
 
-        require(
+        Require._require(
             quoteAsset != address(0) && baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
         );
-        require(
+        Require._require(
             quoteAsset != baseAsset,
             DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
         );
-        require(
+        Require._require(
             pathPairManagers[baseAsset][quoteAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
         );
 
-        require(
+        Require._require(
             basisPoint > 0 &&
                 basisPoint % 2 == 0 &&
                 maxFindingWordsIndex > 0 &&
@@ -153,8 +154,8 @@ contract PositionSpotFactory is
         override
         returns (bool)
     {
-        // Just 1 in 2 address need require != address 0x000
-        // Because when we added pair, already require both of them difference address 0x00
+        // Just 1 in 2 address needRequire._require != address 0x000
+        // Because when we added pair, alreadyRequire._require both of them difference address 0x00
         return allPairManager[pairManager].BaseAsset != address(0);
     }
 
@@ -174,7 +175,10 @@ contract PositionSpotFactory is
         external
         onlyOwner
     {
-        require(_positionLiquidity != address(0), DexErrors.DEX_EMPTY_ADDRESS);
+        Require._require(
+            _positionLiquidity != address(0),
+            DexErrors.DEX_EMPTY_ADDRESS
+        );
         positionLiquidity = _positionLiquidity;
     }
 
@@ -191,15 +195,15 @@ contract PositionSpotFactory is
         address _baseAsset,
         address _quoteAsset
     ) external {
-        require(
+        Require._require(
             _quoteAsset != address(0) && _baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
         );
-        require(
+        Require._require(
             _quoteAsset != _baseAsset,
             DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
         );
-        require(
+        Require._require(
             pathPairManagers[_baseAsset][_quoteAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
         );

@@ -32,7 +32,7 @@ contract SpotHouse is
     using Convert for uint256;
 
     modifier onlyRouter() {
-        require(_msgSender() == positionRouter, "!OR");
+        require(_msgSender() == positionRouter, DexErrors.DEX_ONLY_ROUTER);
         _;
     }
 
@@ -187,11 +187,11 @@ contract SpotHouse is
         spotFactory = ISpotFactory(_factoryAddress);
     }
 
-    function updateFee(uint16 _fee) external override onlyOwner {
-        //max fee can be is 10%
-        require(_fee <= 1000, "!F");
-        fee = _fee;
-    }
+    //    function updateFee(uint16 _fee) external override onlyOwner {
+    //        //max fee can be is 10%
+    //        require(_fee <= 1000, DexErrors.DEX_MAX_FEE);
+    //        fee = _fee;
+    //    }
 
     function setWBNB(address _wbnb) external onlyOwner {
         WBNB = _wbnb;
@@ -233,6 +233,22 @@ contract SpotHouse is
         }
 
         pairManager.resetFee(baseFeeFunding, quoteFeeFunding);
+    }
+
+    function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
+        public
+        override(StrategyFee)
+        onlyOwner
+    {
+        super.updateDiscountStrategy(newStrategyDiscount);
+    }
+
+    function setFee(uint16 _defaultFeePercentage)
+        public
+        override(StrategyFee)
+        onlyOwner
+    {
+        super.setFee(_defaultFeePercentage);
     }
 
     //------------------------------------------------------------------------------------------------------------------

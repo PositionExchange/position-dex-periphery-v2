@@ -5,10 +5,10 @@
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "./implement/LiquidityManager.sol";
 import "./implement/LiquidityManagerNFT.sol";
-
 import "./libraries/helper/TransferHelper.sol";
 import "./implement/LiquidityManager.sol";
 
@@ -19,12 +19,15 @@ contract PositionNondisperseLiquidity is
     OwnableUpgradeable
 {
     modifier nftOwner(uint256 nftId) {
-        require(_msgSender() == ownerOf(nftId), DexErrors.DEX_ONLY_OWNER);
+        Require._require(
+            _msgSender() == ownerOf(nftId),
+            DexErrors.DEX_ONLY_OWNER
+        );
         _;
     }
 
     modifier nftOwnerOrStaking(uint256 nftId) {
-        require(
+        Require._require(
             (_msgSender() == ownerOf(nftId)) ||
                 _isOwnerWhenStaking(_msgSender(), nftId),
             DexErrors.DEX_ONLY_OWNER
@@ -272,7 +275,7 @@ contract PositionNondisperseLiquidity is
     function _depositBNB(address _pairManagerAddress, uint256 _amount)
         internal
     {
-        require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
+        Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
     }

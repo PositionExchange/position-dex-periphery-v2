@@ -42,7 +42,7 @@ abstract contract StrategyFee {
     }
 
     function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
-        external
+        public
         virtual
     {
         delete strategyFee;
@@ -55,7 +55,7 @@ abstract contract StrategyFee {
         }
     }
 
-    function setFee(uint16 _defaultFeePercentage) external virtual {
+    function setFee(uint16 _defaultFeePercentage) public virtual {
         defaultFeePercentage = _defaultFeePercentage;
     }
 }

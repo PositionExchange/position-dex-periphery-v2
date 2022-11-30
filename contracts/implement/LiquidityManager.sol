@@ -5,13 +5,15 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
+
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/helper/DexErrors.sol";
 import "../interfaces/ILiquidityNFT.sol";
-import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
-import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
-import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 import "../interfaces/ILiquidityManager.sol";
 import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";
@@ -38,7 +40,10 @@ abstract contract LiquidityManager is ILiquidityManager {
         payable
         virtual
     {
-        require(params.amountVirtual != 0, DexErrors.LQ_INVALID_NUMBER);
+        Require._require(
+            params.amountVirtual != 0,
+            DexErrors.LQ_INVALID_NUMBER
+        );
         address user = _msgSender();
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
@@ -67,7 +72,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 ? _resultAddLiquidity.quoteAmountAdded
                 : _resultAddLiquidity.baseAmountAdded
         );
-        require(
+        Require._require(
             params.isBase
                 ? amountModifySecondAsset >=
                     _resultAddLiquidity.quoteAmountAdded
@@ -151,7 +156,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
-        require(amountModify != 0, DexErrors.LQ_INVALID_NUMBER);
+        Require._require(amountModify != 0, DexErrors.LQ_INVALID_NUMBER);
 
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -185,7 +190,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 : _resultAddLiquidity.baseAmountAdded
         );
 
-        require(
+        Require._require(
             isBase
                 ? amountModifySecondAsset >=
                     _resultAddLiquidity.quoteAmountAdded
@@ -247,13 +252,13 @@ abstract contract LiquidityManager is ILiquidityManager {
         public
         virtual
     {
-        require(liquidity != 0, DexErrors.LQ_INVALID_NUMBER);
+        Require._require(liquidity != 0, DexErrors.LQ_INVALID_NUMBER);
 
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
 
-        //        require(liquidityData.liquidity >= liquidity, "!Liquidity");
+        //       Require._require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
         if (liquidity > liquidityData.liquidity) {
             liquidity = liquidityData.liquidity;
@@ -339,7 +344,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             state.liquidityData.pool
         );
 
-        require(
+        Require._require(
             targetIndex != state.liquidityData.indexedPipRange,
             DexErrors.LQ_INDEX_RANGE_NOT_DIFF
         );
@@ -611,11 +616,11 @@ abstract contract LiquidityManager is ILiquidityManager {
         // TODO consider necessary to check it
         //        state.WBNBAddress = _getWBNBAddress();
         //        if (state.pair.QuoteAsset == state.WBNBAddress) {
-        //            require(!isBase, "not support");
+        //           Require._require(!isBase, "not support");
         //        }
         //
         //        if (state.pair.BaseAsset == state.WBNBAddress) {
-        //            require(isBase, "not support");
+        //           Require._require(isBase, "not support");
         //        }
 
         if (
@@ -793,7 +798,7 @@ abstract contract LiquidityManager is ILiquidityManager {
     ) internal {
         if (address(stakingManager) != address(0)) {
             if (_owner(tokenId) == address(stakingManager)) {
-                require(
+                Require._require(
                     IUpdateStakingManager(address(stakingManager))
                         .updateStakingLiquidity(
                             user,
@@ -820,7 +825,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 address(stakingManager)
             ).isOwnerWhenStaking(user, nftId);
 
-            //            require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
+            //           Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
             return isOwner;
         } else {
             //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);

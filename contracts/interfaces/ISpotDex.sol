@@ -120,8 +120,6 @@ interface ISpotDex {
 
     function setFactory(address _factoryAddress) external;
 
-    function updateFee(uint16 _fee) external;
-
     function openMarketOrder(
         IMatchingEngineAMM _pairManager,
         SpotHouseStorage.Side _side,

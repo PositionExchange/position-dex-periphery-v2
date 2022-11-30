@@ -7,12 +7,12 @@ pragma solidity ^0.8.9;
 import "../libraries/types/SpotHouseStorage.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
-import "hardhat/console.sol";
 
 abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
     using Convert for uint256;
@@ -37,7 +37,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 quantity,
         uint128 pip
     ) public payable virtual {
-        require(side == Side.BUY, DexErrors.DEX_MUST_ORDER_BUY);
+        Require._require(side == Side.BUY, DexErrors.DEX_MUST_ORDER_BUY);
         address trader = _msgSender();
         _openBuyLimitOrderExactInput(pairManager, quantity, pip, trader);
     }
@@ -134,7 +134,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _trader
             );
 
-        require(
+        Require._require(
             _listPendingLimitOrder.length > 0,
             DexErrors.DEX_NO_LIMIT_TO_CANCEL
         );
@@ -214,12 +214,15 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         SpotLimitOrder.Data[] storage _orders = limitOrders[
             address(_pairManager)
         ][_trader];
-        require(_orderIdx < _orders.length, DexErrors.DEX_INVALID_ORDER_ID);
+        Require._require(
+            _orderIdx < _orders.length,
+            DexErrors.DEX_INVALID_ORDER_ID
+        );
 
         // save gas
         SpotLimitOrder.Data memory _order = _orders[_orderIdx];
 
-        require(
+        Require._require(
             _order.baseAmount != 0 && _order.quoteAmount != 0,
             DexErrors.DEX_NO_LIMIT_TO_CANCEL
         );
@@ -229,7 +232,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _order.orderId
         );
 
-        require(isFilled == false, DexErrors.DEX_ORDER_MUST_NOT_FILLED);
+        Require._require(
+            isFilled == false,
+            DexErrors.DEX_ORDER_MUST_NOT_FILLED
+        );
 
         // blank limit order data
         // we set the deleted order to a blank data
@@ -281,7 +287,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             uint256 baseAmount,
             uint256 basicPoint
         ) = getAmountClaimable(_pairManager, _trader);
-        require(
+        Require._require(
             quoteAmount > 0 || baseAmount > 0,
             DexErrors.DEX_NO_AMOUNT_TO_CLAIM
         );
@@ -460,7 +466,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 quoteAmount
             );
 
-            require(
+            Require._require(
                 quoteAmountTransferred == quoteAmount,
                 DexErrors.DEX_MUST_NOT_TOKEN_RFI
             );
@@ -506,8 +512,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 false
             );
         }
-        console.log("state.sizeOut: ", state.sizeOut);
-        console.log("_quantity: ", _quantity);
 
         emit LimitOrderOpened(
             state.orderId,
@@ -636,8 +640,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         /// state.mainSideOut is base asset
         /// state.flipSideOut is quote asset
         OpenMarketState memory state;
-        //        uint256 sizeOut;
-        //        uint256 quoteAmount;
+
         uint16 fee = _getFee();
 
         if (_side == Side.BUY) {
@@ -646,7 +649,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.flipSideOut,
                 state.feeAmount
             ) = _pairManager.openMarket(_quantity, true, _payer, fee);
-            require(
+            Require._require(
                 state.mainSideOut == _quantity,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );
@@ -659,7 +662,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.flipSideOut
             );
 
-            require(
+            Require._require(
                 amountTransferred == state.flipSideOut,
                 DexErrors.DEX_MUST_NOT_TOKEN_RFI
             );
@@ -692,7 +695,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _payer,
                 fee
             );
-            require(
+            Require._require(
                 state.mainSideOut == baseAmountTransferred,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );
@@ -752,7 +755,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 fee
             );
 
-            require(
+            Require._require(
                 state.mainSideOut == amountTransferred,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );
@@ -785,7 +788,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 _payer,
                 fee
             );
-            require(
+            Require._require(
                 state.mainSideOut == _quoteAmount,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );

@@ -22,6 +22,7 @@ import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/types/PositionRouterStorage.sol";
 import "./interfaces/IPositionRouter.sol";
+import "./libraries/helper/DexErrors.sol";
 
 contract PositionRouter is
     PositionRouterStorage,
@@ -169,7 +170,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[0] == WBNB, "!BNB");
+        require(path[0] == WBNB, DexErrors.DEX_MUST_BNB);
         (
             SpotHouseStorage.Side side,
             address pairManager
@@ -219,7 +220,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[path.length - 1] == WBNB, "!BNB");
+        require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
         (
             SpotHouseStorage.Side side,
             address pairManager
@@ -272,7 +273,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[path.length - 1] == WBNB, "!BNB");
+        require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
         (
             SpotHouseStorage.Side side,
             address pairManager
@@ -416,7 +417,7 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external payable virtual override ensure(deadline) {
-        require(path[0] == WBNB, "!BNB");
+        require(path[0] == WBNB, DexErrors.DEX_MUST_BNB);
         (
             SpotHouseStorage.Side side,
             address pairManager
@@ -457,7 +458,7 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
-        require(path[path.length - 1] == WBNB, "!BNB");
+        require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
         (
             SpotHouseStorage.Side side,
             address pairManager
