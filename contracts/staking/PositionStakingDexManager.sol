@@ -535,6 +535,7 @@ contract PositionStakingDexManager is
 
     function isOwnerWhenStaking(address user, uint256 nftId)
         external
+        view
         returns (bool, address)
     {
         UserLiquidity.Data memory nftData = _getLiquidityManager(nftId);

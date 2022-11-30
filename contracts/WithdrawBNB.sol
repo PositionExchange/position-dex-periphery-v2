@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import {Errors} from "./libraries/helper/Errors.sol";
+import {DexErrors} from "./libraries/helper/DexErrors.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IWBNB.sol";
 
@@ -19,12 +19,12 @@ contract WithdrawBNB is IWithdrawBNB {
     address public spotHouse;
 
     modifier onlyOwner() {
-        require(msg.sender == owner, Errors.VL_ONLY_OWNER);
+        require(msg.sender == owner, DexErrors.DEX_ONLY_OWNER);
         _;
     }
 
     modifier onlyCounterParty() {
-        require(msg.sender == spotHouse, Errors.VL_ONLY_COUNTERPARTY);
+        require(msg.sender == spotHouse, DexErrors.DEX_ONLY_COUNTER_PARTY);
         _;
     }
 

@@ -7,7 +7,7 @@ pragma solidity ^0.8.9;
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/SpotHouseStorage.sol";
-import "../libraries/helper/Errors.sol";
+import "../libraries/helper/DexErrors.sol";
 import "../interfaces/ILiquidityNFT.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
@@ -38,7 +38,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         payable
         virtual
     {
-        require(params.amountVirtual != 0, "!0");
+        require(params.amountVirtual != 0, DexErrors.LQ_INVALID_NUMBER);
         address user = _msgSender();
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
@@ -73,7 +73,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     _resultAddLiquidity.quoteAmountAdded
                 : amountModifySecondAsset >=
                     _resultAddLiquidity.baseAmountAdded,
-            "not support"
+            DexErrors.LQ_NOT_SUPPORT
         );
 
         uint256 nftTokenId = mint(user);
@@ -151,7 +151,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 amountModify,
         bool isBase
     ) public payable virtual {
-        require(amountModify != 0, "!0");
+        require(amountModify != 0, DexErrors.LQ_INVALID_NUMBER);
 
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -191,7 +191,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     _resultAddLiquidity.quoteAmountAdded
                 : amountModifySecondAsset >=
                     _resultAddLiquidity.baseAmountAdded,
-            "not support"
+            DexErrors.LQ_NOT_SUPPORT
         );
 
         UserLiquidity.CollectFeeData
@@ -247,7 +247,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         public
         virtual
     {
-        require(liquidity != 0, "!0");
+        require(liquidity != 0, DexErrors.LQ_INVALID_NUMBER);
 
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -341,7 +341,7 @@ abstract contract LiquidityManager is ILiquidityManager {
 
         require(
             targetIndex != state.liquidityData.indexedPipRange,
-            Errors.LQ_INDEX_RANGE_NOT_DIFF
+            DexErrors.LQ_INDEX_RANGE_NOT_DIFF
         );
 
         state.collectFeeData = estimateCollectFee(
@@ -802,16 +802,17 @@ abstract contract LiquidityManager is ILiquidityManager {
                             deltaLiquidityModify,
                             modifyType
                         ) == address(this),
-                    "Not implement yet"
+                    DexErrors.LQ_NOT_IMPLEMENT_YET
                 );
             }
         } else {
-            //            revert("Empty staking manger");
+            //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);
         }
     }
 
     function _isOwnerWhenStaking(address user, uint256 nftId)
         internal
+        view
         returns (bool)
     {
         if (address(stakingManager) != address(0)) {
@@ -819,10 +820,10 @@ abstract contract LiquidityManager is ILiquidityManager {
                 address(stakingManager)
             ).isOwnerWhenStaking(user, nftId);
 
-            require(caller == address(this), "Not implement yet");
+            //            require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
             return isOwner;
         } else {
-            //            revert("Empty staking manger");
+            //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);
         }
         return false;
     }

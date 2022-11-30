@@ -19,7 +19,7 @@ contract PositionNondisperseLiquidity is
     OwnableUpgradeable
 {
     modifier nftOwner(uint256 nftId) {
-        require(_msgSender() == ownerOf(nftId), "!Owner");
+        require(_msgSender() == ownerOf(nftId), DexErrors.DEX_ONLY_OWNER);
         _;
     }
 
@@ -27,7 +27,7 @@ contract PositionNondisperseLiquidity is
         require(
             (_msgSender() == ownerOf(nftId)) ||
                 _isOwnerWhenStaking(_msgSender(), nftId),
-            "!Owner"
+            DexErrors.DEX_ONLY_OWNER
         );
         _;
     }
@@ -177,7 +177,7 @@ contract PositionNondisperseLiquidity is
         returns (SpotFactoryStorage.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
-        require(pair.BaseAsset != address(0), "!0x");
+        require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
     }
 
     function depositLiquidity(
@@ -272,7 +272,7 @@ contract PositionNondisperseLiquidity is
     function _depositBNB(address _pairManagerAddress, uint256 _amount)
         internal
     {
-        require(msg.value >= _amount, Errors.VL_NEED_MORE_BNB);
+        require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
     }
