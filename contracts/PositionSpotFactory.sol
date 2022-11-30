@@ -9,13 +9,12 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import "./interfaces/ISpotFactory.sol";
 import "./libraries/types/SpotFactoryStorage.sol";
-import "./libraries/helper/Errors.sol";
-
-import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "./libraries/helper/DexErrors.sol";
 
 contract PositionSpotFactory is
     ISpotFactory,
@@ -46,12 +45,15 @@ contract PositionSpotFactory is
 
         require(
             quoteAsset != address(0) && baseAsset != address(0),
-            Errors.VL_EMPTY_ADDRESS
+            DexErrors.DEX_EMPTY_ADDRESS
         );
-        require(quoteAsset != baseAsset, Errors.VL_MUST_IDENTICAL_ADDRESSES);
+        require(
+            quoteAsset != baseAsset,
+            DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
+        );
         require(
             pathPairManagers[baseAsset][quoteAsset] == address(0),
-            Errors.VL_SPOT_MANGER_EXITS
+            DexErrors.DEX_SPOT_MANGER_EXITS
         );
 
         require(
@@ -61,7 +63,7 @@ contract PositionSpotFactory is
                 initialPip > 0 &&
                 pipRange > 0 &&
                 tickSpace > 0,
-            Errors.VL_INVALID_PAIR_INFO
+            DexErrors.DEX_INVALID_PAIR_INFO
         );
 
         address pair;
@@ -172,7 +174,7 @@ contract PositionSpotFactory is
         external
         onlyOwner
     {
-        require(_positionLiquidity != address(0), Errors.VL_EMPTY_ADDRESS);
+        require(_positionLiquidity != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         positionLiquidity = _positionLiquidity;
     }
 
@@ -191,12 +193,15 @@ contract PositionSpotFactory is
     ) external {
         require(
             _quoteAsset != address(0) && _baseAsset != address(0),
-            Errors.VL_EMPTY_ADDRESS
+            DexErrors.DEX_EMPTY_ADDRESS
         );
-        require(_quoteAsset != _baseAsset, Errors.VL_MUST_IDENTICAL_ADDRESSES);
+        require(
+            _quoteAsset != _baseAsset,
+            DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
+        );
         require(
             pathPairManagers[_baseAsset][_quoteAsset] == address(0),
-            Errors.VL_SPOT_MANGER_EXITS
+            DexErrors.DEX_SPOT_MANGER_EXITS
         );
 
         // save

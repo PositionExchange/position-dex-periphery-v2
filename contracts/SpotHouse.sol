@@ -15,7 +15,7 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 
 import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
-import {Errors} from "./libraries/helper/Errors.sol";
+import {DexErrors} from "./libraries/helper/DexErrors.sol";
 import {TransferHelper} from "./libraries/helper/TransferHelper.sol";
 import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
@@ -159,7 +159,7 @@ contract SpotHouse is
         returns (SpotFactoryStorage.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
-        require(pair.BaseAsset != address(0), "!0x");
+        require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ contract SpotHouse is
     }
 
     function setFactory(address _factoryAddress) external override onlyOwner {
-        require(_factoryAddress != address(0), Errors.VL_EMPTY_ADDRESS);
+        require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         spotFactory = ISpotFactory(_factoryAddress);
     }
 
@@ -260,7 +260,7 @@ contract SpotHouse is
         internal
         override(SpotDex)
     {
-        require(msg.value >= _amount, Errors.VL_NEED_MORE_BNB);
+        require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
     }
