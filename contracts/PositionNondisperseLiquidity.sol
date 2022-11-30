@@ -29,7 +29,7 @@ contract PositionNondisperseLiquidity is
     modifier nftOwnerOrStaking(uint256 nftId) {
         Require._require(
             (_msgSender() == ownerOf(nftId)) ||
-                _isOwnerWhenStaking(_msgSender(), nftId),
+                isOwnerWhenStaking(_msgSender(), nftId),
             DexErrors.DEX_ONLY_OWNER
         );
         _;
@@ -48,20 +48,24 @@ contract PositionNondisperseLiquidity is
         tokenID = 1000000;
     }
 
+    //    function setTokenId(uint256 tokenId) external {
+    //        tokenID = tokenId;
+    //    }
+
     function setFactory(ISpotFactory _sportFactory) public onlyOwner {
         spotFactory = _sportFactory;
     }
 
-    function setStakingManager(IPositionStakingDexManager _stakingManager)
-        public
-        onlyOwner
-    {
-        stakingManager = _stakingManager;
-    }
+    //    function setStakingManager(IPositionStakingDexManager _stakingManager)
+    //        public
+    //        onlyOwner
+    //    {
+    //        stakingManager = _stakingManager;
+    //    }
 
-    function getStakingManager() public view returns (address) {
-        return address(stakingManager);
-    }
+    //    function getStakingManager() public view returns (address) {
+    //        return address(stakingManager);
+    //    }
 
     function addLiquidity(AddLiquidityParams calldata params)
         public
@@ -173,11 +177,22 @@ contract PositionNondisperseLiquidity is
         depositLiquidity(pool, _msgSender(), SpotHouseStorage.Asset.Base, base);
     }
 
+    function getStakingManager(address poolAddress)
+        public
+        view
+        override(LiquidityManager)
+        returns (address)
+    {
+        address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
+
+        return spotFactory.pairOfStakingManager(ownerOfPool, poolAddress);
+    }
+
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
         override(LiquidityManager)
-        returns (SpotFactoryStorage.Pair memory pair)
+        returns (ISpotFactory.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
         require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
@@ -190,9 +205,7 @@ contract PositionNondisperseLiquidity is
         uint256 _amount
     ) internal override(LiquidityManager) returns (uint256 amount) {
         if (_amount == 0) return 0;
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
+        ISpotFactory.Pair memory _pairAddress = _getQuoteAndBase(_pairManager);
         address pairManagerAddress = address(_pairManager);
         if (_asset == SpotHouseStorage.Asset.Quote) {
             if (_pairAddress.QuoteAsset == WBNB) {
@@ -242,9 +255,7 @@ contract PositionNondisperseLiquidity is
     ) internal override(LiquidityManager) {
         address user = _msgSender();
         if (_amount == 0) return;
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
+        ISpotFactory.Pair memory _pairAddress = _getQuoteAndBase(_pairManager);
 
         address pairManagerAddress = address(_pairManager);
         if (_asset == SpotHouseStorage.Asset.Quote) {

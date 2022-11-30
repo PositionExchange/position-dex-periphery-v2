@@ -11,7 +11,6 @@ import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "../libraries/liquidity/Liquidity.sol";
-import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/helper/DexErrors.sol";
 import "../interfaces/ILiquidityNFT.sol";
 import "../interfaces/ILiquidityManager.sol";
@@ -19,6 +18,8 @@ import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../staking/PositionStakingDexManager.sol";
+import "../interfaces/ISpotFactory.sol";
+import "../libraries/types/SpotHouseStorage.sol";
 
 abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
@@ -586,7 +587,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 baseAmountModify;
         uint128 quoteAmountModify;
         uint256 currentIndexedPipRange;
-        SpotFactoryStorage.Pair pair;
+        ISpotFactory.Pair pair;
         address WBNBAddress;
         uint128 currentPrice;
         uint128 maxPip;
@@ -784,7 +785,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         internal
         view
         virtual
-        returns (SpotFactoryStorage.Pair memory pair)
+        returns (ISpotFactory.Pair memory pair)
     {}
 
     function _getWBNBAddress() internal view virtual returns (address) {}
@@ -792,18 +793,19 @@ abstract contract LiquidityManager is ILiquidityManager {
     function _updateStakingLiquidity(
         address user,
         uint256 tokenId,
-        address poolId,
+        address poolAddress,
         uint128 deltaLiquidityModify,
         ModifyType modifyType
     ) internal {
-        if (address(stakingManager) != address(0)) {
-            if (_owner(tokenId) == address(stakingManager)) {
+        address stakingManager = getStakingManager(poolAddress);
+        if (stakingManager != address(0)) {
+            if (_owner(tokenId) == stakingManager) {
                 Require._require(
-                    IUpdateStakingManager(address(stakingManager))
+                    IUpdateStakingManager(stakingManager)
                         .updateStakingLiquidity(
                             user,
                             tokenId,
-                            poolId,
+                            poolAddress,
                             deltaLiquidityModify,
                             modifyType
                         ) == address(this),
@@ -815,14 +817,16 @@ abstract contract LiquidityManager is ILiquidityManager {
         }
     }
 
-    function _isOwnerWhenStaking(address user, uint256 nftId)
-        internal
+    function isOwnerWhenStaking(address user, uint256 nftId)
+        public
         view
         returns (bool)
     {
-        if (address(stakingManager) != address(0)) {
+        UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftId];
+        address stakingManager = getStakingManager(address(liquidityData.pool));
+        if (stakingManager != address(0)) {
             (bool isOwner, address caller) = ICheckOwnerWhenStaking(
-                address(stakingManager)
+                stakingManager
             ).isOwnerWhenStaking(user, nftId);
 
             //           Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
@@ -838,4 +842,11 @@ abstract contract LiquidityManager is ILiquidityManager {
     function burn(uint256 tokenId) internal virtual {}
 
     function _owner(uint256 tokenId) internal view virtual returns (address) {}
+
+    function getStakingManager(address poolAddress)
+        public
+        view
+        virtual
+        returns (address)
+    {}
 }
