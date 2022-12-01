@@ -536,18 +536,22 @@ abstract contract LiquidityManager is ILiquidityManager {
             liquidityData.liquidity,
             liquidityData.indexedPipRange
         );
-        (
-            uint128 baseAmountRemoved,
-            uint128 quoteAmountRemoved,
 
-        ) = liquidityData.pool.estimateRemoveLiquidity(
-                IAutoMarketMakerCore.RemoveLiquidity({
-                    liquidity: liquidityData.liquidity,
-                    indexedPipRange: liquidityData.indexedPipRange,
-                    feeGrowthBase: liquidityData.feeGrowthBase,
-                    feeGrowthQuote: liquidityData.feeGrowthQuote
-                })
-            );
+        uint128 baseAmountRemoved;
+        uint128 quoteAmountRemoved;
+
+        if (liquidityData.liquidity > 0) {
+            (baseAmountRemoved, quoteAmountRemoved, ) = liquidityData
+                .pool
+                .estimateRemoveLiquidity(
+                    IAutoMarketMakerCore.RemoveLiquidity({
+                        liquidity: liquidityData.liquidity,
+                        indexedPipRange: liquidityData.indexedPipRange,
+                        feeGrowthBase: liquidityData.feeGrowthBase,
+                        feeGrowthQuote: liquidityData.feeGrowthQuote
+                    })
+                );
+        }
 
         return (
             baseAmountRemoved,
