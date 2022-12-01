@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "../libraries/types/SpotFactoryStorage.sol";
-
 interface ISpotFactory {
     event PairManagerInitialized(
         address quoteAsset,
@@ -15,6 +13,11 @@ interface ISpotFactory {
         uint256 pipRange,
         uint256 tickSpace
     );
+
+    struct Pair {
+        address BaseAsset;
+        address QuoteAsset;
+    }
 
     function createPairManager(
         address quoteAsset,
@@ -34,7 +37,7 @@ interface ISpotFactory {
     function getQuoteAndBase(address pairManager)
         external
         view
-        returns (SpotFactoryStorage.Pair memory);
+        returns (Pair memory);
 
     function isPairManagerExist(address pairManager)
         external
@@ -49,4 +52,11 @@ interface ISpotFactory {
             address quoteToken,
             address pairManager
         );
+
+    function pairOfStakingManager(address owner, address pair)
+        external
+        view
+        returns (address);
+
+    function ownerPairManager(address pair) external view returns (address);
 }

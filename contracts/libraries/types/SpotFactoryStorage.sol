@@ -1,21 +1,30 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interfaces/ISpotFactory.sol";
 
-contract SpotFactoryStorage {
+abstract contract SpotFactoryStorage is ISpotFactory {
     address public spotHouse;
 
     address public positionLiquidity;
-
-    struct Pair {
-        address BaseAsset;
-        address QuoteAsset;
-    }
 
     //  baseAsset address => quoteAsset address => spotManager address
     mapping(address => mapping(address => address)) internal pathPairManagers;
 
     mapping(address => Pair) internal allPairManager;
+
+    mapping(address => bool) public allowedAddressAddPair;
+
+    // pair manager => owner
+    mapping(address => address) public override ownerPairManager;
+
+    // owner => pair manager => staking manager
+    mapping(address => mapping(address => address))
+        public
+        override pairOfStakingManager;
+
+    address public templatePair;
+    uint32 public feeShareAmm;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -23,6 +32,4 @@ contract SpotFactoryStorage {
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
     uint256[49] private __gap;
-
-    mapping(address => bool) public allowedAddressAddPair;
 }

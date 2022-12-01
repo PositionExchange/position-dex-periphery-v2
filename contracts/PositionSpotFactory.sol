@@ -18,7 +18,6 @@ import "./libraries/types/SpotFactoryStorage.sol";
 import "./libraries/helper/DexErrors.sol";
 
 contract PositionSpotFactory is
-    ISpotFactory,
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
@@ -30,9 +29,6 @@ contract PositionSpotFactory is
         __Pausable_init();
     }
 
-    address public templatePair;
-    uint32 public feeShareAmm;
-
     function createPairManager(
         address quoteAsset,
         address baseAsset,
@@ -41,7 +37,7 @@ contract PositionSpotFactory is
         uint128 initialPip,
         uint128 pipRange,
         uint32 tickSpace
-    ) external nonReentrant {
+    ) external override(ISpotFactory) nonReentrant {
         address creator = msg.sender;
 
         Require._require(
@@ -83,6 +79,8 @@ contract PositionSpotFactory is
             QuoteAsset: quoteAsset
         });
 
+        ownerPairManager[pair] = creator;
+
         IMatchingEngineAMM(pair).initialize(
             IMatchingEngineAMM.InitParams({
                 quoteAsset: IERC20(quoteAsset),
@@ -112,10 +110,18 @@ contract PositionSpotFactory is
         );
     }
 
+    function setStakingManagerForPair(address pair, address stakingManager)
+        public
+    {
+        address owner = msg.sender;
+        require(owner == ownerPairManager[pair], "NOT_OWNER");
+        pairOfStakingManager[pair][owner] = stakingManager;
+    }
+
     function getPairManager(address quoteAsset, address baseAsset)
         external
         view
-        override
+        override(ISpotFactory)
         returns (address spotManager)
     {
         return pathPairManagers[baseAsset][quoteAsset];
@@ -142,7 +148,7 @@ contract PositionSpotFactory is
     function getQuoteAndBase(address pairManager)
         external
         view
-        override
+        override(ISpotFactory)
         returns (Pair memory)
     {
         return allPairManager[pairManager];
@@ -151,7 +157,7 @@ contract PositionSpotFactory is
     function isPairManagerExist(address pairManager)
         external
         view
-        override
+        override(ISpotFactory)
         returns (bool)
     {
         // Just 1 in 2 address needRequire._require != address 0x000
@@ -215,6 +221,7 @@ contract PositionSpotFactory is
             BaseAsset: _baseAsset,
             QuoteAsset: _quoteAsset
         });
+        ownerPairManager[_pairManager] = msg.sender;
     }
 
     function updateTemplatePair(address templatePair_) public onlyOwner {
