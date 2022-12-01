@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "./TradeConvert.sol";
 import "./Convert.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
 
 library SpotHouseHelper {
     using TradeConvert for uint256;

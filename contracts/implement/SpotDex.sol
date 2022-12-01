@@ -27,7 +27,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint128 pip
     ) public payable virtual {
         address trader = _msgSender();
-
         _openLimitOrder(pairManager, quantity, pip, trader, side);
     }
 
@@ -124,8 +123,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             quoteFilled,
             baseFilled,
             basicPoint
-            //            uint256 feeQuote,
-            //            uint256 feeBase
         ) = getAmountClaimable(_pairManager, _trader);
 
         PendingLimitOrder[]
@@ -448,12 +445,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     (_quantity - state.sizeOut),
                     _pip,
                     state.basicPoint
-                ) +
-                //                _pairManager.calculatingQuoteAmount(
-                //                    (_quantity - state.sizeOut).Uint256ToUint128(),
-                //                    _pip
-                //                )
-                state.quoteAmountFilled;
+                ) + state.quoteAmountFilled;
 
             //            quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
@@ -536,11 +528,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         state.basicPoint = _basisPoint(_pairManager);
 
         uint256 quoteAmount = _baseToQuote(_quantity, _pip, state.basicPoint);
-        //
-        //        uint256 quoteAmount = _pairManager.calculatingQuoteAmount(
-        //            _quantity.Uint256ToUint128(),
-        //            _pip
-        //        );
 
         uint256 quoteAmountTransferred = _deposit(
             _pairManager,

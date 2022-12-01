@@ -7,10 +7,7 @@ pragma solidity ^0.8.9;
 import {DexErrors} from "./libraries/helper/DexErrors.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IWBNB.sol";
-
-interface IWithdrawBNB {
-    function withdraw(address recipient, uint256 _amount) external;
-}
+import "./interfaces/IWithdrawBNB.sol";
 
 contract WithdrawBNB is IWithdrawBNB {
     using Address for address payable;

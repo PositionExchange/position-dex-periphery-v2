@@ -11,6 +11,8 @@ import "./implement/LiquidityManager.sol";
 import "./implement/LiquidityManagerNFT.sol";
 import "./libraries/helper/TransferHelper.sol";
 import "./implement/LiquidityManager.sol";
+import "./interfaces/IWithdrawBNB.sol";
+import "./interfaces/IWBNB.sol";
 
 contract PositionNondisperseLiquidity is
     LiquidityManager,
@@ -48,24 +50,10 @@ contract PositionNondisperseLiquidity is
         tokenID = 1000000;
     }
 
-    //    function setTokenId(uint256 tokenId) external {
-    //        tokenID = tokenId;
-    //    }
-
     function setFactory(ISpotFactory _sportFactory) public onlyOwner {
         spotFactory = _sportFactory;
     }
 
-    //    function setStakingManager(IPositionStakingDexManager _stakingManager)
-    //        public
-    //        onlyOwner
-    //    {
-    //        stakingManager = _stakingManager;
-    //    }
-
-    //    function getStakingManager() public view returns (address) {
-    //        return address(stakingManager);
-    //    }
 
     function addLiquidity(AddLiquidityParams calldata params)
         public
@@ -168,13 +156,8 @@ contract PositionNondisperseLiquidity is
         uint256 base,
         uint256 quote
     ) external {
-        depositLiquidity(
-            pool,
-            _msgSender(),
-            SpotHouseStorage.Asset.Quote,
-            quote
-        );
-        depositLiquidity(pool, _msgSender(), SpotHouseStorage.Asset.Base, base);
+        depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
+        depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
     }
 
     function getStakingManager(address poolAddress)
@@ -201,13 +184,13 @@ contract PositionNondisperseLiquidity is
     function depositLiquidity(
         IMatchingEngineAMM _pairManager,
         address _payer,
-        SpotHouseStorage.Asset _asset,
+        Asset.Type _asset,
         uint256 _amount
     ) internal override(LiquidityManager) returns (uint256 amount) {
         if (_amount == 0) return 0;
         ISpotFactory.Pair memory _pairAddress = _getQuoteAndBase(_pairManager);
         address pairManagerAddress = address(_pairManager);
-        if (_asset == SpotHouseStorage.Asset.Quote) {
+        if (_asset == Asset.Type.Quote) {
             if (_pairAddress.QuoteAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
             } else {
@@ -250,7 +233,7 @@ contract PositionNondisperseLiquidity is
     function withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
         address _recipient,
-        SpotHouseStorage.Asset _asset,
+        Asset.Type _asset,
         uint256 _amount
     ) internal override(LiquidityManager) {
         address user = _msgSender();
@@ -258,7 +241,7 @@ contract PositionNondisperseLiquidity is
         ISpotFactory.Pair memory _pairAddress = _getQuoteAndBase(_pairManager);
 
         address pairManagerAddress = address(_pairManager);
-        if (_asset == SpotHouseStorage.Asset.Quote) {
+        if (_asset == Asset.Type.Quote) {
             if (_pairAddress.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
