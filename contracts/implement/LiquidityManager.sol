@@ -19,7 +19,7 @@ import "../interfaces/ICheckOwnerWhenStaking.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../staking/PositionStakingDexManager.sol";
 import "../interfaces/ISpotFactory.sol";
-import "../libraries/types/SpotHouseStorage.sol";
+import "../libraries/types/Asset.sol";
 
 abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
@@ -49,9 +49,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint256 _addedAmountVirtual = depositLiquidity(
             params.pool,
             user,
-            params.isBase
-                ? SpotHouseStorage.Asset.Base
-                : SpotHouseStorage.Asset.Quote,
+            params.isBase ? Asset.Type.Base : Asset.Type.Quote,
             params.amountVirtual
         );
 
@@ -66,9 +64,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint256 amountModifySecondAsset = depositLiquidity(
             params.pool,
             user,
-            params.isBase
-                ? SpotHouseStorage.Asset.Quote
-                : SpotHouseStorage.Asset.Base,
+            params.isBase ? Asset.Type.Quote : Asset.Type.Base,
             params.isBase
                 ? _resultAddLiquidity.quoteAmountAdded
                 : _resultAddLiquidity.baseAmountAdded
@@ -131,14 +127,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Base,
+            Asset.Type.Base,
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Quote,
+            Asset.Type.Quote,
             quoteAmountRemoved + _collectFeeData.feeQuoteAmount
         );
 
@@ -167,9 +163,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             depositLiquidity(
                 liquidityData.pool,
                 user,
-                isBase
-                    ? SpotHouseStorage.Asset.Base
-                    : SpotHouseStorage.Asset.Quote,
+                isBase ? Asset.Type.Base : Asset.Type.Quote,
                 amountModify
             )
         );
@@ -185,7 +179,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint256 amountModifySecondAsset = depositLiquidity(
             liquidityData.pool,
             user,
-            isBase ? SpotHouseStorage.Asset.Quote : SpotHouseStorage.Asset.Base,
+            isBase ? Asset.Type.Quote : Asset.Type.Base,
             isBase
                 ? _resultAddLiquidity.quoteAmountAdded
                 : _resultAddLiquidity.baseAmountAdded
@@ -212,14 +206,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Base,
+            Asset.Type.Base,
             _collectFeeData.feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Quote,
+            Asset.Type.Quote,
             _collectFeeData.feeQuoteAmount
         );
 
@@ -259,7 +253,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             nftTokenId
         ];
 
-        //       Require._require(liquidityData.liquidity >= liquidity, "!Liquidity");
 
         if (liquidity > liquidityData.liquidity) {
             liquidity = liquidityData.liquidity;
@@ -291,14 +284,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Base,
+            Asset.Type.Base,
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Quote,
+            Asset.Type.Quote,
             quoteAmountRemoved + _collectFeeData.feeQuoteAmount
         );
 
@@ -373,6 +366,17 @@ abstract contract LiquidityManager is ILiquidityManager {
             quoteAmountRemoved +
             uint128(state.collectFeeData.feeQuoteAmount);
 
+        state.user = _msgSender();
+
+        amountNeeded = uint128(
+            depositLiquidity(
+                state.liquidityData.pool,
+                state.user,
+                isBase ? Asset.Type.Base : Asset.Type.Quote,
+                amountNeeded
+            )
+        );
+
         if (isBase) {
             state.baseReceiveEstimate += amountNeeded;
         } else {
@@ -398,25 +402,34 @@ abstract contract LiquidityManager is ILiquidityManager {
             state.liquidityData.pool
         );
 
-        state.user = _msgSender();
         {
+            uint256 amountNeed;
+            uint256 amountTransferred;
             if (
                 quoteAmountRemoved + state.collectFeeData.feeQuoteAmount <
                 state.resultAddLiquidity.quoteAmountAdded
             ) {
-                depositLiquidity(
-                    state.liquidityData.pool,
-                    state.user,
-                    SpotHouseStorage.Asset.Quote,
+                amountNeed =
                     state.resultAddLiquidity.quoteAmountAdded -
-                        quoteAmountRemoved -
-                        state.collectFeeData.feeQuoteAmount
-                );
+                    quoteAmountRemoved -
+                    state.collectFeeData.feeQuoteAmount;
+                if (isBase) {
+                    amountTransferred = depositLiquidity(
+                        state.liquidityData.pool,
+                        state.user,
+                        Asset.Type.Quote,
+                        amountNeed
+                    );
+                    Require._require(
+                        amountTransferred >= amountNeed,
+                        DexErrors.DEX_MUST_NOT_TOKEN_RFI
+                    );
+                }
             } else {
                 withdrawLiquidity(
                     state.liquidityData.pool,
                     state.user,
-                    SpotHouseStorage.Asset.Quote,
+                    Asset.Type.Quote,
                     quoteAmountRemoved +
                         state.collectFeeData.feeQuoteAmount -
                         state.resultAddLiquidity.quoteAmountAdded
@@ -427,19 +440,28 @@ abstract contract LiquidityManager is ILiquidityManager {
                 baseAmountRemoved + state.collectFeeData.feeBaseAmount <
                 state.resultAddLiquidity.baseAmountAdded
             ) {
-                depositLiquidity(
-                    state.liquidityData.pool,
-                    state.user,
-                    SpotHouseStorage.Asset.Base,
+                amountNeed =
                     state.resultAddLiquidity.baseAmountAdded -
-                        baseAmountRemoved -
-                        state.collectFeeData.feeBaseAmount
-                );
+                    baseAmountRemoved -
+                    state.collectFeeData.feeBaseAmount;
+                if (!isBase) {
+                    amountTransferred = depositLiquidity(
+                        state.liquidityData.pool,
+                        state.user,
+                        Asset.Type.Base,
+                        amountNeed
+                    );
+
+                    Require._require(
+                        amountTransferred >= amountNeed,
+                        DexErrors.DEX_MUST_NOT_TOKEN_RFI
+                    );
+                }
             } else {
                 withdrawLiquidity(
                     state.liquidityData.pool,
                     state.user,
-                    SpotHouseStorage.Asset.Base,
+                    Asset.Type.Base,
                     baseAmountRemoved +
                         state.collectFeeData.feeBaseAmount -
                         state.resultAddLiquidity.baseAmountAdded
@@ -495,14 +517,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Base,
+            Asset.Type.Base,
             _collectFeeData.feeBaseAmount
         );
 
         withdrawLiquidity(
             liquidityData.pool,
             user,
-            SpotHouseStorage.Asset.Quote,
+            Asset.Type.Quote,
             _collectFeeData.feeQuoteAmount
         );
         concentratedLiquidity[nftTokenId].feeGrowthBase = _collectFeeData
@@ -770,14 +792,14 @@ abstract contract LiquidityManager is ILiquidityManager {
     function depositLiquidity(
         IMatchingEngineAMM _pairManager,
         address _payer,
-        SpotHouseStorage.Asset _asset,
+        Asset.Type _asset,
         uint256 _amount
     ) internal virtual returns (uint256 amount) {}
 
     function withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
         address _recipient,
-        SpotHouseStorage.Asset _asset,
+        Asset.Type _asset,
         uint256 _amount
     ) internal virtual {}
 

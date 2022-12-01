@@ -49,7 +49,8 @@ contract PositionSpotFactory is
             DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
         );
         Require._require(
-            pathPairManagers[baseAsset][quoteAsset] == address(0),
+            pathPairManagers[baseAsset][quoteAsset] == address(0) ||
+                pathPairManagers[quoteAsset][baseAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
         );
 
@@ -114,7 +115,7 @@ contract PositionSpotFactory is
         public
     {
         address owner = msg.sender;
-        require(owner == ownerPairManager[pair], "NOT_OWNER");
+        require(owner == ownerPairManager[pair], DexErrors.DEX_ONLY_OWNER);
         pairOfStakingManager[pair][owner] = stakingManager;
     }
 
