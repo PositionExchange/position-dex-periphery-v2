@@ -22,6 +22,11 @@ library UserLiquidity {
         uint256 newFeeGrowthQuote;
     }
 
+    /// @notice update the liquidity of user
+    /// @param liquidity the liquidity of user
+    /// @param indexedPipRange the index of liquidity info
+    /// @param feeGrowthBase the growth of base
+    /// @param feeGrowthQuote the growth of quote
     function updateLiquidity(
         Data storage self,
         uint128 liquidity,
