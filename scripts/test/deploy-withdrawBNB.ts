@@ -1,7 +1,6 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
+import {readConfig, verifyContract, verifyImplContract, writeConfig} from "../utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
-import {WithdrawBNB} from "../typeChain";
 
 
 task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
@@ -17,6 +16,7 @@ task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, 
 
     const address = hardhatDeployContract.address
     console.log("withdrawBNB deployed address: ",  address);
+    configData.withdrawBNB = address
 
 
     await verifyContract(hre,address, ["0x480CB7cCEacfA9267D905f48CA2af7C11dF02697"],"contracts/WithdrawBNB.sol:WithdrawBNB");

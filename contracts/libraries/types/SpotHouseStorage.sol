@@ -19,10 +19,6 @@ contract SpotHouseStorage {
         SELL
     }
 
-    uint128 feeBasis;
-
-    // fee 0.01 %
-    uint16 public fee;
 
     enum Asset {
         Quote,

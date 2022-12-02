@@ -1,5 +1,5 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
+import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 
 
