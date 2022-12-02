@@ -8,6 +8,8 @@ import "../libraries/types/SpotHouseStorage.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
+
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
@@ -316,7 +318,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         ][_trader];
         uint256 i = 0;
         basisPoint = _basisPoint(_pairManager);
-        uint128 _feeBasis = feeBasis;
+        uint128 _feeBasis = FixedPoint128.BASIC_POINT_FEE;
         IMatchingEngineAMM.ExchangedData memory exData = IMatchingEngineAMM
             .ExchangedData({
                 baseAmount: 0,
@@ -529,6 +531,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         uint256 quoteAmount = _baseToQuote(_quantity, _pip, state.basicPoint);
 
+        uint16 fee = _getFee();
+
         uint256 quoteAmountTransferred = _deposit(
             _pairManager,
             _trader,
@@ -555,7 +559,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             true,
             _trader,
             quoteAmountTransferred,
-            _getFee()
+            fee
         );
         uint256 baseAmountReceive = state.sizeOut;
         if (

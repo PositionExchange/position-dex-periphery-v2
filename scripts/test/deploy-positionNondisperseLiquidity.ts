@@ -1,6 +1,6 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
+import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
 
 
 task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskArgs, hre) => {

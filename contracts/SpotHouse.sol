@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
 
 import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
@@ -40,9 +41,8 @@ contract SpotHouse is
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
-        _initStrategyFee(300);
+        _initStrategyFee(20);
 
-        feeBasis = 10000;
     }
 
     function openLimitOrder(
@@ -307,7 +307,7 @@ contract SpotHouse is
 
         address pairManagerAddress = address(_pairManager);
         uint256 _fee;
-        uint128 _feeBasis = feeBasis;
+        uint128 _feeBasis = FixedPoint128.BASIC_POINT_FEE;
         if (_asset == Asset.Quote) {
             if (_pairAddress.QuoteAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
@@ -402,7 +402,7 @@ contract SpotHouse is
         uint256 _amountFilled
     ) internal override(SpotDex) {
         if (_amountFilled > 0) {
-            uint256 feeCalculatedAmount = _feeCalculator(_amountFilled, fee);
+            uint256 feeCalculatedAmount = _feeCalculator(_amountFilled, _getFee());
             _amountFilled -= feeCalculatedAmount;
             _increaseFee(_pairManager, feeCalculatedAmount, asset);
         }
@@ -425,7 +425,7 @@ contract SpotHouse is
         if (_fee == 0) {
             return 0;
         }
-        feeCalculatedAmount = (_fee * _amount) / feeBasis;
+        feeCalculatedAmount = (_fee * _amount) / FixedPoint128.BASIC_POINT_FEE;
     }
 
     function _increaseFee(

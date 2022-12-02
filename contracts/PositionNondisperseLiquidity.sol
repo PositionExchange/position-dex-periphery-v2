@@ -50,6 +50,7 @@ contract PositionNondisperseLiquidity is
         tokenID = 1000000;
     }
 
+
     function setFactory(ISpotFactory _sportFactory) public onlyOwner {
         spotFactory = _sportFactory;
     }
@@ -169,6 +170,22 @@ contract PositionNondisperseLiquidity is
         address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
 
         return spotFactory.pairOfStakingManager(ownerOfPool, poolAddress);
+    }
+
+    function getWithdrawBNB() public view returns(IWithdrawBNB) {
+        return withdrawBNB;
+    }
+
+    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) public onlyOwner {
+        withdrawBNB = _withdrawBNB;
+    }
+
+    function getWBNB() public view returns(address) {
+        return WBNB;
+    }
+
+    function setBNB(address _BNB) public onlyOwner {
+        WBNB = _BNB;
     }
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
