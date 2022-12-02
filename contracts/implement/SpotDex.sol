@@ -533,6 +533,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         uint16 fee = _getFee();
 
+        uint16 fee = _getFee();
+
         uint256 quoteAmountTransferred = _deposit(
             _pairManager,
             _trader,
