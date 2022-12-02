@@ -25,7 +25,7 @@ task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', asy
         PositionStakingDexManager
     );
     await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
-    configData.PositionStakingDexManager = address
+    configData.positionStakingDexManager = address
     await writeConfig('config-testnet.json', configData);
 })
 
