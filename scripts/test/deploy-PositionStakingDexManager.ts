@@ -1,5 +1,5 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
+import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 
 
@@ -9,7 +9,7 @@ task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', asy
 
     const PositionStakingDexManager = await hre.ethers.getContractFactory("PositionStakingDexManager")
 
-    const contractArgs : string[] = [configData.mockRewardToken, configData.positionConcentratedLiquidity, 1000];
+    const contractArgs: string[] = [configData.mockRewardToken, configData.positionConcentratedLiquidity, 1000];
 
     const instance = await hre.upgrades.deployProxy(
         PositionStakingDexManager,
@@ -18,13 +18,13 @@ task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', asy
     await instance.deployed();
 
     const address = instance.address
-    console.log("PositionStakingDexManager deploy address: ",  address);
+    console.log("PositionStakingDexManager deploy address: ", address);
 
     const upgraded = await hre.upgrades.upgradeProxy(
         address,
         PositionStakingDexManager
     );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
+    await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
     configData.PositionStakingDexManager = address
     await writeConfig('config-testnet.json', configData);
 })
@@ -39,6 +39,6 @@ task('upgrade-PositionStakingDexManager-testnet', 'How is your girl friend?', as
         configData.PositionStakingDexManager,
         PositionConcentratedLiquidity
     );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
+    await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
     await writeConfig('config-testnet.json', configData);
 })

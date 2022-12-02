@@ -1,7 +1,7 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyContract, verifyImplContract, writeConfig} from "./utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
-import {ForkMatchingEngineAMM} from "../typeChain";
+import {readConfig, verifyContract, writeConfig} from "../utils-deploy";
+import {ForkMatchingEngineAMM} from "../../typeChain";
 
 
 task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
