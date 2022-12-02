@@ -49,9 +49,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 _quantity
     ) public payable virtual {
         address _trader = _msgSender();
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
 
         _openMarketOrder(_pairManager, _side, _quantity, _trader, _trader);
     }
@@ -111,9 +108,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         virtual
     {
         address _trader = _msgSender();
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
 
         uint256 refundQuote;
         uint256 refundBase;
@@ -158,7 +152,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _orderIds[i] = _pendingLimitOrder.orderId;
             _listSides[i] = _pendingLimitOrder.isBuy ? Side.BUY : Side.SELL;
 
-            (uint256 refundQuantity, uint256 partialFilled) = _pairManager
+            (uint256 refundQuantity,) = _pairManager
                 .cancelLimitOrder(
                     _pendingLimitOrder.pip,
                     _pendingLimitOrder.orderId
@@ -236,10 +230,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             DexErrors.DEX_ORDER_MUST_NOT_FILLED
         );
 
-        // blank limit order data
-        // we set the deleted order to a blank data
-        // because we don't want to mess with order index (orderIdx)
-        SpotLimitOrder.Data memory blankLimitOrderData;
 
         (uint256 refundQuantity, uint256 partialFilled) = _pairManager
             .cancelLimitOrder(_order.pip, _order.orderId);
@@ -266,7 +256,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             }
         }
         delete _orders[_orderIdx];
-        // = blankLimitOrderData;
 
         emit LimitOrderCancelled(
             _trader,
@@ -447,7 +436,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                     (_quantity - state.sizeOut),
                     _pip,
                     state.basicPoint
-                ) + state.quoteAmountFilled;
+                ) +
+                state.quoteAmountFilled;
 
             //            quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
@@ -530,8 +520,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         state.basicPoint = _basisPoint(_pairManager);
 
         uint256 quoteAmount = _baseToQuote(_quantity, _pip, state.basicPoint);
-
-        uint16 fee = _getFee();
 
         uint16 fee = _getFee();
 
@@ -878,7 +866,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         Side _side,
         uint256 baseAmount,
         uint256 quoteAmount
-    ) internal returns (uint256[] memory) {
+    ) internal pure returns (uint256[] memory) {
         uint256[] memory amounts = new uint256[](2);
 
         if (_side == Side.BUY) {
@@ -896,7 +884,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 baseAmount,
         uint128 pip,
         uint256 basisPoint
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         return TradeConvert.baseToQuote(baseAmount, pip, basisPoint);
     }
 
@@ -904,7 +892,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 quoteAmount,
         uint128 pip,
         uint256 basisPoint
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         return TradeConvert.quoteToBase(quoteAmount, pip, basisPoint);
     }
 

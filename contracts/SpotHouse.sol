@@ -306,8 +306,6 @@ contract SpotHouse is
         );
 
         address pairManagerAddress = address(_pairManager);
-        uint256 _fee;
-        uint128 _feeBasis = FixedPoint128.BASIC_POINT_FEE;
         if (_asset == Asset.Quote) {
             if (_pairAddress.QuoteAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
@@ -371,8 +369,6 @@ contract SpotHouse is
             if (_pairAddress.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
-                uint256 balanceOfPairManager = IERC20(_pairAddress.QuoteAsset)
-                    .balanceOf(pairManagerAddress);
                 TransferHelper.transferFrom(
                     IERC20(_pairAddress.QuoteAsset),
                     address(_pairManager),
@@ -419,7 +415,7 @@ contract SpotHouse is
     // _feeCalculator calculate fee
     function _feeCalculator(uint256 _amount, uint16 _fee)
         internal
-        view
+        pure
         returns (uint256 feeCalculatedAmount)
     {
         if (_fee == 0) {
