@@ -10,7 +10,7 @@ task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, 
     const withdrawBNB = await hre.ethers.getContractFactory("WithdrawBNB")
 
 
-    const hardhatDeployContract = await withdrawBNB.deploy("0x480CB7cCEacfA9267D905f48CA2af7C11dF02697");
+    const hardhatDeployContract = await withdrawBNB.deploy(configData.WBNB);
 
     await hardhatDeployContract.deployTransaction.wait(5);
 
@@ -19,6 +19,6 @@ task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, 
     configData.withdrawBNB = address
 
 
-    await verifyContract(hre,address, ["0x480CB7cCEacfA9267D905f48CA2af7C11dF02697"],"contracts/WithdrawBNB.sol:WithdrawBNB");
+    await verifyContract(hre,address, [configData.WBNB],"contracts/WithdrawBNB.sol:WithdrawBNB");
     await writeConfig('config-testnet.json', configData);
 })
