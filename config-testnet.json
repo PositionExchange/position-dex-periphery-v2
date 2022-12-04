@@ -1,11 +1,11 @@
 {
-  "spotHouse": "0x9310f9ce14A69dec4CF246041b169E48Bf112d11",
-  "spotFactory": "0x29Cea1453a84dDd8AE8cA9c83D77e69565B9E1d5",
-  "WBNB": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-  "positionConcentratedLiquidity": "0x891b45127e25C5c8b6BBfDad8c7316f43794dE19",
-  "withdrawBNB": "0x6b9A07ca30823F95158cF2AD37F0dBd2C23120f6",
-  "factoryMockToken": "0xf916cbD14cDb2eEf93cafF7BD613aB7708C8917C",
+  "positionConcentratedLiquidity": "0xC88ae7BcFf3514d0E7f3c372fEC9F934fa465166",
+  "spotFactory": "0xe2E13c220d2cD7F79a6Be837c88Bb731D1221390",
   "mockRewardToken": "0xA8AB8Adf2A4695cdD756bF8094F883Cf17F384dA",
-  "positionStakingDexManager": "0xd095aA0cc60CDAa0A79280E1d20abc4e14ECD7B2",
-  "mockTokenTreasury": "0x6c4e2B19f182826720710A079FeDC680d38F461c"
+  "WBNB": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+  "spotHouse": "0xb96c6f113B31eF337E8C67C0B3F307a18f4f02c0",
+  "withdrawBNB": "0x6b9A07ca30823F95158cF2AD37F0dBd2C23120f6",
+  "mockTokenTreasury": "0x6E461bb6dA0D8E8875DAb4cBf73b9623caF8aB86",
+  "positionStakingDexManager": "0x9b2DA475a83b196677E08dF561c7A600DA1CA33f",
+  "factoryMockToken": "0xf916cbD14cDb2eEf93cafF7BD613aB7708C8917C"
 }
