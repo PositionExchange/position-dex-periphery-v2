@@ -19,7 +19,6 @@ contract SpotHouseStorage {
         SELL
     }
 
-
     enum Asset {
         Quote,
         Base,

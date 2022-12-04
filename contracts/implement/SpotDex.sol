@@ -115,11 +115,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 baseFilled;
         uint256 basicPoint;
 
-        (
-            quoteFilled,
-            baseFilled,
-            basicPoint
-        ) = getAmountClaimable(_pairManager, _trader);
+        (quoteFilled, baseFilled, basicPoint) = getAmountClaimable(
+            _pairManager,
+            _trader
+        );
 
         PendingLimitOrder[]
             memory _listPendingLimitOrder = getPendingLimitOrders(
@@ -152,11 +151,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _orderIds[i] = _pendingLimitOrder.orderId;
             _listSides[i] = _pendingLimitOrder.isBuy ? Side.BUY : Side.SELL;
 
-            (uint256 refundQuantity,) = _pairManager
-                .cancelLimitOrder(
-                    _pendingLimitOrder.pip,
-                    _pendingLimitOrder.orderId
-                );
+            (uint256 refundQuantity, ) = _pairManager.cancelLimitOrder(
+                _pendingLimitOrder.pip,
+                _pendingLimitOrder.orderId
+            );
 
             if (_pendingLimitOrder.isBuy) {
                 refundQuote += _baseToQuote(
@@ -229,7 +227,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             isFilled == false,
             DexErrors.DEX_ORDER_MUST_NOT_FILLED
         );
-
 
         (uint256 refundQuantity, uint256 partialFilled) = _pairManager
             .cancelLimitOrder(_order.pip, _order.orderId);

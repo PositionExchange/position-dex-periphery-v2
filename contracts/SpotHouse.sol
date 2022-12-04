@@ -42,7 +42,6 @@ contract SpotHouse is
         __Ownable_init();
         __Pausable_init();
         _initStrategyFee(20);
-
     }
 
     function openLimitOrder(
@@ -398,7 +397,10 @@ contract SpotHouse is
         uint256 _amountFilled
     ) internal override(SpotDex) {
         if (_amountFilled > 0) {
-            uint256 feeCalculatedAmount = _feeCalculator(_amountFilled, _getFee());
+            uint256 feeCalculatedAmount = _feeCalculator(
+                _amountFilled,
+                _getFee()
+            );
             _amountFilled -= feeCalculatedAmount;
             _increaseFee(_pairManager, feeCalculatedAmount, asset);
         }

@@ -253,7 +253,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             nftTokenId
         ];
 
-
         if (liquidity > liquidityData.liquidity) {
             liquidity = liquidityData.liquidity;
         }
@@ -550,6 +549,17 @@ abstract contract LiquidityManager is ILiquidityManager {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
+        if (address(liquidityData.pool) == address(0x000)) {
+            return (
+                baseVirtual,
+                quoteVirtual,
+                liquidity,
+                indexedPipRange,
+                feeBasePending,
+                feeQuotePending,
+                pool
+            );
+        }
         UserLiquidity.CollectFeeData memory _collectFeeData;
         _collectFeeData = estimateCollectFee(
             liquidityData.pool,
@@ -778,7 +788,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         internal
         returns (uint128 pipRange)
     {
-        return pool.getPipRange();
+        return pool.pipRange();
     }
 
     function _getCurrentIndexPipRange(IMatchingEngineAMM pool)
