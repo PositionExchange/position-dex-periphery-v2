@@ -184,7 +184,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             baseFilled
         );
 
-        emit AllLimitOrderCancelled(
+        emitAllLimitOrderCancelled(
             _trader,
             _pairManager,
             _listPips,
@@ -192,6 +192,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _listSides,
             _blockTimestamp()
         );
+
     }
 
     function cancelLimitOrder(
@@ -254,7 +255,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
         delete _orders[_orderIdx];
 
-        emit LimitOrderCancelled(
+        emitLimitOrderCancelled(
             _trader,
             _pairManager,
             _order.pip,
@@ -494,7 +495,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             );
         }
 
-        emit LimitOrderOpened(
+        emitLimitOrderOpened(
             state.orderId,
             _trader,
             _quantity - state.sizeOut,
@@ -559,7 +560,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.basicPoint
             );
 
-            emit MarketOrderOpened(
+            emitMarketOrderOpened(
                 _trader,
                 state.sizeOut,
                 state.quoteAmountFilled,
@@ -590,7 +591,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         }
         _withdraw(_pairManager, _trader, Asset.Base, baseAmountReceive, false);
 
-        emit LimitOrderOpened(
+        emitLimitOrderOpened(
             state.orderId,
             _trader,
             _quantity - state.sizeOut,
@@ -689,7 +690,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _quantity = baseAmountTransferred;
         }
 
-        emit MarketOrderOpened(
+        emitMarketOrderOpened(
             _payer,
             state.mainSideOut,
             state.flipSideOut,
@@ -778,7 +779,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 false
             );
         }
-        emit MarketOrderOpened(
+        emitMarketOrderOpened(
             _payer,
             state.flipSideOut,
             state.mainSideOut,
@@ -857,6 +858,139 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
 
         return subListLimitOrder;
     }
+
+    function _trackingId(address pairManager) internal returns(uint256){
+
+        return trackingId[pairManager]++;
+    }
+
+
+    function  emitMarketOrderOpened(
+        address trader,
+        uint256 quantity,
+        uint256 openNational,
+        SpotHouseStorage.Side side,
+        IMatchingEngineAMM spotManager,
+        uint128 currentPip,
+        uint64 blockTimestamp
+    ) internal {
+
+        emit MarketOrderOpened(
+            trader,
+            quantity,
+            openNational,
+            side,
+            spotManager,
+            currentPip,
+            blockTimestamp
+        );
+        emit MarketOrderOpened(
+            trader,
+            quantity,
+            openNational,
+            side,
+            spotManager,
+            currentPip,
+            blockTimestamp,
+            _trackingId(address(spotManager))
+        );
+
+    }
+    function emitLimitOrderOpened(
+        uint64 orderId,
+        address trader,
+        uint256 quantity,
+        uint256 sizeOut,
+        uint128 pip,
+        SpotHouseStorage.Side _side,
+        address spotManager,
+        uint64 blockTimestamp
+    ) internal {
+
+        emit LimitOrderOpened(
+            orderId,
+            trader,
+            quantity,
+            sizeOut,
+            pip,
+            _side,
+            spotManager,
+            blockTimestamp
+        );
+        emit LimitOrderOpened(
+            orderId,
+            trader,
+            quantity,
+            sizeOut,
+            pip,
+            _side,
+            spotManager,
+            blockTimestamp,
+            _trackingId(spotManager)
+        );
+    }
+
+    function emitLimitOrderCancelled(
+        address _trader,
+        IMatchingEngineAMM _pairManager,
+        uint128 pip,
+        SpotHouseStorage.Side _side,
+        uint64 orderId,
+        uint256 blockTimestamp
+    ) internal {
+
+        emit LimitOrderCancelled(
+            _trader,
+            _pairManager,
+            pip,
+            _side,
+            orderId,
+            blockTimestamp
+        );
+
+        emit LimitOrderCancelled(
+            _trader,
+            _pairManager,
+            pip,
+            _side,
+            orderId,
+            blockTimestamp,
+            _trackingId(address(_pairManager))
+        );
+
+
+    }
+
+    function emitAllLimitOrderCancelled(
+        address _trader,
+        IMatchingEngineAMM _pairManager,
+        uint128[] memory _listPips,
+        uint64[] memory _orderIds,
+        SpotHouseStorage.Side[] memory _listSides,
+        uint256 blockTimestamp
+    ) internal {
+
+        emit AllLimitOrderCancelled(
+            _trader,
+            _pairManager,
+            _listPips,
+            _orderIds,
+            _listSides,
+            blockTimestamp
+        );
+
+        emit AllLimitOrderCancelled(
+            _trader,
+            _pairManager,
+            _listPips,
+            _orderIds,
+            _listSides,
+            blockTimestamp,
+            _trackingId(address(_pairManager))
+        );
+
+    }
+
 
     // INTERNAL FUNCTIONS
     function _calculatorAmounts(
