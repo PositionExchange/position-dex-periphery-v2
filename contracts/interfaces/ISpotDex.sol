@@ -73,7 +73,6 @@ interface ISpotDex {
         address spotManager,
         uint64 blockTimestamp,
         uint256 tradkingId
-
     );
 
     event LimitOrderCancelled(
@@ -84,7 +83,6 @@ interface ISpotDex {
         uint64 orderId,
         uint256 blockTimestamp,
         uint256 tradkingId
-
     );
 
     event AllLimitOrderCancelled(

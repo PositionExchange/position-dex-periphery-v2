@@ -166,6 +166,16 @@ contract PositionSpotFactory is
         return allPairManager[pairManager].BaseAsset != address(0);
     }
 
+    function getTrackingRequestId(address pairManager)
+        external
+        returns (uint256)
+    {
+        if ( msg.sender == spotHouse || msg.sender == positionLiquidity){
+            return trackingRequestId[pairManager]++;
+        }
+        return 0;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -201,7 +211,7 @@ contract PositionSpotFactory is
         address _pairManager,
         address _baseAsset,
         address _quoteAsset
-    ) external  onlyOwner {
+    ) external onlyOwner {
         Require._require(
             _quoteAsset != address(0) && _baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS

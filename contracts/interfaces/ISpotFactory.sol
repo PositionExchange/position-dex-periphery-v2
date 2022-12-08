@@ -59,4 +59,6 @@ interface ISpotFactory {
         returns (address);
 
     function ownerPairManager(address pair) external view returns (address);
+
+    function getTrackingRequestId(address pair) external returns (uint256);
 }

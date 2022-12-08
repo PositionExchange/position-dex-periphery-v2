@@ -192,7 +192,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _listSides,
             _blockTimestamp()
         );
-
     }
 
     function cancelLimitOrder(
@@ -859,13 +858,11 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         return subListLimitOrder;
     }
 
-    function _trackingId(address pairManager) internal returns(uint256){
-
-        return trackingId[pairManager]++;
+    function _trackingId(address pairManager) internal returns (uint256) {
+        return spotFactory.getTrackingRequestId(pairManager);
     }
 
-
-    function  emitMarketOrderOpened(
+    function emitMarketOrderOpened(
         address trader,
         uint256 quantity,
         uint256 openNational,
@@ -874,16 +871,15 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint128 currentPip,
         uint64 blockTimestamp
     ) internal {
-
-        emit MarketOrderOpened(
-            trader,
-            quantity,
-            openNational,
-            side,
-            spotManager,
-            currentPip,
-            blockTimestamp
-        );
+        //        emit MarketOrderOpened(
+        //            trader,
+        //            quantity,
+        //            openNational,
+        //            side,
+        //            spotManager,
+        //            currentPip,
+        //            blockTimestamp
+        //        );
         emit MarketOrderOpened(
             trader,
             quantity,
@@ -894,8 +890,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             blockTimestamp,
             _trackingId(address(spotManager))
         );
-
     }
+
     function emitLimitOrderOpened(
         uint64 orderId,
         address trader,
@@ -906,17 +902,16 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address spotManager,
         uint64 blockTimestamp
     ) internal {
-
-        emit LimitOrderOpened(
-            orderId,
-            trader,
-            quantity,
-            sizeOut,
-            pip,
-            _side,
-            spotManager,
-            blockTimestamp
-        );
+        //        emit LimitOrderOpened(
+        //            orderId,
+        //            trader,
+        //            quantity,
+        //            sizeOut,
+        //            pip,
+        //            _side,
+        //            spotManager,
+        //            blockTimestamp
+        //        );
         emit LimitOrderOpened(
             orderId,
             trader,
@@ -938,15 +933,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint64 orderId,
         uint256 blockTimestamp
     ) internal {
-
-        emit LimitOrderCancelled(
-            _trader,
-            _pairManager,
-            pip,
-            _side,
-            orderId,
-            blockTimestamp
-        );
+        //        emit LimitOrderCancelled(
+        //            _trader,
+        //            _pairManager,
+        //            pip,
+        //            _side,
+        //            orderId,
+        //            blockTimestamp
+        //        );
 
         emit LimitOrderCancelled(
             _trader,
@@ -957,8 +951,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             blockTimestamp,
             _trackingId(address(_pairManager))
         );
-
-
     }
 
     function emitAllLimitOrderCancelled(
@@ -969,15 +961,14 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         SpotHouseStorage.Side[] memory _listSides,
         uint256 blockTimestamp
     ) internal {
-
-        emit AllLimitOrderCancelled(
-            _trader,
-            _pairManager,
-            _listPips,
-            _orderIds,
-            _listSides,
-            blockTimestamp
-        );
+        //        emit AllLimitOrderCancelled(
+        //            _trader,
+        //            _pairManager,
+        //            _listPips,
+        //            _orderIds,
+        //            _listSides,
+        //            blockTimestamp
+        //        );
 
         emit AllLimitOrderCancelled(
             _trader,
@@ -988,9 +979,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             blockTimestamp,
             _trackingId(address(_pairManager))
         );
-
     }
-
 
     // INTERNAL FUNCTIONS
     function _calculatorAmounts(
