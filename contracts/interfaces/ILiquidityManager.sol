@@ -68,18 +68,18 @@ interface ILiquidityManager {
     //        uint128 modifiedLiquidity
     //    );
 
-    event LiquidityShiftRange(
-        address user,
-        address pool,
-        uint64 oldIndexedPipRange,
-        uint128 liquidityRemoved,
-        uint256 amountBaseRemoved,
-        uint256 amountQuoteRemoved,
-        uint64 newIndexedPipRange,
-        uint128 newLiquidity,
-        uint256 amountBaseAdded,
-        uint256 amountQuoteAded
-    );
+//    event LiquidityShiftRange(
+//        address user,
+//        address pool,
+//        uint64 oldIndexedPipRange,
+//        uint128 liquidityRemoved,
+//        uint256 amountBaseRemoved,
+//        uint256 amountQuoteRemoved,
+//        uint64 newIndexedPipRange,
+//        uint128 newLiquidity,
+//        uint256 amountBaseAdded,
+//        uint256 amountQuoteAded
+//    );
 
     event LiquidityAdded(
         address indexed user,

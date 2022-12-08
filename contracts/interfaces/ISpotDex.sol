@@ -14,43 +14,43 @@ interface ISpotDex {
 
     event SpotHouseInitialized(address owner);
 
-    event MarketOrderOpened(
-        address trader,
-        uint256 quantity,
-        uint256 openNational,
-        SpotHouseStorage.Side side,
-        IMatchingEngineAMM spotManager,
-        uint128 currentPip,
-        uint64 blockTimestamp
-    );
-    event LimitOrderOpened(
-        uint64 orderId,
-        address trader,
-        uint256 quantity,
-        uint256 sizeOut,
-        uint128 pip,
-        SpotHouseStorage.Side _side,
-        address spotManager,
-        uint64 blockTimestamp
-    );
-
-    event LimitOrderCancelled(
-        address trader,
-        IMatchingEngineAMM spotManager,
-        uint128 pip,
-        SpotHouseStorage.Side _side,
-        uint64 orderId,
-        uint256 blockTimestamp
-    );
-
-    event AllLimitOrderCancelled(
-        address trader,
-        IMatchingEngineAMM spotManager,
-        uint128[] pips,
-        uint64[] orderIds,
-        SpotHouseStorage.Side[] sides,
-        uint256 blockTimestamp
-    );
+//    event MarketOrderOpened(
+//        address trader,
+//        uint256 quantity,
+//        uint256 openNational,
+//        SpotHouseStorage.Side side,
+//        IMatchingEngineAMM spotManager,
+//        uint128 currentPip,
+//        uint64 blockTimestamp
+//    );
+//    event LimitOrderOpened(
+//        uint64 orderId,
+//        address trader,
+//        uint256 quantity,
+//        uint256 sizeOut,
+//        uint128 pip,
+//        SpotHouseStorage.Side _side,
+//        address spotManager,
+//        uint64 blockTimestamp
+//    );
+//
+//    event LimitOrderCancelled(
+//        address trader,
+//        IMatchingEngineAMM spotManager,
+//        uint128 pip,
+//        SpotHouseStorage.Side _side,
+//        uint64 orderId,
+//        uint256 blockTimestamp
+//    );
+//
+//    event AllLimitOrderCancelled(
+//        address trader,
+//        IMatchingEngineAMM spotManager,
+//        uint128[] pips,
+//        uint64[] orderIds,
+//        SpotHouseStorage.Side[] sides,
+//        uint256 blockTimestamp
+//    );
 
     // TODO remove
     event MarketOrderOpened(
