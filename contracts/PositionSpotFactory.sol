@@ -49,7 +49,7 @@ contract PositionSpotFactory is
             DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
         );
         Require._require(
-            pathPairManagers[baseAsset][quoteAsset] == address(0) ||
+            pathPairManagers[baseAsset][quoteAsset] == address(0) &&
                 pathPairManagers[quoteAsset][baseAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
         );
@@ -201,7 +201,7 @@ contract PositionSpotFactory is
         address _pairManager,
         address _baseAsset,
         address _quoteAsset
-    ) external {
+    ) external  onlyOwner {
         Require._require(
             _quoteAsset != address(0) && _baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
