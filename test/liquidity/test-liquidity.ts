@@ -112,7 +112,7 @@ function roundNumber(n, decimal = 6){
 }
 
 // useWBNB: 0 is not use, 1 is WBNB Quote, 2 is WBNB Base
-export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee = true, isRFI = false) {
+export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee = true, isRFI = false, pipRange= 30_000) {
     let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
@@ -142,9 +142,9 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
             quoteAsset: quote.address,
             baseAsset: base.address,
             basisPoint: BASIS_POINT,
-            maxFindingWordsIndex: 1000,
+            maxFindingWordsIndex: 10000,
             initialPip: 100000,
-            pipRange: 30_000,
+            pipRange: pipRange,
             tickSpace: 1,
             owner: deployer.address,
             positionLiquidity: dexNFT.address,
@@ -157,6 +157,7 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     await spotHouse.setFactory(factory.address);
     await dexNFT.initialize();
     await dexNFT.setFactory(factory.address);
+    await factory.initialize();
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);
 
@@ -319,13 +320,13 @@ export class TestLiquidity {
 
     async openMarketOrder( side: number, size: number, asset : String, idSender : number,opts?: CallOptions) {
         console.group(`OpenMarketOrder`);
-        await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
+        const tx = await  this.mockSpotHouse.connect(this.users[idSender])["openMarketOrder(address,uint8,uint256)"](this.mockMatching.address, side, toWei(size));
         const listOrderUserAf = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[4].address);
         const balanceBase = await this.baseToken.balanceOf(this.users[2].address);
         const balanceQuote = await this.quoteToken.balanceOf(this.users[2].address);
-        // console.log("[openMarketOrder] listOrderUser after: ", listOrderUserAf);
-        // console.log("[openMarketOrder] balanceBase balanceQuote after: ",balanceBase, balanceQuote);
         const currentPrice = await this.getCurrentPrice();
+        const receipt = await tx.wait(0)
+        console.log("gas used: ", receipt.cumulativeGasUsed.toString());
         console.log("[openMarketOrder] currentPrice : ", currentPrice)
         console.groupEnd();
     }
