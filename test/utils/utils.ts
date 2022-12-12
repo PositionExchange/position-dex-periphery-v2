@@ -212,7 +212,7 @@ export async function approveAndMintToken(
   const baseSymbol = await baseAsset.symbol();
   console.log(quoteSymbol)
 
-    amounts =  amounts == undefined ? 1000: 10000;
+    amounts =  amounts == undefined ? 1000: amounts;
 
   users.forEach((user) => {
 

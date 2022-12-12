@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "./Convert.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
-import "@positionex/matching-engine/contracts/libraries/helper/LiquidityMath.sol";
+import "@positionex/matching-engine/contracts/libraries/amm/LiquidityMath.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 
 library LiquidityHelper {

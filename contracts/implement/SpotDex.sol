@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "../libraries/types/SpotHouseStorage.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
@@ -12,11 +11,12 @@ import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol
 
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
+import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
 
-abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
+abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     using Convert for uint256;
 
     /**
@@ -189,10 +189,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _pairManager,
             _listPips,
             _orderIds,
-            _listSides,
-            _blockTimestamp()
+            _listSides
         );
-
     }
 
     function cancelLimitOrder(
@@ -260,8 +258,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             _pairManager,
             _order.pip,
             _order.isBuy ? Side.BUY : Side.SELL,
-            _order.orderId,
-            _blockTimestamp()
+            _order.orderId
         );
     }
 
@@ -374,6 +371,23 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         return blankListPendingOrderData;
     }
 
+    function getOrderIdOfTrader(
+        address _pairManager,
+        address _trader,
+        uint128 _pip,
+        uint64 _orderId
+    ) public view returns(int256){
+
+        SpotLimitOrder.Data[] memory limitOrder = limitOrders[_pairManager][_trader];
+
+        for (uint256 i = 0; i < limitOrder.length; i++) {
+            if (limitOrder[i].pip == _pip && limitOrder[i].orderId == _orderId) {
+                return int256(i);
+            }
+        }
+        return -1;
+}
+
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
         view
@@ -437,7 +451,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 ) +
                 state.quoteAmountFilled;
 
-            //            quoteAmount += _feeCalculator(quoteAmount, fee);
+            // quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
             // with token has RFI we need deposit first
             // and get real balance transferred
@@ -502,8 +516,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             state.sizeOut,
             _pip,
             isBuy ? Side.BUY : Side.SELL,
-            _pairManagerAddress,
-            _blockTimestamp()
+            _pairManagerAddress
         );
     }
 
@@ -566,8 +579,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 state.quoteAmountFilled,
                 Side.BUY,
                 _pairManager,
-                _pairManager.getCurrentPip(),
-                _blockTimestamp()
+                _pairManager.getCurrentPip()
             );
             state.sizeOut = 0;
         }
@@ -598,8 +610,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             state.sizeOut,
             _pip,
             Side.BUY,
-            _pairManagerAddress,
-            _blockTimestamp()
+            _pairManagerAddress
         );
     }
 
@@ -696,8 +707,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             state.flipSideOut,
             _side,
             _pairManager,
-            _pairManager.getCurrentPip(),
-            _blockTimestamp()
+            _pairManager.getCurrentPip()
         );
         return _calculatorAmounts(_side, state.mainSideOut, state.flipSideOut);
     }
@@ -785,8 +795,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             state.mainSideOut,
             _side,
             _pairManager,
-            _pairManager.getCurrentPip(),
-            _blockTimestamp()
+            _pairManager.getCurrentPip()
         );
         return _calculatorAmounts(_side, state.flipSideOut, state.mainSideOut);
     }
@@ -859,22 +868,18 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         return subListLimitOrder;
     }
 
-    function _trackingId(address pairManager) internal returns(uint256){
-
-        return trackingId[pairManager]++;
+    function _trackingId(address pairManager) internal returns (uint256) {
+        return spotFactory.getTrackingRequestId(pairManager);
     }
 
-
-    function  emitMarketOrderOpened(
+    function emitMarketOrderOpened(
         address trader,
         uint256 quantity,
         uint256 openNational,
         SpotHouseStorage.Side side,
         IMatchingEngineAMM spotManager,
-        uint128 currentPip,
-        uint64 blockTimestamp
+        uint128 currentPip
     ) internal {
-
         emit MarketOrderOpened(
             trader,
             quantity,
@@ -882,20 +887,10 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             side,
             spotManager,
             currentPip,
-            blockTimestamp
-        );
-        emit MarketOrderOpened(
-            trader,
-            quantity,
-            openNational,
-            side,
-            spotManager,
-            currentPip,
-            blockTimestamp,
             _trackingId(address(spotManager))
         );
-
     }
+
     function emitLimitOrderOpened(
         uint64 orderId,
         address trader,
@@ -903,10 +898,8 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         uint256 sizeOut,
         uint128 pip,
         SpotHouseStorage.Side _side,
-        address spotManager,
-        uint64 blockTimestamp
+        address spotManager
     ) internal {
-
         emit LimitOrderOpened(
             orderId,
             trader,
@@ -915,17 +908,6 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
             pip,
             _side,
             spotManager,
-            blockTimestamp
-        );
-        emit LimitOrderOpened(
-            orderId,
-            trader,
-            quantity,
-            sizeOut,
-            pip,
-            _side,
-            spotManager,
-            blockTimestamp,
             _trackingId(spotManager)
         );
     }
@@ -935,30 +917,16 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         IMatchingEngineAMM _pairManager,
         uint128 pip,
         SpotHouseStorage.Side _side,
-        uint64 orderId,
-        uint256 blockTimestamp
+        uint64 orderId
     ) internal {
-
         emit LimitOrderCancelled(
             _trader,
             _pairManager,
             pip,
             _side,
             orderId,
-            blockTimestamp
-        );
-
-        emit LimitOrderCancelled(
-            _trader,
-            _pairManager,
-            pip,
-            _side,
-            orderId,
-            blockTimestamp,
             _trackingId(address(_pairManager))
         );
-
-
     }
 
     function emitAllLimitOrderCancelled(
@@ -966,31 +934,17 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         IMatchingEngineAMM _pairManager,
         uint128[] memory _listPips,
         uint64[] memory _orderIds,
-        SpotHouseStorage.Side[] memory _listSides,
-        uint256 blockTimestamp
+        SpotHouseStorage.Side[] memory _listSides
     ) internal {
-
         emit AllLimitOrderCancelled(
             _trader,
             _pairManager,
             _listPips,
             _orderIds,
             _listSides,
-            blockTimestamp
-        );
-
-        emit AllLimitOrderCancelled(
-            _trader,
-            _pairManager,
-            _listPips,
-            _orderIds,
-            _listSides,
-            blockTimestamp,
             _trackingId(address(_pairManager))
         );
-
     }
-
 
     // INTERNAL FUNCTIONS
     function _calculatorAmounts(

@@ -104,3 +104,65 @@ describe("ReproduceManualPTX", async function(){
 `)
     })
 })
+
+describe("ReproduceManualBTC", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 3000000)
+    })
+
+
+
+it ("Limit BTC", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 169210000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 56
+    Asset: base
+    AmountVirtual: 10000
+- S2: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 55
+    Asset: quote
+    AmountVirtual: 10000
+- S3: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 57
+    Asset: base
+    AmountVirtual: 100
+- S4: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 55
+    Asset: quote
+    AmountVirtual: 1000000
+- S5: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 0.0058
+    Price: 169210000
+- S6: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 0.1
+    Price: 169200000
+- S7: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 0
+    Quantity: 0.01
+`)
+    })
+})

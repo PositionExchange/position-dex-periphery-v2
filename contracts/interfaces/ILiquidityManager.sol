@@ -39,38 +39,44 @@ interface ILiquidityManager {
     //------------------------------------------------------------------------------------------------------------------
 
     event LiquidityAdded(
-        address user,
-        address pool,
+        address indexed user,
+        address indexed pool,
+        uint256 indexed nftId,
         uint256 amountBaseAdded,
         uint256 amountQuoteAdded,
         uint64 indexedPipRange,
-        uint256 nftId
+        uint256 trackingId
     );
 
     event LiquidityRemoved(
-        address user,
-        address pool,
+        address indexed user,
+        address indexed pool,
+        uint256 indexed nftId,
         uint256 amountBaseRemoved,
         uint256 amountQuoteRemoved,
         uint64 indexedPipRange,
-        uint128 removedLiquidity
+        uint128 removedLiquidity,
+        uint256 trackingId
     );
 
     event LiquidityModified(
-        address user,
-        address pool,
+        address indexed user,
+        address indexed pool,
+        uint256 indexed nftId,
         uint256 amountBaseModified,
         uint256 amountQuoteModified,
         // 0: increase
         // 1: decrease
         ModifyType modifyType,
         uint64 indexedPipRange,
-        uint128 modifiedLiquidity
+        uint128 modifiedLiquidity,
+        uint256 trackingId
     );
 
     event LiquidityShiftRange(
-        address user,
-        address pool,
+        address indexed user,
+        address indexed pool,
+        uint256 indexed nftId,
         uint64 oldIndexedPipRange,
         uint128 liquidityRemoved,
         uint256 amountBaseRemoved,
@@ -78,6 +84,7 @@ interface ILiquidityManager {
         uint64 newIndexedPipRange,
         uint128 newLiquidity,
         uint256 amountBaseAdded,
-        uint256 amountQuoteAded
+        uint256 amountQuoteAded,
+        uint256 trackingId
     );
 }

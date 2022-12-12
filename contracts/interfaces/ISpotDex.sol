@@ -21,7 +21,7 @@ interface ISpotDex {
         SpotHouseStorage.Side side,
         IMatchingEngineAMM spotManager,
         uint128 currentPip,
-        uint64 blockTimestamp
+        uint256 trackingId
     );
     event LimitOrderOpened(
         uint64 orderId,
@@ -31,7 +31,7 @@ interface ISpotDex {
         uint128 pip,
         SpotHouseStorage.Side _side,
         address spotManager,
-        uint64 blockTimestamp
+        uint256 trackingId
     );
 
     event LimitOrderCancelled(
@@ -40,7 +40,7 @@ interface ISpotDex {
         uint128 pip,
         SpotHouseStorage.Side _side,
         uint64 orderId,
-        uint256 blockTimestamp
+        uint256 trackingId
     );
 
     event AllLimitOrderCancelled(
@@ -49,52 +49,7 @@ interface ISpotDex {
         uint128[] pips,
         uint64[] orderIds,
         SpotHouseStorage.Side[] sides,
-        uint256 blockTimestamp
-    );
-
-    // TODO remove
-    event MarketOrderOpened(
-        address trader,
-        uint256 quantity,
-        uint256 openNational,
-        SpotHouseStorage.Side side,
-        IMatchingEngineAMM spotManager,
-        uint128 currentPip,
-        uint64 blockTimestamp,
-        uint256 tradkingId
-    );
-    event LimitOrderOpened(
-        uint64 orderId,
-        address trader,
-        uint256 quantity,
-        uint256 sizeOut,
-        uint128 pip,
-        SpotHouseStorage.Side _side,
-        address spotManager,
-        uint64 blockTimestamp,
-        uint256 tradkingId
-
-    );
-
-    event LimitOrderCancelled(
-        address trader,
-        IMatchingEngineAMM spotManager,
-        uint128 pip,
-        SpotHouseStorage.Side _side,
-        uint64 orderId,
-        uint256 blockTimestamp,
-        uint256 tradkingId
-
-    );
-
-    event AllLimitOrderCancelled(
-        address trader,
-        IMatchingEngineAMM spotManager,
-        uint128[] pips,
-        uint64[] orderIds,
-        SpotHouseStorage.Side[] sides,
-        uint256 blockTimestamp,
-        uint256 tradkingId
+        uint256 trackingId
     );
 
     event AssetClaimed(
@@ -152,8 +107,6 @@ interface ISpotDex {
             uint256 quoteAsset,
             uint256 baseAsset,
             uint256 basisPoint
-            //            uint256 feeQuoteAmount,
-            //            uint256 feeBaseAmount
         );
 
     function cancelAllLimitOrder(IMatchingEngineAMM _spotManager) external;

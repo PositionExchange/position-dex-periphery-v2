@@ -49,14 +49,15 @@ contract PositionSpotFactory is
             DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
         );
         Require._require(
-            pathPairManagers[baseAsset][quoteAsset] == address(0) ||
+            pathPairManagers[baseAsset][quoteAsset] == address(0) &&
                 pathPairManagers[quoteAsset][baseAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
         );
 
         Require._require(
-            basisPoint > 0 &&
+                basisPoint > 0 &&
                 basisPoint % 2 == 0 &&
+                basisPoint % 2 <= 8 &&
                 maxFindingWordsIndex > 0 &&
                 initialPip > 0 &&
                 pipRange > 0 &&
@@ -166,6 +167,16 @@ contract PositionSpotFactory is
         return allPairManager[pairManager].BaseAsset != address(0);
     }
 
+    function getTrackingRequestId(address pairManager)
+        external
+        returns (uint256)
+    {
+        if ( msg.sender == spotHouse || msg.sender == positionLiquidity){
+            return trackingRequestId[pairManager]++;
+        }
+        return 0;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -201,7 +212,7 @@ contract PositionSpotFactory is
         address _pairManager,
         address _baseAsset,
         address _quoteAsset
-    ) external {
+    ) external onlyOwner {
         Require._require(
             _quoteAsset != address(0) && _baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS

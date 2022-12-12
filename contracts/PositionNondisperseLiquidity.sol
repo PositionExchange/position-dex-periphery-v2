@@ -302,6 +302,14 @@ contract PositionNondisperseLiquidity is
         withdrawBNB.withdraw(_trader, _amount);
     }
 
+    function _trackingId(address pairManager)
+        internal
+        override(LiquidityManager)
+        returns (uint256)
+    {
+        return spotFactory.getTrackingRequestId(pairManager);
+    }
+
     function _msgSender()
         internal
         view

@@ -91,10 +91,11 @@ abstract contract LiquidityManager is ILiquidityManager {
         emit LiquidityAdded(
             user,
             address(params.pool),
+            nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
             params.indexedPipRange,
-            nftTokenId
+            _trackingId(address(params.pool))
         );
     }
 
@@ -141,11 +142,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         emit LiquidityRemoved(
             user,
             address(liquidityData.pool),
+            nftTokenId,
             baseAmountRemoved,
             quoteAmountRemoved,
             liquidityData.indexedPipRange,
-            liquidityData.liquidity
+            liquidityData.liquidity,
+            _trackingId(address(liquidityData.pool))
         );
+
     }
 
     function increaseLiquidity(
@@ -235,11 +239,13 @@ abstract contract LiquidityManager is ILiquidityManager {
         emit LiquidityModified(
             user,
             address(liquidityData.pool),
+            nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange,
-            uint128(_resultAddLiquidity.liquidity)
+            uint128(_resultAddLiquidity.liquidity),
+            _trackingId(address(liquidityData.pool))
         );
     }
 
@@ -305,11 +311,13 @@ abstract contract LiquidityManager is ILiquidityManager {
         emit LiquidityModified(
             user,
             address(liquidityData.pool),
+            nftTokenId,
             baseAmountRemoved,
             quoteAmountRemoved,
             ModifyType.DECREASE,
             liquidityData.indexedPipRange,
-            liquidity
+            liquidity,
+            _trackingId(address(liquidityData.pool))
         );
     }
 
@@ -488,6 +496,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         emit LiquidityShiftRange(
             state.user,
             address(state.liquidityData.pool),
+            nftTokenId,
             state.liquidityData.indexedPipRange,
             state.liquidityData.liquidity,
             baseAmountRemoved,
@@ -495,7 +504,8 @@ abstract contract LiquidityManager is ILiquidityManager {
             targetIndex,
             uint128(state.resultAddLiquidity.liquidity),
             state.resultAddLiquidity.baseAmountAdded,
-            state.resultAddLiquidity.quoteAmountAdded
+            state.resultAddLiquidity.quoteAmountAdded,
+            _trackingId(address(state.liquidityData.pool))
         );
     }
 
@@ -608,7 +618,6 @@ abstract contract LiquidityManager is ILiquidityManager {
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
-
     function _msgSender() internal view virtual returns (address) {}
 
     struct ResultAddLiquidity {
@@ -884,5 +893,11 @@ abstract contract LiquidityManager is ILiquidityManager {
         view
         virtual
         returns (address)
+    {}
+
+    function _trackingId(address pairManager)
+        internal
+        virtual
+        returns (uint256)
     {}
 }
