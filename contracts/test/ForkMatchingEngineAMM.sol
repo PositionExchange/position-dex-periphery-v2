@@ -15,9 +15,13 @@ contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
     }
 
     function approveForTest() public {
-        quoteAsset.approve(counterParty, type(uint256).max);
-        baseAsset.approve(counterParty, type(uint256).max);
-        quoteAsset.approve(positionManagerLiquidity, type(uint256).max);
-        baseAsset.approve(positionManagerLiquidity, type(uint256).max);
+        _approve(quoteAsset,counterParty);
+        _approve(baseAsset,counterParty);
+        _approve(quoteAsset,positionManagerLiquidity);
+        _approve(baseAsset,positionManagerLiquidity);
+    }
+
+    function _approve(IERC20 token, address spender) internal {
+        token.approve(spender, type(uint256).max);
     }
 }

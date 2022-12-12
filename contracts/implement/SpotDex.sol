@@ -16,7 +16,7 @@ import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
 
-abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
+abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     using Convert for uint256;
 
     /**
@@ -376,16 +376,16 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
         address _trader,
         uint128 _pip,
         uint64 _orderId
-    ) public view returns(uint256){
+    ) public view returns(int256){
 
         SpotLimitOrder.Data[] memory limitOrder = limitOrders[_pairManager][_trader];
 
         for (uint256 i = 0; i < limitOrder.length; i++) {
             if (limitOrder[i].pip == _pip && limitOrder[i].orderId == _orderId) {
-                return i;
+                return int256(i);
             }
         }
-        return 0;
+        return -1;
 }
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
@@ -451,7 +451,7 @@ abstract contract SpotDex is ISpotDex, Block, SpotHouseStorage {
                 ) +
                 state.quoteAmountFilled;
 
-            //            quoteAmount += _feeCalculator(quoteAmount, fee);
+            // quoteAmount += _feeCalculator(quoteAmount, fee);
             // deposit quote asset
             // with token has RFI we need deposit first
             // and get real balance transferred

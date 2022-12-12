@@ -157,13 +157,6 @@ it ("Limit BTC", async () => {
     Side: 0
     Quantity: 0.1
     Price: 169200000
-- S6.1: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 0.1
-    Price: 169200100
 - S7: OpenMarket
   Action:
     id: 1
