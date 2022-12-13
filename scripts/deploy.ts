@@ -6,4 +6,5 @@ export * from "./test/deploy-PositionStakingDexManager"
 export * from "./test/deploy-withdrawBNB"
 export * from "./test/deployt-treasury"
 export * from "./test/deploy-mocktoken";
+export * from "./test/deploy-positionRouter"
 export * from "./setup";

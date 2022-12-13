@@ -57,7 +57,7 @@ contract PositionSpotFactory is
         Require._require(
             basisPoint > 0 &&
                 basisPoint % 2 == 0 &&
-                basisPoint % 2 <= 8 &&
+                basisPoint <= 8 &&
                 maxFindingWordsIndex > 0 &&
                 initialPip > 0 &&
                 pipRange > 0 &&
