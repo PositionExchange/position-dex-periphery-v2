@@ -149,7 +149,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             liquidityData.liquidity,
             _trackingId(address(liquidityData.pool))
         );
-
     }
 
     function increaseLiquidity(

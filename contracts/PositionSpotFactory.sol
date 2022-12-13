@@ -55,7 +55,7 @@ contract PositionSpotFactory is
         );
 
         Require._require(
-                basisPoint > 0 &&
+            basisPoint > 0 &&
                 basisPoint % 2 == 0 &&
                 basisPoint % 2 <= 8 &&
                 maxFindingWordsIndex > 0 &&
@@ -95,7 +95,8 @@ contract PositionSpotFactory is
                 feeShareAmm: feeShareAmm,
                 owner: msg.sender,
                 positionLiquidity: positionLiquidity,
-                spotHouse: spotHouse
+                spotHouse: spotHouse,
+                router: positionRouter
             })
         );
 
@@ -171,7 +172,7 @@ contract PositionSpotFactory is
         external
         returns (uint256)
     {
-        if ( msg.sender == spotHouse || msg.sender == positionLiquidity){
+        if (msg.sender == spotHouse || msg.sender == positionLiquidity) {
             return trackingRequestId[pairManager]++;
         }
         return 0;
@@ -183,6 +184,10 @@ contract PositionSpotFactory is
 
     function setSpotHouse(address newSpotHouse) external onlyOwner {
         spotHouse = newSpotHouse;
+    }
+
+    function setPositionRouter(address newPositionRouter) external onlyOwner {
+        positionRouter = newPositionRouter;
     }
 
     function setFeeShareAmm(uint32 _feeShareAmm) external onlyOwner {

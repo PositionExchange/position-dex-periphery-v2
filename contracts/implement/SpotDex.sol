@@ -376,17 +376,20 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         address _trader,
         uint128 _pip,
         uint64 _orderId
-    ) public view returns(int256){
-
-        SpotLimitOrder.Data[] memory limitOrder = limitOrders[_pairManager][_trader];
+    ) public view returns (int256) {
+        SpotLimitOrder.Data[] memory limitOrder = limitOrders[_pairManager][
+            _trader
+        ];
 
         for (uint256 i = 0; i < limitOrder.length; i++) {
-            if (limitOrder[i].pip == _pip && limitOrder[i].orderId == _orderId) {
+            if (
+                limitOrder[i].pip == _pip && limitOrder[i].orderId == _orderId
+            ) {
                 return int256(i);
             }
         }
         return -1;
-}
+    }
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal

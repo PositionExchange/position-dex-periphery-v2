@@ -561,6 +561,39 @@ contract PositionRouter is
         }
     }
 
+    struct SideAndPair {
+        SpotHouseStorage.Side side;
+        address pairManager;
+    }
+
+    function getSidesAndPairs(address[] calldata path)
+        public
+        view
+        returns (SideAndPair[] memory)
+    {
+        SideAndPair[] memory sidesAndPairs = new SideAndPair[](path.length - 1);
+        address quoteToken;
+        address pairManager;
+
+        for (uint256 i = 0; i < path.length - 1; i++) {
+            (, quoteToken, pairManager) = isPosiDexSupportPair(
+                path[i],
+                path[i + 1]
+            );
+
+            if (quoteToken == path[i]) {
+                // Buy
+                // path[0] -> path[path.length - 1] and path[0] is quote
+                sidesAndPairs[i].side = SpotHouseStorage.Side.BUY;
+            } else {
+                sidesAndPairs[i].side = SpotHouseStorage.Side.SELL;
+            }
+            sidesAndPairs[i].pairManager = pairManager;
+        }
+
+        return sidesAndPairs;
+    }
+
     function getReserves(address tokenA, address tokenB)
         external
         view

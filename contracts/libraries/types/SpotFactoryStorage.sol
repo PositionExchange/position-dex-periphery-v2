@@ -34,4 +34,6 @@ abstract contract SpotFactoryStorage is ISpotFactory {
     uint256[49] private __gap;
 
     mapping(address => uint256) public trackingRequestId;
+
+    address public positionRouter;
 }

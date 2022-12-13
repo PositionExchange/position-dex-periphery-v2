@@ -43,7 +43,6 @@ contract WithdrawBNB is IWithdrawBNB {
         owner = _newOwner;
     }
 
-
     function setCounterParty(address _newCounterParty) external onlyOwner {
         counterParties[_newCounterParty] = true;
     }

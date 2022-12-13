@@ -48,7 +48,8 @@ describe("manage liquidity", async () => {
                     owner: deployer.address,
                     positionLiquidity: deployer.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0
+                    feeShareAmm: 0,
+                    router : deployer.address
                 }
             );
 
@@ -89,7 +90,7 @@ describe("manage liquidity", async () => {
 
         it("remove liquidity", async () => {
 
-            console.log("current pip : ", matching.getPipRange())
+            console.log("current pip : ", matching.pipRange())
 
             await dexNFT.addLiquidity({
                 pool: matching.address,
@@ -112,7 +113,7 @@ describe("manage liquidity", async () => {
 
         it("increase liquidity", async () => {
 
-            console.log("current pip : ", matching.getPipRange())
+            console.log("current pip : ", matching.pipRange())
 
             await dexNFT.addLiquidity({
                 pool: matching.address,
