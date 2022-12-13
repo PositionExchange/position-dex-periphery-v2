@@ -25,11 +25,11 @@ import "./interfaces/IPositionRouter.sol";
 import "./libraries/helper/DexErrors.sol";
 
 contract PositionRouter is
-    PositionRouterStorage,
     IPositionRouter,
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    PositionRouterStorage
 {
     modifier ensure(uint256 deadline) {
         require(deadline >= blockNumber(), "PositionRouter: EXPIRED");
@@ -378,7 +378,6 @@ contract PositionRouter is
             uint256 balanceBefore = IERC20(path[0]).balanceOf(address(this));
             _deposit(path[0], msg.sender, amountIn);
             uint256 balanceAfter = IERC20(path[0]).balanceOf(address(this));
-            //            _deposit(path[0], msg.sender, amountIn);
             if (!isApprove(path[0])) {
                 _approve(path[0]);
             }

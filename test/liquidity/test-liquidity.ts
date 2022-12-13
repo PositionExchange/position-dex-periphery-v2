@@ -5,7 +5,7 @@ import YAML from "js-yaml";
     MockSpotHouse,
     MockToken,
     MockReflexToken,
-    PositionSpotFactory, PositionNondisperseLiquidity
+    PositionSpotFactory, PositionNondisperseLiquidity, MockWBNB, WithdrawBNB
     } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -21,7 +21,7 @@ import {
 import {BigNumber, ethers} from "ethers";
 import {YamlTestProcess} from "./yaml-test-process";
 import Decimal from "decimal.js";
-import {deployMockReflexToken, deployMockToken} from "../utils/mock";
+import {deployMockReflexToken, deployMockToken, deployMockWrappedBNB} from "../utils/mock";
 import {EventFragment} from "@ethersproject/abi";
 
 // import {waffle} from "hardhat";
@@ -30,6 +30,7 @@ import {EventFragment} from "@ethersproject/abi";
 
 export type SNumber = number | string | BigNumber
 export type StringOrNumber = string | number
+export type UseEther = 'none' | 'quote' | 'base';
 
 export interface CallOptions {
     sender?: SignerWithAddress;
@@ -111,13 +112,21 @@ function roundNumber(n, decimal = 6){
     return new Decimal((n).toString()).toDP(decimal).toNumber()
 }
 
+
 // useWBNB: 0 is not use, 1 is WBNB Quote, 2 is WBNB Base
-export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee = true, isRFI = false, pipRange= 30_000) {
+export async function deployAndCreateRouterHelper(
+    amountMint?: number,
+    isUseFee = true,
+    isRFI = false,
+    pipRange= 30_000,
+    userEther  :UseEther= 'none') {
     let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
-    let quote : MockToken;
+    let quote : any;
     let base : any;
+    let wbnb : MockWBNB;
+    let withdrawBNB : WithdrawBNB
     let testHelper: TestLiquidity;
     let dexNFT : PositionNondisperseLiquidity;
 
@@ -129,12 +138,23 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
     dexNFT = await deployContract("PositionNondisperseLiquidity", deployer );
+    wbnb = await  deployMockWrappedBNB();
+    console.log("wbnb: ", wbnb.address);
+    withdrawBNB = await deployContract("WithdrawBNB", deployer, wbnb.address);
+
 
     quote = await deployMockToken("Quote");
     if (isRFI) {
         base = await deployMockReflexToken("Base");
     } else {
         base = await deployMockToken("Base");
+    }
+    if (userEther !== 'none'){
+        if ( userEther === 'quote') {
+            quote = wbnb;
+        }else if ( userEther === 'base') {
+            base = wbnb;
+        }
     }
 
     await matching.initialize(
@@ -154,9 +174,13 @@ export async function deployAndCreateRouterHelper(amountMint?: number, isUseFee 
 
     await spotHouse.initialize();
 
+    await spotHouse.setWBNB(wbnb.address);
     await spotHouse.setFactory(factory.address);
+    await spotHouse.setWithdrawBNB(withdrawBNB.address);
     await dexNFT.initialize();
     await dexNFT.setFactory(factory.address);
+    await dexNFT.setBNB(wbnb.address)
+    await dexNFT.setWithdrawBNB(withdrawBNB.address);
     await factory.initialize();
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);

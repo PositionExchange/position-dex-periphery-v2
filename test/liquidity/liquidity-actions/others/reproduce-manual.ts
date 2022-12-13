@@ -165,4 +165,62 @@ it ("Limit BTC", async () => {
     Quantity: 0.01
 `)
     })
+it ("Add BTC", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 169210000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 56
+    Asset: quote
+    AmountVirtual: 1000000000
+`)
+    })
+})
+describe("ReproduceManualCHZ", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 30000)
+    })
+it ("Add CHZ", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 33757
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 1000000
+`)
+    })
+})
+
+
+describe("ReproduceManualAdd1M", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(10_000_000, false, false, 30000)
+    })
+
+
+
+it ("Add 1M", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 10000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 0
+    Asset: base
+    AmountVirtual: 1000000
+`)
+    })
 })
