@@ -1,6 +1,6 @@
 {
   "name": "position-evm-dex-v2",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "This is the next-gen of position dex. Embed orderbook and auto market maker",
   "main": "index.js",
   "scripts": {
@@ -54,7 +54,7 @@
     "@openzeppelin/contracts": "^4.7.3",
     "@openzeppelin/contracts-upgradeable": "^4.8.0-rc.1",
     "@openzeppelin/hardhat-upgrades": "^1.21.0",
-    "@positionex/matching-engine": "1.2.3",
+    "@positionex/matching-engine": "1.2.4",
     "@positionex/posi-token": "^1.1.4",
     "prettier-plugin-solidity": "^1.0.0-beta.24"
   }

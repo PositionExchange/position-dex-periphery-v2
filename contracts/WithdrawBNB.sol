@@ -13,7 +13,7 @@ contract WithdrawBNB is IWithdrawBNB {
     using Address for address payable;
     IWBNB public WBNB;
     address public owner;
-    address public spotHouse;
+    mapping(address => bool) counterParties;
 
     modifier onlyOwner() {
         require(msg.sender == owner, DexErrors.DEX_ONLY_OWNER);
@@ -21,7 +21,7 @@ contract WithdrawBNB is IWithdrawBNB {
     }
 
     modifier onlyCounterParty() {
-        require(msg.sender == spotHouse, DexErrors.DEX_ONLY_COUNTER_PARTY);
+        require(counterParties[msg.sender], DexErrors.DEX_ONLY_COUNTER_PARTY);
         _;
     }
 
@@ -43,8 +43,13 @@ contract WithdrawBNB is IWithdrawBNB {
         owner = _newOwner;
     }
 
-    function setSpotHouse(address _newSpotHouse) external onlyOwner {
-        spotHouse = _newSpotHouse;
+
+    function setCounterParty(address _newCounterParty) external onlyOwner {
+        counterParties[_newCounterParty] = true;
+    }
+
+    function revokeCounterParty(address _account) external onlyOwner {
+        counterParties[_account] = false;
     }
 
     function withdraw(address recipient, uint256 amount)
