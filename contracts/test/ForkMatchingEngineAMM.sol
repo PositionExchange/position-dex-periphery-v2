@@ -7,18 +7,18 @@ import "@positionex/matching-engine/contracts/test/MockMatchingEngineAMM.sol";
 
 contract ForkMatchingEngineAMM is MockMatchingEngineAMM {
     function setCounterParty02(address a) public {
-        counterParty = a;
+        counterParties[a] = true;
     }
 
     function resetFeeShareAmm() public {
         feeShareAmm = 0;
     }
 
-    function approveForTest() public {
-        _approve(quoteAsset,counterParty);
-        _approve(baseAsset,counterParty);
-        _approve(quoteAsset,positionManagerLiquidity);
-        _approve(baseAsset,positionManagerLiquidity);
+    function approveForTest(address house, address liquidity) public {
+        _approve(quoteAsset, house);
+        _approve(baseAsset, house);
+        _approve(quoteAsset, liquidity);
+        _approve(baseAsset, liquidity);
     }
 
     function _approve(IERC20 token, address spender) internal {

@@ -14,6 +14,8 @@ contract PositionRouterStorage {
 
     ISpotHouse public spotHouse;
 
+    IWithdrawBNB public withdrawBNB;
+
     address public WBNB;
 
     IUniswapV2Router02 public uniSwapRouterV2;

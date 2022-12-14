@@ -5,8 +5,8 @@ import YAML from "js-yaml";
     MockSpotHouse,
     MockToken,
     MockReflexToken,
-    PositionSpotFactory, PositionNondisperseLiquidity, MockWBNB, WithdrawBNB
-    } from "../../typeChain";
+    PositionSpotFactory, PositionNondisperseLiquidity, MockWBNB, WithdrawBNB, PositionRouter
+} from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {
     approve,
@@ -129,6 +129,7 @@ export async function deployAndCreateRouterHelper(
     let withdrawBNB : WithdrawBNB
     let testHelper: TestLiquidity;
     let dexNFT : PositionNondisperseLiquidity;
+    let router : PositionRouter;
 
 
     let users  : any[] = [];
@@ -138,6 +139,7 @@ export async function deployAndCreateRouterHelper(
     spotHouse = await deployContract("MockSpotHouse", deployer );
     factory = await deployContract("PositionSpotFactory", deployer );
     dexNFT = await deployContract("PositionNondisperseLiquidity", deployer );
+    router = await deployContract("PositionRouter", deployer );
     wbnb = await  deployMockWrappedBNB();
     console.log("wbnb: ", wbnb.address);
     withdrawBNB = await deployContract("WithdrawBNB", deployer, wbnb.address);
@@ -169,7 +171,8 @@ export async function deployAndCreateRouterHelper(
             owner: deployer.address,
             positionLiquidity: dexNFT.address,
             spotHouse: spotHouse.address,
-            feeShareAmm: 6000
+            feeShareAmm: 6000,
+            router :router.address
         });
 
     await spotHouse.initialize();
@@ -188,7 +191,7 @@ export async function deployAndCreateRouterHelper(
     // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
-    await matching.approveForTest()
+    await matching.approveForTest(spotHouse.address, dexNFT.address);
     await dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
         await matching.resetFeeShareAmm();
