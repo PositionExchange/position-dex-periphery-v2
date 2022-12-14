@@ -84,30 +84,9 @@ contract PositionRouter is
                 deadline
             );
         } else {
-            uint256 mainSideOut;
-            uint256 flipSideOut;
-            uint256 fee;
-            amounts = new uint256[](3);
+            amounts = new uint256[](sidesAndPairs.length + 1);
             amounts[0] = amountIn;
-            for (uint256 i = 0; i < sidesAndPairs.length; i++) {
-                if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
-                    (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
-                        sidesAndPairs[i].pairManager
-                    ).openMarketWithQuoteAsset(
-                            amounts[i],
-                            true,
-                            _msgSender(),
-                            20
-                        );
-                } else {
-                    (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
-                        sidesAndPairs[i].pairManager
-                    ).openMarket(amounts[i], true, _msgSender(), 20);
-                }
-                require(mainSideOut == amounts[i], "!L");
-                amounts[i + 1] = flipSideOut - fee;
-            }
-            _transferBridge(amounts, sidesAndPairs);
+            return _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -189,30 +168,9 @@ contract PositionRouter is
                 deadline
             );
         } else {
-            uint256 mainSideOut;
-            uint256 flipSideOut;
-            uint256 fee;
-            amounts = new uint256[](3);
+            amounts = new uint256[](sidesAndPairs.length + 1);
             amounts[0] = msg.value;
-            for (uint256 i = 0; i < sidesAndPairs.length; i++) {
-                if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
-                    (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
-                        sidesAndPairs[i].pairManager
-                    ).openMarketWithQuoteAsset(
-                            amounts[i],
-                            true,
-                            _msgSender(),
-                            20
-                        );
-                } else {
-                    (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
-                        sidesAndPairs[i].pairManager
-                    ).openMarket(amounts[i], true, _msgSender(), 20);
-                }
-                require(mainSideOut == amounts[i],DexErrors.DEX_MARKET_NOT_FULL_FILL);
-                amounts[i + 1] = flipSideOut - fee;
-            }
-            _transferBridge(amounts, sidesAndPairs);
+            return _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -283,12 +241,9 @@ contract PositionRouter is
         returns (uint256[] memory amounts)
     {
         require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
-        if (pairManager == address(0)) {
+        if (sidesAndPairs[0].pairManager == address(0)) {
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
             _deposit(path[0], _msgSender(), amounts[0]);
 
@@ -303,23 +258,9 @@ contract PositionRouter is
                 deadline
             );
         } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                amounts = spotHouse.openMarketOrderWithQuote(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountIn,
-                    _msgSender(),
-                    to
-                );
-            } else {
-                amounts = spotHouse.openMarketOrder(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountIn,
-                    _msgSender(),
-                    to
-                );
-            }
+            amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = amountIn;
+            return _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -512,6 +453,73 @@ contract PositionRouter is
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    function _swap(
+        uint256[] memory amounts,
+        SideAndPair[] memory sidesAndPairs,
+        address to
+    ) internal returns (uint256[] memory) {
+        uint256 mainSideOut;
+        uint256 flipSideOut;
+        uint256 fee;
+        for (uint256 i = 0; i < sidesAndPairs.length; i++) {
+            if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
+                if (sidesAndPairs[i].quoteToken == WBNB) {
+                    _depositBNB(sidesAndPairs[i].pairManager, amounts[i]);
+                } else {
+                    amounts[i] = _transferFromRealBalance(
+                        IERC20(sidesAndPairs[i].quoteToken),
+                        i == 0
+                            ? _msgSender()
+                            : sidesAndPairs[i - 1].pairManager,
+                        sidesAndPairs[i].pairManager,
+                        amounts[i]
+                    );
+                }
+                (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
+                    sidesAndPairs[i].pairManager
+                ).openMarketWithQuoteAsset(amounts[i], true, _msgSender(), 20);
+            } else {
+                if (sidesAndPairs[i].baseToken == WBNB) {
+                    _depositBNB(sidesAndPairs[i].pairManager, amounts[i]);
+                } else {
+                    amounts[i] = _transferFromRealBalance(
+                        IERC20(sidesAndPairs[i].baseToken),
+                        i == 0
+                            ? _msgSender()
+                            : sidesAndPairs[i - 1].pairManager,
+                        sidesAndPairs[i].pairManager,
+                        amounts[i]
+                    );
+                }
+                (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
+                    sidesAndPairs[i].pairManager
+                ).openMarket(amounts[i], true, _msgSender(), 20);
+            }
+            require(mainSideOut == amounts[i], "!L");
+            amounts[i + 1] = flipSideOut - fee;
+        }
+        _transferAfterBridge(
+            amounts[sidesAndPairs.length],
+            sidesAndPairs[sidesAndPairs.length - 1],
+            to
+        );
+
+        return amounts;
+    }
+
+    function _transferFromRealBalance(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 amount
+    ) internal returns (uint256) {
+        uint256 balanceBefore = token.balanceOf(to);
+
+        TransferHelper.transferFrom(token, from, to, amount);
+
+        return token.balanceOf(to) - balanceBefore;
+    }
+
     function _deposit(
         address token,
         address from,
@@ -541,84 +549,32 @@ contract PositionRouter is
         withdrawBNB.withdraw(_trader, _amount);
     }
 
-    function _transferBridge(
-        uint256[] memory amounts,
-        SideAndPair[] memory sidesAndPairs
+    function _transferAfterBridge(
+        uint256 amount,
+        SideAndPair memory sidesAndPairs,
+        address to
     ) internal {
-        for (uint256 i = 0; i < sidesAndPairs.length; i++) {
-            if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
-                if (i == 0) {
-                    if (sidesAndPairs[i].quoteToken == WBNB) {
-                        _depositBNB(sidesAndPairs[i].pairManager, amounts[i]);
-                    } else {
-                        TransferHelper.transferFrom(
-                            IERC20(sidesAndPairs[i].quoteToken),
-                            _msgSender(),
-                            sidesAndPairs[i].pairManager,
-                            amounts[i]
-                        );
-                    }
-                } else {
-                    TransferHelper.transferFrom(
-                        IERC20(sidesAndPairs[i].quoteToken),
-                        sidesAndPairs[i - 1].pairManager,
-                        sidesAndPairs[i].pairManager,
-                        amounts[i]
-                    );
-                }
-                if (i == sidesAndPairs.length - 1) {
-                    if (sidesAndPairs[i].baseToken == WBNB) {
-                        _withdrawBNB(
-                            msg.sender,
-                            sidesAndPairs[i].pairManager,
-                            amounts[i + 1]
-                        );
-                    } else {
-                        TransferHelper.transferFrom(
-                            IERC20(sidesAndPairs[i].baseToken),
-                            sidesAndPairs[i].pairManager,
-                            _msgSender(),
-                            amounts[i + 1]
-                        );
-                    }
-                }
+        if (sidesAndPairs.side == SpotHouseStorage.Side.BUY) {
+            if (sidesAndPairs.baseToken == WBNB) {
+                _withdrawBNB(to, sidesAndPairs.pairManager, amount);
             } else {
-                if (i == 0) {
-                    if (sidesAndPairs[i].baseToken == WBNB) {
-                        _depositBNB(sidesAndPairs[i].pairManager, amounts[i]);
-                    } else {
-                        TransferHelper.transferFrom(
-                            IERC20(sidesAndPairs[i].baseToken),
-                            _msgSender(),
-                            sidesAndPairs[i].pairManager,
-                            amounts[i]
-                        );
-                    }
-                } else {
-                    TransferHelper.transferFrom(
-                        IERC20(sidesAndPairs[i].baseToken),
-                        sidesAndPairs[i - 1].pairManager,
-                        sidesAndPairs[i].pairManager,
-                        amounts[i]
-                    );
-                }
-
-                if (i == sidesAndPairs.length - 1) {
-                    if (sidesAndPairs[i].quoteToken == WBNB) {
-                        _withdrawBNB(
-                            msg.sender,
-                            sidesAndPairs[i].pairManager,
-                            amounts[i + 1]
-                        );
-                    } else {
-                        TransferHelper.transferFrom(
-                            IERC20(sidesAndPairs[i].quoteToken),
-                            sidesAndPairs[i].pairManager,
-                            _msgSender(),
-                            amounts[i + 1]
-                        );
-                    }
-                }
+                TransferHelper.transferFrom(
+                    IERC20(sidesAndPairs.baseToken),
+                    sidesAndPairs.pairManager,
+                    to,
+                    amount
+                );
+            }
+        } else {
+            if (sidesAndPairs.quoteToken == WBNB) {
+                _withdrawBNB(to, sidesAndPairs.pairManager, amount);
+            } else {
+                TransferHelper.transferFrom(
+                    IERC20(sidesAndPairs.quoteToken),
+                    sidesAndPairs.pairManager,
+                    to,
+                    amount
+                );
             }
         }
     }
@@ -657,6 +613,7 @@ contract PositionRouter is
     //------------------------------------------------------------------------------------------------------------------
     // VIEWS FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
+
     function getSideAndPairManager(address[] calldata path)
         public
         view
