@@ -320,11 +320,9 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
-        if (pairManager == address(0)) {
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
+
+        if (sidesAndPairs[0].pairManager == address(0)) {
             uint256 balanceBefore = IERC20(path[0]).balanceOf(address(this));
             _deposit(path[0], _msgSender(), amountIn);
             uint256 balanceAfter = IERC20(path[0]).balanceOf(address(this));
@@ -340,23 +338,9 @@ contract PositionRouter is
                     deadline
                 );
         } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                spotHouse.openMarketOrderWithQuote(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(amountIn),
-                    _msgSender(),
-                    to
-                );
-            } else {
-                spotHouse.openMarketOrder(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(amountIn),
-                    _msgSender(),
-                    to
-                );
-            }
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = amountIn;
+            _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -367,12 +351,9 @@ contract PositionRouter is
         uint256 deadline
     ) external payable virtual override ensure(deadline) {
         require(path[0] == WBNB, DexErrors.DEX_MUST_BNB);
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
-        if (pairManager == address(0)) {
+        if (sidesAndPairs[0].pairManager == address(0)) {
             if (!isApprove(path[0])) {
                 _approve(path[0]);
             }
@@ -380,23 +361,9 @@ contract PositionRouter is
                 value: msg.value
             }(amountOutMin, path, to, deadline);
         } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                spotHouse.openMarketOrderWithQuote{value: msg.value}(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(msg.value),
-                    _msgSender(),
-                    to
-                );
-            } else {
-                spotHouse.openMarketOrder{value: msg.value}(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(msg.value),
-                    _msgSender(),
-                    to
-                );
-            }
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = msg.value;
+            _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -408,12 +375,9 @@ contract PositionRouter is
         uint256 deadline
     ) external virtual override ensure(deadline) {
         require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
-        if (pairManager == address(0)) {
+        if (sidesAndPairs[0].pairManager == address(0)) {
             uint256 balanceBefore = IERC20(path[0]).balanceOf(address(this));
             _deposit(path[0], _msgSender(), amountIn);
             uint256 balanceAfter = IERC20(path[0]).balanceOf(address(this));
@@ -429,23 +393,9 @@ contract PositionRouter is
                 deadline
             );
         } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                spotHouse.openMarketOrderWithQuote(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountIn,
-                    _msgSender(),
-                    to
-                );
-            } else {
-                spotHouse.openMarketOrder(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountIn,
-                    _msgSender(),
-                    to
-                );
-            }
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = amountIn;
+            _swap(amounts, sidesAndPairs, to);
         }
     }
 
