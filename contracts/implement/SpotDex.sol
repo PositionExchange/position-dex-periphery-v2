@@ -922,14 +922,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         SpotHouseStorage.Side _side,
         uint64 orderId
     ) internal {
-        emit LimitOrderCancelled(
-            _trader,
-            _pairManager,
-            pip,
-            _side,
-            orderId,
-            0
-        );
+        emit LimitOrderCancelled(_trader, _pairManager, pip, _side, orderId, 0);
     }
 
     function emitAllLimitOrderCancelled(

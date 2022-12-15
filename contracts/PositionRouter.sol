@@ -411,6 +411,7 @@ contract PositionRouter is
         uint256 mainSideOut;
         uint256 flipSideOut;
         uint256 fee;
+        address _trader = _msgSender();
         for (uint256 i = 0; i < sidesAndPairs.length; i++) {
             if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
                 if (sidesAndPairs[i].quoteToken == WBNB) {
@@ -418,9 +419,7 @@ contract PositionRouter is
                 } else {
                     amounts[i] = _transferFromRealBalance(
                         IERC20(sidesAndPairs[i].quoteToken),
-                        i == 0
-                            ? _msgSender()
-                            : sidesAndPairs[i - 1].pairManager,
+                        i == 0 ? _trader : sidesAndPairs[i - 1].pairManager,
                         sidesAndPairs[i].pairManager,
                         amounts[i]
                     );
@@ -434,19 +433,29 @@ contract PositionRouter is
                 } else {
                     amounts[i] = _transferFromRealBalance(
                         IERC20(sidesAndPairs[i].baseToken),
-                        i == 0
-                            ? _msgSender()
-                            : sidesAndPairs[i - 1].pairManager,
+                        i == 0 ? _trader : sidesAndPairs[i - 1].pairManager,
                         sidesAndPairs[i].pairManager,
                         amounts[i]
                     );
                 }
                 (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
                     sidesAndPairs[i].pairManager
-                ).openMarket(amounts[i], true, _msgSender(), 20);
+                ).openMarket(amounts[i], true, _trader, 20);
             }
-            require(mainSideOut == amounts[i], "!L");
+            require(mainSideOut == amounts[i], DexErrors.DEX_MARKET_NOT_FULL_FILL);
             amounts[i + 1] = flipSideOut - fee;
+            emitMarketOrderOpened(
+                _trader,
+                sidesAndPairs[i].side == SpotHouseStorage.Side.BUY
+                    ? amounts[i + 1]
+                    : amounts[i],
+                sidesAndPairs[i].side == SpotHouseStorage.Side.BUY
+                    ? amounts[i]
+                    : amounts[i + 1],
+                sidesAndPairs[i].side,
+                IMatchingEngineAMM(sidesAndPairs[i].pairManager),
+                IMatchingEngineAMM(sidesAndPairs[i].pairManager).getCurrentPip()
+            );
         }
         _transferAfterBridge(
             amounts[sidesAndPairs.length],
@@ -455,6 +464,35 @@ contract PositionRouter is
         );
 
         return amounts;
+    }
+
+    event MarketOrderOpened(
+        address trader,
+        uint256 quantity,
+        uint256 openNational,
+        SpotHouseStorage.Side side,
+        IMatchingEngineAMM spotManager,
+        uint128 currentPip,
+        uint256 trackingId
+    );
+
+    function emitMarketOrderOpened(
+        address trader,
+        uint256 quantity,
+        uint256 openNational,
+        SpotHouseStorage.Side side,
+        IMatchingEngineAMM spotManager,
+        uint128 currentPip
+    ) internal {
+        emit MarketOrderOpened(
+            trader,
+            quantity,
+            openNational,
+            side,
+            spotManager,
+            currentPip,
+            0
+        );
     }
 
     function _transferFromRealBalance(
