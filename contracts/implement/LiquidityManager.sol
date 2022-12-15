@@ -94,8 +94,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
-            params.indexedPipRange,
-            _trackingId(address(params.pool))
+            params.indexedPipRange
         );
     }
 
@@ -146,8 +145,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             baseAmountRemoved,
             quoteAmountRemoved,
             liquidityData.indexedPipRange,
-            liquidityData.liquidity,
-            _trackingId(address(liquidityData.pool))
+            liquidityData.liquidity
         );
     }
 
@@ -243,8 +241,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange,
-            uint128(_resultAddLiquidity.liquidity),
-            _trackingId(address(liquidityData.pool))
+            uint128(_resultAddLiquidity.liquidity)
         );
     }
 
@@ -315,8 +312,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             quoteAmountRemoved,
             ModifyType.DECREASE,
             liquidityData.indexedPipRange,
-            liquidity,
-            _trackingId(address(liquidityData.pool))
+            liquidity
         );
     }
 
@@ -503,8 +499,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             targetIndex,
             uint128(state.resultAddLiquidity.liquidity),
             state.resultAddLiquidity.baseAmountAdded,
-            state.resultAddLiquidity.quoteAmountAdded,
-            _trackingId(address(state.liquidityData.pool))
+            state.resultAddLiquidity.quoteAmountAdded
         );
     }
 
