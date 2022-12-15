@@ -7,5 +7,6 @@
   "withdrawBNB": "0x4401c57Fcc6306f1A6f3cC4d0ab25aD29c2ffBC4",
   "mockTokenTreasury": "0x6E461bb6dA0D8E8875DAb4cBf73b9623caF8aB86",
   "positionStakingDexManager": "0x9b2DA475a83b196677E08dF561c7A600DA1CA33f",
-  "factoryMockToken": "0xf916cbD14cDb2eEf93cafF7BD613aB7708C8917C"
+  "factoryMockToken": "0xf916cbD14cDb2eEf93cafF7BD613aB7708C8917C",
+  "positionRouter": "0x70d83C003fCd89D79Ea2071425b9a84b888A5539"
 }

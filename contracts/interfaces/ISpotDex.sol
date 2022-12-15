@@ -21,7 +21,7 @@ interface ISpotDex {
         SpotHouseStorage.Side side,
         IMatchingEngineAMM spotManager,
         uint128 currentPip,
-        uint256 trackingId
+        uint64 blockTimestamp
     );
     event LimitOrderOpened(
         uint64 orderId,
@@ -31,7 +31,7 @@ interface ISpotDex {
         uint128 pip,
         SpotHouseStorage.Side _side,
         address spotManager,
-        uint256 trackingId
+        uint64 blockTimestamp
     );
 
     event LimitOrderCancelled(
@@ -40,7 +40,7 @@ interface ISpotDex {
         uint128 pip,
         SpotHouseStorage.Side _side,
         uint64 orderId,
-        uint256 trackingId
+        uint64 blockTimestamp
     );
 
     event AllLimitOrderCancelled(
@@ -49,7 +49,7 @@ interface ISpotDex {
         uint128[] pips,
         uint64[] orderIds,
         SpotHouseStorage.Side[] sides,
-        uint256 trackingId
+        uint64 blockTimestamp
     );
 
     event AssetClaimed(

@@ -890,7 +890,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             side,
             spotManager,
             currentPip,
-            _trackingId(address(spotManager))
+            0
         );
     }
 
@@ -911,7 +911,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             pip,
             _side,
             spotManager,
-            _trackingId(spotManager)
+            0
         );
     }
 
@@ -928,7 +928,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             pip,
             _side,
             orderId,
-            _trackingId(address(_pairManager))
+            0
         );
     }
 
@@ -945,7 +945,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _listPips,
             _orderIds,
             _listSides,
-            _trackingId(address(_pairManager))
+            0
         );
     }
 
