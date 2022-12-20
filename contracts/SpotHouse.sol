@@ -32,6 +32,7 @@ contract SpotHouse is
 {
     using Convert for uint256;
 
+    // TODO remove
     modifier onlyRouter() {
         require(_msgSender() == positionRouter, DexErrors.DEX_ONLY_ROUTER);
         _;
@@ -70,6 +71,7 @@ contract SpotHouse is
         super.openMarketOrder(_pairManager, _side, _quantity);
     }
 
+    // TODO remove
     function openMarketOrder(
         IMatchingEngineAMM _pairManager,
         Side _side,
@@ -103,6 +105,7 @@ contract SpotHouse is
         super.openMarketOrderWithQuote(_pairManager, _side, _quoteAmount);
     }
 
+    // TODO remove
     function openMarketOrderWithQuote(
         IMatchingEngineAMM _pairManager,
         Side _side,

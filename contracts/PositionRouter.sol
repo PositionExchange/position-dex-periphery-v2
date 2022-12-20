@@ -443,9 +443,9 @@ contract PositionRouter is
                 }
                 (mainSideOut, flipSideOut, fee) = IMatchingEngineAMM(
                     sidesAndPairs[i].pairManager
-                ).openMarket(amounts[i], true, _msgSender(), 20);
+                ).openMarket(amounts[i], false, _msgSender(), 20);
             }
-            require(mainSideOut == amounts[i], "!L");
+            require(mainSideOut == amounts[i], DexErrors.DEX_MARKET_NOT_FULL_FILL);
             amounts[i + 1] = flipSideOut - fee;
         }
         _transferAfterBridge(
