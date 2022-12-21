@@ -745,4 +745,20 @@ contract PositionStakingDexManager is
             data.pool
         ) = positionNondisperseLiquidity.concentratedLiquidity(tokenId);
     }
+
+    function _calculatePower(
+        uint32 indexedPipRangeNft,
+        uint32 currentIndexedPipRange,
+        uint256 liquidity
+    ) internal view returns (uint256 power) {
+        if (indexedPipRangeNft > currentIndexedPipRange) {
+            power =
+                liquidity /
+                ((indexedPipRangeNft - currentIndexedPipRange) + 1);
+        } else {
+            power =
+                liquidity /
+                ((currentIndexedPipRange - indexedPipRangeNft) + 1);
+        }
+    }
 }
