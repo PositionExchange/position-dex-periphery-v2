@@ -375,25 +375,32 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         address instance;
         PendingLimitOrder[] pendingOrders;
     }
+
     function getBatchPendingLimitOrdersByTrader(
         IMatchingEngineAMM pairManager,
         address[] memory traders
-    ) public view returns (BatchPendingLimitOrder[] memory batchPendingOrders){
+    ) public view returns (BatchPendingLimitOrder[] memory batchPendingOrders) {
         batchPendingOrders = new BatchPendingLimitOrder[](traders.length);
-        for (uint i =0; i< traders.length; i++) {
+        for (uint256 i = 0; i < traders.length; i++) {
             batchPendingOrders[i].instance = traders[i];
-            batchPendingOrders[i].pendingOrders = getPendingLimitOrders(pairManager,  traders[i]);
+            batchPendingOrders[i].pendingOrders = getPendingLimitOrders(
+                pairManager,
+                traders[i]
+            );
         }
     }
 
     function getBatchPendingLimitOrdersByPair(
         IMatchingEngineAMM[] memory pairManagers,
         address trader
-    ) public view returns (BatchPendingLimitOrder[] memory batchPendingOrders){
+    ) public view returns (BatchPendingLimitOrder[] memory batchPendingOrders) {
         batchPendingOrders = new BatchPendingLimitOrder[](pairManagers.length);
-        for (uint i =0; i< pairManagers.length; i++) {
+        for (uint256 i = 0; i < pairManagers.length; i++) {
             batchPendingOrders[i].instance = address(pairManagers[i]);
-            batchPendingOrders[i].pendingOrders = getPendingLimitOrders(pairManagers[i], trader);
+            batchPendingOrders[i].pendingOrders = getPendingLimitOrders(
+                pairManagers[i],
+                trader
+            );
         }
     }
 

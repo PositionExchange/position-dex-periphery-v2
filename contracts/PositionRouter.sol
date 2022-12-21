@@ -445,7 +445,10 @@ contract PositionRouter is
                     sidesAndPairs[i].pairManager
                 ).openMarket(amounts[i], false, _msgSender(), 20);
             }
-            require(mainSideOut == amounts[i], DexErrors.DEX_MARKET_NOT_FULL_FILL);
+            require(
+                mainSideOut == amounts[i],
+                DexErrors.DEX_MARKET_NOT_FULL_FILL
+            );
             amounts[i + 1] = flipSideOut - fee;
         }
         _transferAfterBridge(
