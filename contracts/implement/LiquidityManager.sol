@@ -29,74 +29,19 @@ abstract contract LiquidityManager is ILiquidityManager {
         override concentratedLiquidity;
     IPositionStakingDexManager stakingManager;
 
-    struct AddLiquidityParams {
-        IMatchingEngineAMM pool;
-        uint128 amountVirtual;
-        uint32 indexedPipRange;
-        bool isBase;
-    }
-
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
         virtual
     {
-        Require._require(
-            params.amountVirtual != 0,
-            DexErrors.LQ_INVALID_NUMBER
-        );
-        address user = _msgSender();
-        uint256 _addedAmountVirtual = depositLiquidity(
-            params.pool,
-            user,
-            params.isBase ? Asset.Type.Base : Asset.Type.Quote,
-            params.amountVirtual
-        );
+        _addLiquidityRecipient(params, _msgSender());
+    }
 
-        ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
-            uint128(_addedAmountVirtual),
-            params.isBase,
-            params.indexedPipRange,
-            _getCurrentIndexPipRange(params.pool),
-            params.pool
-        );
-
-        uint256 amountModifySecondAsset = depositLiquidity(
-            params.pool,
-            user,
-            params.isBase ? Asset.Type.Quote : Asset.Type.Base,
-            params.isBase
-                ? _resultAddLiquidity.quoteAmountAdded
-                : _resultAddLiquidity.baseAmountAdded
-        );
-        Require._require(
-            params.isBase
-                ? amountModifySecondAsset >=
-                    _resultAddLiquidity.quoteAmountAdded
-                : amountModifySecondAsset >=
-                    _resultAddLiquidity.baseAmountAdded,
-            DexErrors.LQ_NOT_SUPPORT
-        );
-
-        uint256 nftTokenId = mint(user);
-
-        concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
-            liquidity: uint128(_resultAddLiquidity.liquidity),
-            indexedPipRange: params.indexedPipRange,
-            feeGrowthBase: _resultAddLiquidity.feeGrowthBase,
-            feeGrowthQuote: _resultAddLiquidity.feeGrowthQuote,
-            pool: params.pool
-        });
-
-        emit LiquidityAdded(
-            user,
-            address(params.pool),
-            nftTokenId,
-            _resultAddLiquidity.baseAmountAdded,
-            _resultAddLiquidity.quoteAmountAdded,
-            params.indexedPipRange,
-            0
-        );
+    function addLiquidityWithRecipient(
+        AddLiquidityParams calldata params,
+        address recipient
+    ) public payable virtual {
+        _addLiquidityRecipient(params, recipient);
     }
 
     function removeLiquidity(uint256 nftTokenId) public virtual {
@@ -743,6 +688,67 @@ abstract contract LiquidityManager is ILiquidityManager {
                 quoteAmount: state.quoteAmountModify,
                 indexedPipRange: indexedPipRange
             })
+        );
+    }
+
+    function _addLiquidityRecipient(
+        AddLiquidityParams calldata params,
+        address user
+    ) internal {
+        Require._require(
+            params.amountVirtual != 0,
+            DexErrors.LQ_INVALID_NUMBER
+        );
+        uint256 _addedAmountVirtual = depositLiquidity(
+            params.pool,
+            user,
+            params.isBase ? Asset.Type.Base : Asset.Type.Quote,
+            params.amountVirtual
+        );
+
+        ResultAddLiquidity memory _resultAddLiquidity = _addLiquidity(
+            uint128(_addedAmountVirtual),
+            params.isBase,
+            params.indexedPipRange,
+            _getCurrentIndexPipRange(params.pool),
+            params.pool
+        );
+
+        uint256 amountModifySecondAsset = depositLiquidity(
+            params.pool,
+            user,
+            params.isBase ? Asset.Type.Quote : Asset.Type.Base,
+            params.isBase
+                ? _resultAddLiquidity.quoteAmountAdded
+                : _resultAddLiquidity.baseAmountAdded
+        );
+        Require._require(
+            params.isBase
+                ? amountModifySecondAsset >=
+                    _resultAddLiquidity.quoteAmountAdded
+                : amountModifySecondAsset >=
+                    _resultAddLiquidity.baseAmountAdded,
+            DexErrors.LQ_NOT_SUPPORT
+        );
+
+        uint256 nftTokenId = mint(user);
+
+        concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
+            liquidity: uint128(_resultAddLiquidity.liquidity),
+            indexedPipRange: params.indexedPipRange,
+            feeGrowthBase: _resultAddLiquidity.feeGrowthBase,
+            feeGrowthQuote: _resultAddLiquidity.feeGrowthQuote,
+            pool: params.pool
+        });
+
+        emit LiquidityAdded(
+            user,
+            address(params.pool),
+            nftTokenId,
+            _resultAddLiquidity.baseAmountAdded,
+            _resultAddLiquidity.quoteAmountAdded,
+            params.indexedPipRange,
+            0
         );
     }
 

@@ -63,6 +63,13 @@ contract PositionNondisperseLiquidity is
         super.addLiquidity(params);
     }
 
+    function addLiquidityWithRecipient(
+        AddLiquidityParams calldata params,
+        address recipient
+    ) public payable override(LiquidityManager) nonReentrant {
+        super.addLiquidityWithRecipient(params, recipient);
+    }
+
     function removeLiquidity(uint256 nftTokenId)
         public
         override(LiquidityManager)

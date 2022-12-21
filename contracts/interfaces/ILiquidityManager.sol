@@ -12,6 +12,13 @@ interface ILiquidityManager {
         DECREASE
     }
 
+    struct AddLiquidityParams {
+        IMatchingEngineAMM pool;
+        uint128 amountVirtual;
+        uint32 indexedPipRange;
+        bool isBase;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -33,6 +40,35 @@ interface ILiquidityManager {
             uint256 feeGrowthQuote,
             IMatchingEngineAMM pool
         );
+
+    function addLiquidity(AddLiquidityParams calldata params)
+        external
+        payable
+        virtual;
+
+    function addLiquidityWithRecipient(
+        AddLiquidityParams calldata params,
+        address recipient
+    ) external payable virtual;
+
+    function removeLiquidity(uint256 nftTokenId) external virtual;
+
+    function increaseLiquidity(
+        uint256 nftTokenId,
+        uint128 amountModify,
+        bool isBase
+    ) external payable virtual;
+
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
+        external
+        virtual;
+
+    function shiftRange(
+        uint256 nftTokenId,
+        uint32 targetIndex,
+        uint128 amountNeeded,
+        bool isBase
+    ) external payable virtual;
 
     //------------------------------------------------------------------------------------------------------------------
     // EVENTS
