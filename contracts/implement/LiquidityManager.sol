@@ -847,9 +847,12 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 deltaLiquidityModify,
         ModifyType modifyType
     ) internal {
+        /// NFT in user wallet
+        if (_isOwner(tokenId, _msgSender())) return;
+
         address stakingManager = getStakingManager(poolAddress);
         if (stakingManager != address(0)) {
-            if (_owner(tokenId) == stakingManager) {
+            if (_isOwner(tokenId, stakingManager)) {
                 Require._require(
                     IUpdateStakingManager(stakingManager)
                         .updateStakingLiquidity(
@@ -891,7 +894,12 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function burn(uint256 tokenId) internal virtual {}
 
-    function _owner(uint256 tokenId) internal view virtual returns (address) {}
+    function _isOwner(uint256 tokenId, address user)
+        internal
+        view
+        virtual
+        returns (bool)
+    {}
 
     function getStakingManager(address poolAddress)
         public

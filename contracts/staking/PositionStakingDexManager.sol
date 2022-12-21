@@ -127,6 +127,9 @@ contract PositionStakingDexManager is
     // nftid => poolId => its index in userNft
     mapping(uint256 => mapping(address => uint256)) public nftOwnedIndex;
 
+    /// nftid => power
+    mapping(uint256 => uint256) public powerNft;
+
     event Deposit(address indexed user, address indexed pid, uint256 amount);
     event Withdraw(address indexed user, address indexed pid, uint256 amount);
     event EmergencyWithdraw(
@@ -443,11 +446,17 @@ contract PositionStakingDexManager is
         }
         payOrLockupPendingPosition(poolAddress);
         _transferNFTIn(_nftId);
-        user.amount = user.amount.add(nftData.liquidity);
+        uint128 power = _calculatePower(
+            nftData.indexedPipRange,
+            uint32(nftData.pool.currentIndexedPipRange()),
+            nftData.liquidity
+        );
+        user.amount = user.amount.add(power);
         user.rewardDebt = uint128(
             user.amount.mul(pool.accPositionPerShare).div(1e12)
         );
-        pool.totalStaked += nftData.liquidity;
+        pool.totalStaked += power;
+        powerNft[_nftId] = power;
         emit Deposit(msg.sender, poolAddress, _nftId);
     }
 
@@ -750,15 +759,15 @@ contract PositionStakingDexManager is
         uint32 indexedPipRangeNft,
         uint32 currentIndexedPipRange,
         uint256 liquidity
-    ) internal view returns (uint256 power) {
+    ) internal view returns (uint128 power) {
         if (indexedPipRangeNft > currentIndexedPipRange) {
-            power =
-                liquidity /
-                ((indexedPipRangeNft - currentIndexedPipRange) + 1);
+            power = uint128(
+                liquidity / ((indexedPipRangeNft - currentIndexedPipRange) + 1)
+            );
         } else {
-            power =
-                liquidity /
-                ((currentIndexedPipRange - indexedPipRangeNft) + 1);
+            power = uint128(
+                liquidity / ((currentIndexedPipRange - indexedPipRangeNft) + 1)
+            );
         }
     }
 }

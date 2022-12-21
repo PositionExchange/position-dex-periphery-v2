@@ -30,7 +30,7 @@ contract PositionNondisperseLiquidity is
 
     modifier nftOwnerOrStaking(uint256 nftId) {
         Require._require(
-            (_msgSender() == ownerOf(nftId)) ||
+            _isOwner(nftId, _msgSender()) ||
                 isOwnerWhenStaking(_msgSender(), nftId),
             DexErrors.DEX_ONLY_OWNER
         );
@@ -335,12 +335,12 @@ contract PositionNondisperseLiquidity is
         return WBNB;
     }
 
-    function _owner(uint256 tokenId)
+    function _isOwner(uint256 tokenId, address user)
         internal
         view
         override(LiquidityManager)
-        returns (address)
+        returns (bool)
     {
-        return ownerOf(tokenId);
+        return ownerOf(tokenId) == user;
     }
 }
