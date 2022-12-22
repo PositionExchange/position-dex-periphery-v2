@@ -34,14 +34,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         payable
         virtual
     {
-        _addLiquidityRecipient(params, _msgSender());
+        _addLiquidityRecipient(params, _msgSender(), _msgSender());
     }
 
     function addLiquidityWithRecipient(
         AddLiquidityParams calldata params,
         address recipient
     ) public payable virtual {
-        _addLiquidityRecipient(params, recipient);
+        _addLiquidityRecipient(params, _msgSender(), recipient);
     }
 
     function removeLiquidity(uint256 nftTokenId) public virtual {
@@ -693,7 +693,8 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function _addLiquidityRecipient(
         AddLiquidityParams calldata params,
-        address user
+        address user,
+        address recipient
     ) internal {
         Require._require(
             params.amountVirtual != 0,
@@ -731,7 +732,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             DexErrors.LQ_NOT_SUPPORT
         );
 
-        uint256 nftTokenId = mint(user);
+        uint256 nftTokenId = mint(recipient);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             liquidity: uint128(_resultAddLiquidity.liquidity),
