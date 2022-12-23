@@ -8,3 +8,4 @@ export * from "./test/deployt-treasury"
 export * from "./test/deploy-mocktoken";
 export * from "./test/deploy-positionRouter"
 export * from "./setup";
+export * from "./test/deploy-migration"
