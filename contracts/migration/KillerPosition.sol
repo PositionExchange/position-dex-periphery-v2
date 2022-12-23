@@ -247,7 +247,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 minPip,
         address pair
     ) internal view returns (uint128 amountBase, uint128 amountQuote) {
-        // TODO add sqrt minPip and maxPip
+        maxPip = uint128(Math.sqrt(uint256(maxPip) * 10**18));
+        minPip = uint128(Math.sqrt(uint256(minPip) * 10**18));
         if (isBase) {
             uint128 baseReal = LiquidityMath.calculateBaseReal(
                 maxPip,
