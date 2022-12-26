@@ -55,6 +55,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
 
+    // TODO remove when testing done
+    function updateUniswapRouter(address _new) public {
+        uniswapRouter = _new;
+    }
+
+
     function isToken0Base(IUniswapV2Pair pair) public view returns (bool) {
 
         (address  baseToken, address  quoteToken, address  pairManager) = spotFactory
@@ -98,8 +104,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             );
 
 
-            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
-            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
+//            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
+//            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
         } else {
             uniswapRouter.removeLiquidity(
                 token0,
@@ -110,9 +116,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 address(this),
                 9999999999
             );
-            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
-            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
+//            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
+//            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
         }
+
+        state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
+        state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
 
         state.balance0 = _balanceOf(token0, address(this));
         state.balance1 = _balanceOf(token1, address(this));
@@ -144,9 +153,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             );
 
             /// Get back quote because no need quote token
-            state.getBackQuoteAmount = isToken0Base
-                ? uint128(state.amount1)
-                : uint128(state.amount0);
+//            state.getBackQuoteAmount = isToken0Base
+//                ? uint128(state.amount1)
+//                : uint128(state.amount0);
         } else if (maxPip == state.currentPip) {
             /// add only quote
             positionLiquidity.addLiquidityWithRecipient(
@@ -161,9 +170,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 user
             );
             /// Get back base because no need base token
-            state.getBackQuoteAmount = isToken0Base
-                ? uint128(state.amount0)
-                : uint128(state.amount1);
+//            state.getBackQuoteAmount = isToken0Base
+//                ? uint128(state.amount0)
+//                : uint128(state.amount1);
         } else {
             uint128 amountBase;
             uint128 amountQuote;
@@ -255,8 +264,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             }
         }
 
-        _getBack(token0, state.amount0 - (state.balance0 - _balanceOf(token0), address(this)), user);
-        _getBack(token1, state.amount1 - (state.balance1 - _balanceOf(token1), address(this)), user);
+        _getBack(token0, uint128(state.amount0 - (state.balance0 - _balanceOf(token0, address(this)))), user);
+        _getBack(token1, uint128(state.amount1 - (state.balance1 - _balanceOf(token1, address(this)))), user);
     }
 
     function sqrt(uint256 number) public view returns (uint128) {
@@ -343,7 +352,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     function _balanceOf(address token, address instance) internal view returns(uint256) {
-        if ( token  == address(WBNB)) {
+        if ( token == address(WBNB)) {
             return instance.balance;
         }
         return IERC20(token).balanceOf(instance);
