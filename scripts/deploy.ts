@@ -9,3 +9,4 @@ export * from "./test/deploy-mocktoken";
 export * from "./test/deploy-positionRouter"
 export * from "./setup";
 export * from "./test/deploy-migration"
+export * from "./test/deploy-mockUniRouter"
