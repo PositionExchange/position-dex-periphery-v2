@@ -9,7 +9,7 @@ import "../interfaces/IWBNB.sol";
 pragma solidity ^0.8.9;
 
 contract MockUniRouter {
-
+    using Address for address payable;
     address public token0;
     address public token1;
 
@@ -50,15 +50,18 @@ contract MockUniRouter {
     function getAllBack() public {
 
         address caller = msg.sender;
+
         if ( token0 == WBNB){
             _withdrawBNB(caller, IWBNB(WBNB).balanceOf(address(this)));
         }else {
+            if ( token0 == address(0x00) )return;
             IERC20(token0).transfer(caller, IERC20(token0).balanceOf(address(this)));
         }
 
         if ( token1 == WBNB){
             _withdrawBNB(caller, IWBNB(WBNB).balanceOf(address(this)));
         }else {
+            if ( token0 == address(0x00) )return;
             IERC20(token1).transfer(caller, IERC20(token1).balanceOf(address(this)));
         }
     }
@@ -74,9 +77,9 @@ contract MockUniRouter {
     function _withdrawBNB(
         address _trader,
         uint256 _amount
-    ) internal{
+    ) public {
         IWBNB(WBNB).withdraw(_amount);
-        payable(_trader).transfer(address(this).balance);
+        payable(_trader).sendValue(address(this).balance);
     }
 
 
@@ -110,7 +113,7 @@ contract MockUniRouter {
 
         address caller = msg.sender;
         if ( token0 == address(WBNB)) {
-            amountETH =IWBNB(WBNB).balanceOf(address(this));
+            amountETH = IWBNB(WBNB).balanceOf(address(this));
             _withdrawBNB(caller, amountETH);
 
         }else {
@@ -119,7 +122,7 @@ contract MockUniRouter {
         }
 
         if ( token1 == address(WBNB)) {
-            amountETH =IWBNB(WBNB).balanceOf(address(this));
+            amountETH = IWBNB(WBNB).balanceOf(address(this));
             _withdrawBNB(caller, amountETH);
         }else {
             amountToken =  IERC20(token0).balanceOf(address(this));

@@ -56,7 +56,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
 
     // TODO remove when testing done
-    function updateUniswapRouter(address _new) public {
+    function updateUniswapRouter(IUniswapV2Router01 _new) public {
         uniswapRouter = _new;
     }
 
@@ -103,9 +103,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 9999999999
             );
 
-
-//            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
-//            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
         } else {
             uniswapRouter.removeLiquidity(
                 token0,
@@ -116,8 +113,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 address(this),
                 9999999999
             );
-//            state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
-//            state.amount1 = _balanceOf(token1, address(this)) - state.balance1;
+
         }
 
         state.amount0 = _balanceOf(token0, address(this)) - state.balance0;
