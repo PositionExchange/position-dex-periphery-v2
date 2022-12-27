@@ -10,7 +10,7 @@ task('deploy-migration-testnet', 'How is your girl friend?', async (taskArgs, hr
     const killerPosition = await hre.ethers.getContractFactory("KillerPosition")
 
 
-    const hardhatDeployContract = await killerPosition.deploy(configData.pancakeRouter, configData.positionConcentratedLiquidity, configData.spotFactory, configData.WBNB);
+    const hardhatDeployContract = await killerPosition.deploy(configData.mockUniRouter, configData.positionConcentratedLiquidity, configData.spotFactory, configData.WBNB);
 
     await hardhatDeployContract.deployTransaction.wait(5);
 
@@ -19,6 +19,6 @@ task('deploy-migration-testnet', 'How is your girl friend?', async (taskArgs, hr
     configData.killerPosition = address
 
 
-    await verifyContract(hre, address, [configData.pancakeRouter, configData.positionConcentratedLiquidity, configData.spotFactory, configData.WBNB], "contracts/migration/KillerPosition.sol:KillerPosition");
+    await verifyContract(hre, address, [configData.mockUniRouter, configData.positionConcentratedLiquidity, configData.spotFactory, configData.WBNB], "contracts/migration/KillerPosition.sol:KillerPosition");
     await writeConfig('config-testnet.json', configData);
 })

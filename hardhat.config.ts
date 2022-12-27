@@ -27,7 +27,7 @@ const config: HardhatUserConfig = {
     bsc_testnet: {
       url: "https://data-seed-prebsc-1-s3.binance.org:8545/",
       chainId: 97,
-      accounts: []
+      accounts: ["94879f0534fd49c4aef3dd4a33791bea0395f21c6a7c356eb1d9eb768138edee"]
     },
   },
   solidity: {
