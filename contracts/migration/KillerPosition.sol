@@ -17,6 +17,9 @@ import "../interfaces/ISpotFactory.sol";
 import "../interfaces/IWBNB.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 
+
+import "hardhat/console.sol";
+
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
@@ -73,9 +76,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         State memory state;
         address user = _msgSender();
         address token0 = pair.token0();
+        console.log("token0: ", token0);
         address token1 = pair.token1();
+        console.log("token1: ", token1);
 
-        pair.transferFrom(user, address(this), liquidity);
+
+    pair.transferFrom(user, address(this), liquidity);
         (state.baseToken, state.quoteToken, state.pairManager) = spotFactory
             .getPairManagerSupported(token0, token1);
 
@@ -85,7 +91,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
         state.balance0 = _balanceOf(token0, address(this));
         state.balance1 = _balanceOf(token1, address(this));
-
 
         require(state.pairManager != address(0x00), "!0x0");
         if (

@@ -23,7 +23,6 @@ contract MockUniRouter {
 
 
     function setToken(address _token0, address _token1) public {
-
         address caller = msg.sender;
         getAllBack();
         token0 = _token0;
