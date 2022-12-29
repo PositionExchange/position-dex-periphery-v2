@@ -82,6 +82,17 @@ describe("killer-position", async function ()  {
         await uniRouter.deposit(toWei(amount0), toWei(amount1))
     }
 
+    async function addLiquidity(amountVirtual : number, indexInLiquidity : number, isBase : boolean) {
+
+        await dexNFT.addLiquidity({
+            amountVirtual:  amountVirtual,
+            indexedPipRange : indexInLiquidity,
+            isBase: isBase,
+            pool: pair.address
+        })
+
+    }
+
     describe("posi/busd",  function ()  {
 
         beforeEach("init", async ()=>{
@@ -92,7 +103,7 @@ describe("killer-position", async function ()  {
                     baseAsset: reflex.address,
                     basisPoint: BASIS_POINT,
                     maxFindingWordsIndex: 10000,
-                    initialPip: 100000,
+                    initialPip: 75000,
                     pipRange: 30000,
                     tickSpace: 1,
                     owner: deployer.address,
@@ -105,11 +116,68 @@ describe("killer-position", async function ()  {
             await factory.addPairManagerManual(pair.address, reflex.address, quote.address);
         })
 
-        it('#1', async ()=>{
+        it('#case23', async ()=>{
 
             console.log("start set and deposit")
 
-            await setTokenAndDeposit(reflex.address, quote.address, 10, 10)
+            await setTokenAndDeposit(reflex.address, quote.address, 100, 30)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            const liquidity = await dexNFT.liquidity(1000001)
+            console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            console.log("quoteVirtual: ",   toEther(liquidity.quoteVirtual.toString()))
+            console.log("balance base: ", toEther( (await reflex.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther( (await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#case24', async ()=>{
+
+            console.log("start set and deposit")
+
+            await setTokenAndDeposit(quote.address, reflex.address, 30, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            const liquidity = await dexNFT.liquidity(1000001)
+            console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            console.log("quoteVirtual: ",   toEther(liquidity.quoteVirtual.toString()))
+            console.log("balance base: ", toEther( (await reflex.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther( (await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#case27 -- max index', async ()=>{
+
+            console.log("start set and deposit")
+
+            await setTokenAndDeposit(reflex.address, quote.address, 100, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            const liquidity = await dexNFT.liquidity(1000001)
+            console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            console.log("quoteVirtual: ",   toEther(liquidity.quoteVirtual.toString()))
+            console.log("balance base: ", toEther( (await reflex.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther( (await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#case28 -- min index', async ()=>{
+
+            console.log("start set and deposit")
+
+            await setTokenAndDeposit(reflex.address, quote.address, 100, 100)
 
             console.log("start migrate")
 
