@@ -91,13 +91,13 @@ export interface ExpectAddLiquidityResult extends ExpectedPoolData {
 export const BASIS_POINT = 10000;
 
 
-function pipToPrice(currentPip: StringOrNumber) {
-    return Number(currentPip) / BASIS_POINT;
+function pipToPrice(currentPip: StringOrNumber, basisPoint) {
+    return Number(currentPip) / basisPoint;
 }
 
-function price2Pip(currentPrice: number | string) {
-    return new Decimal(currentPrice).mul(BASIS_POINT).toNumber();
-}
+// function price2Pip(currentPrice: number | string) {
+//     return new Decimal(currentPrice).mul(BASIS_POINT).toNumber();
+// }
 
 function fromWeiAndFormat(n, decimal = 6): number{
     return new Decimal(fromWei(n).toString()).toDP(decimal).toNumber()
@@ -119,7 +119,8 @@ export async function deployAndCreateRouterHelper(
     isUseFee = true,
     isRFI = false,
     pipRange= 30_000,
-    userEther  :UseEther= 'none') {
+    userEther  :UseEther= 'none',
+    basisPoint = 10_000) {
     let matching: ForkMatchingEngineAMM
     let spotHouse : MockSpotHouse
     let factory : PositionSpotFactory
@@ -163,7 +164,7 @@ export async function deployAndCreateRouterHelper(
         {
             quoteAsset: quote.address,
             baseAsset: base.address,
-            basisPoint: BASIS_POINT,
+            basisPoint: basisPoint,
             maxFindingWordsIndex: 10000,
             initialPip: 100000,
             pipRange: pipRange,
@@ -517,7 +518,9 @@ export class TestLiquidity {
     }
 
     async getCurrentPrice() {
-        return pipToPrice((await this.mockMatching.getCurrentPip()).toString());
+
+        const basisPoint = (await this.mockMatching.basisPoint()).toString()
+        return pipToPrice((await this.mockMatching.getCurrentPip()).toString(), Number(basisPoint) );
     }
 
     async getPoolData(pId?): Promise<PoolLiquidityInfo> {
