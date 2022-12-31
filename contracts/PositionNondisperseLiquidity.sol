@@ -14,6 +14,8 @@ import "./implement/LiquidityManager.sol";
 import "./interfaces/IWithdrawBNB.sol";
 import "./interfaces/IWBNB.sol";
 
+import "hardhat/console.sol";
+
 contract PositionNondisperseLiquidity is
     LiquidityManager,
     LiquidityManagerNFT,
@@ -291,6 +293,7 @@ contract PositionNondisperseLiquidity is
     function _depositBNB(address _pairManagerAddress, uint256 _amount)
         internal
     {
+        console.log("_depositBNB ");
         Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
