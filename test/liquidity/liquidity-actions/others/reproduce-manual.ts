@@ -381,3 +381,42 @@ it ("should basisPoint 8-noliquidity", async () => {
 `)
     })
 })
+
+
+describe("OpenMarketWithQuote", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(10_000, false)
+    })
+
+
+
+it ("OpenMarketWithQuote-sell-4", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action:
+    Price: 170000
+- S1: AddLiquidity
+  Action:
+    Id: 3
+    IndexPipRange: 5
+    Asset: base
+    AmountVirtual: 0.2704430339572
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: quote
+    Side: 0
+    Quantity: 50
+    Price: 150000
+- S3: OpenMarket
+  Action:
+    id: 2
+    asset: quote
+    Side: 1
+    Quantity: 100
+    `)
+    })
+
+})

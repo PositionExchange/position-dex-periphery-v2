@@ -28,7 +28,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     IWBNB public WBNB;
 
     receive() external payable {
-//        assert(msg.sender == address(uniswapRouter));
+        //        assert(msg.sender == address(uniswapRouter));
         // only accept BNB via fallback from the WBNB contract
     }
 
@@ -209,7 +209,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     );
                 } else {
                     console.log("amountQuote >= state.amount1");
-                    console.log("amountQuote, state.amount1: ", amountQuote, state.amount1);
+                    console.log(
+                        "amountQuote, state.amount1: ",
+                        amountQuote,
+                        state.amount1
+                    );
 
                     (amountBase, amountQuote) = estimate(
                         uint128(state.amount1),
@@ -220,8 +224,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         minPip,
                         state.pairManager
                     );
-                    console.log("before recheck  amountBase, amountQuote: ",  amountBase, amountQuote);
-
+                    console.log(
+                        "before recheck  amountBase, amountQuote: ",
+                        amountBase,
+                        amountQuote
+                    );
 
                     amountBase = recheck(
                         amountQuote,
@@ -230,7 +237,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         minPip,
                         state
                     );
-                    console.log("before recheck  amountBase, amountQuote: ",  amountBase, amountQuote);
+                    console.log(
+                        "before recheck  amountBase, amountQuote: ",
+                        amountBase,
+                        amountQuote
+                    );
 
                     console.log("add liquidity");
                     positionLiquidity.addLiquidityWithRecipient{
@@ -263,8 +274,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     minPip,
                     state.pairManager
                 );
-                console.log("amountQuote, state.amount1, uint128(state.amount1) : ", amountBase, amountQuote, uint128(state.amount1));
-
+                console.log(
+                    "amountQuote, state.amount1, uint128(state.amount1) : ",
+                    amountBase,
+                    amountQuote,
+                    uint128(state.amount1)
+                );
 
                 if (amountQuote <= state.amount0) {
                     console.log("amountQuote <= state.amount0");
@@ -352,7 +367,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 minPip,
         State memory state
     ) internal view returns (uint128 amountBaseRecheck) {
-        console.log("recheck amountQuote, amountBase: ", amountQuote, amountBase);
+        console.log(
+            "recheck amountQuote, amountBase: ",
+            amountQuote,
+            amountBase
+        );
         amountBaseRecheck = amountBase;
         (, uint128 amountQuoteRecheck) = estimate(
             amountBase,
@@ -364,7 +383,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             state.pairManager
         );
         console.log("recheck amountQuoteRecheck: ", amountQuoteRecheck);
-
 
         if (amountQuoteRecheck > amountQuote) {
             (uint128 amountBaseDelta, ) = estimate(
@@ -404,7 +422,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 amountQuote,
         bool isToken0Base
     ) public view returns (uint256 value) {
-        console.log("calculateValue value, amountBase, amountQuote: ", value, amountBase, amountQuote);
+        console.log(
+            "calculateValue value, amountBase, amountQuote: ",
+            value,
+            amountBase,
+            amountQuote
+        );
 
         if (
             (token0 == address(WBNB) && isToken0Base) ||
@@ -420,8 +443,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             value = amountQuote;
         }
         console.log("calculateValue value", value);
-
-
     }
 
     function estimate(

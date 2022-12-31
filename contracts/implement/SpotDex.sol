@@ -796,12 +796,12 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             );
         } else {
             // SELL market
-            uint256 amountTransferred = _deposit(
-                _pairManager,
-                _payer,
-                Asset.Base,
-                _quoteAmount
-            );
+            //            uint256 amountTransferred = _deposit(
+            //                _pairManager,
+            //                _payer,
+            //                Asset.Quote,
+            //                _quoteAmount
+            //            );
 
             (
                 state.mainSideOut,
@@ -813,9 +813,19 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _payer,
                 fee
             );
+            uint256 amountTransferred = _deposit(
+                _pairManager,
+                _payer,
+                Asset.Base,
+                state.flipSideOut
+            );
             Require._require(
                 state.mainSideOut == _quoteAmount,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
+            );
+            Require._require(
+                state.flipSideOut == amountTransferred,
+                DexErrors.DEX_MUST_NOT_TOKEN_RFI
             );
             _withdraw(
                 _pairManager,
