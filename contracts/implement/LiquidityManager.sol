@@ -21,6 +21,8 @@ import "../staking/PositionStakingDexManager.sol";
 import "../interfaces/ISpotFactory.sol";
 import "../libraries/types/Asset.sol";
 
+import "hardhat/console.sol";
+
 abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
 
@@ -636,11 +638,11 @@ abstract contract LiquidityManager is ILiquidityManager {
             );
 
             if (isBase) {
-                uint128 baseReal = LiquidityMath.calculateBaseReal(
-                    state.maxPip,
-                    amountModify,
-                    state.currentPrice
-                );
+                //                uint128 baseReal = LiquidityMath.calculateBaseReal(
+                //                    state.maxPip,
+                //                    amountModify,
+                //                    state.currentPrice
+                //                );
 
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
@@ -655,11 +657,11 @@ abstract contract LiquidityManager is ILiquidityManager {
                         uint128(Math.sqrt(pool.basisPoint()))
                     );
             } else {
-                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
-                    state.minPip,
-                    amountModify,
-                    state.currentPrice
-                );
+                //                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
+                //                    state.minPip,
+                //                    amountModify,
+                //                    state.currentPrice
+                //                );
 
                 state.quoteAmountModify = amountModify;
                 state.baseAmountModify =
@@ -713,6 +715,15 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.indexedPipRange,
             _getCurrentIndexPipRange(params.pool),
             params.pool
+        );
+
+        console.log(
+            "_resultAddLiquidity.quoteAmountAdded: ",
+            _resultAddLiquidity.quoteAmountAdded
+        );
+        console.log(
+            "_resultAddLiquidity.baseAmountAdded: ",
+            _resultAddLiquidity.baseAmountAdded
         );
 
         uint256 amountModifySecondAsset = depositLiquidity(
