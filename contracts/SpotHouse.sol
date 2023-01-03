@@ -32,12 +32,6 @@ contract SpotHouse is
 {
     using Convert for uint256;
 
-    // TODO remove
-    modifier onlyRouter() {
-        require(_msgSender() == positionRouter, DexErrors.DEX_ONLY_ROUTER);
-        _;
-    }
-
     function initialize() public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
@@ -69,65 +63,6 @@ contract SpotHouse is
         uint256 _quantity
     ) public payable override(SpotDex) nonReentrant {
         super.openMarketOrder(_pairManager, _side, _quantity);
-    }
-
-    // TODO remove
-    function openMarketOrder(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quantity,
-        address _payer,
-        address _recipient
-    )
-        public
-        payable
-        virtual
-        override(SpotDex)
-        nonReentrant
-        onlyRouter
-        returns (uint256[] memory)
-    {
-        return
-            super.openMarketOrder(
-                _pairManager,
-                _side,
-                _quantity,
-                _payer,
-                _recipient
-            );
-    }
-
-    function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quoteAmount
-    ) public payable override(SpotDex) nonReentrant {
-        super.openMarketOrderWithQuote(_pairManager, _side, _quoteAmount);
-    }
-
-    // TODO remove
-    function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quoteAmount,
-        address _payer,
-        address _recipient
-    )
-        public
-        payable
-        override(SpotDex)
-        nonReentrant
-        onlyRouter
-        returns (uint256[] memory)
-    {
-        return
-            super.openMarketOrderWithQuote(
-                _pairManager,
-                _side,
-                _quoteAmount,
-                _payer,
-                _recipient
-            );
     }
 
     function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
@@ -188,12 +123,6 @@ contract SpotHouse is
         require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         spotFactory = ISpotFactory(_factoryAddress);
     }
-
-    //    function updateFee(uint16 _fee) external override onlyOwner {
-    //        //max fee can be is 10%
-    //        require(_fee <= 1000, DexErrors.DEX_MAX_FEE);
-    //        fee = _fee;
-    //    }
 
     function setWBNB(address _wbnb) external onlyOwner {
         WBNB = _wbnb;

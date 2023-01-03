@@ -103,42 +103,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
-        if (pairManager == address(0)) {
-            amounts = uniSwapRouterV2.getAmountsIn(amountOut, path);
-            _deposit(path[0], _msgSender(), amounts[0]);
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
-            }
-            uniSwapRouterV2.swapTokensForExactTokens(
-                amountOut,
-                amountInMax,
-                path,
-                to,
-                deadline
-            );
-        } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                amounts = spotHouse.openMarketOrder(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(amountOut),
-                    _msgSender(),
-                    to
-                );
-            } else {
-                amounts = spotHouse.openMarketOrderWithQuote(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(amountOut),
-                    _msgSender(),
-                    to
-                );
-            }
-        }
+        revert("No support");
     }
 
     function swapExactETHForTokens(
@@ -187,44 +152,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(path[path.length - 1] == WBNB, DexErrors.DEX_MUST_BNB);
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
-
-        if (pairManager == address(0)) {
-            amounts = uniSwapRouterV2.getAmountsIn(amountOut, path);
-            _deposit(path[0], _msgSender(), amounts[0]);
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
-            }
-            uniSwapRouterV2.swapTokensForExactETH(
-                amountOut,
-                amountInMax,
-                path,
-                to,
-                deadline
-            );
-        } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                amounts = spotHouse.openMarketOrder(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountOut,
-                    _msgSender(),
-                    to
-                );
-            } else {
-                amounts = spotHouse.openMarketOrderWithQuote(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountOut,
-                    _msgSender(),
-                    to
-                );
-            }
-        }
+        revert("No support");
     }
 
     function swapExactTokensForETH(
@@ -277,40 +205,7 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        (
-            SpotHouseStorage.Side side,
-            address pairManager
-        ) = getSideAndPairManager(path);
-
-        if (pairManager == address(0)) {
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
-            }
-            uniSwapRouterV2.swapExactETHForTokens{value: msg.value}(
-                amountOut,
-                path,
-                to,
-                deadline
-            );
-        } else {
-            if (side == SpotHouseStorage.Side.BUY) {
-                amounts = spotHouse.openMarketOrder{value: msg.value}(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    amountOut,
-                    _msgSender(),
-                    to
-                );
-            } else {
-                amounts = spotHouse.openMarketOrderWithQuote{value: msg.value}(
-                    IMatchingEngineAMM(pairManager),
-                    side,
-                    uint256(msg.value),
-                    _msgSender(),
-                    to
-                );
-            }
-        }
+        revert("No support");
     }
 
     function swapExactTokensForTokensSupportingFeeOnTransferTokens(

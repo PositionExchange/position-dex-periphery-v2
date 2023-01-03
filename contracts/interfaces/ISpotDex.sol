@@ -20,8 +20,7 @@ interface ISpotDex {
         uint256 openNational,
         SpotHouseStorage.Side side,
         IMatchingEngineAMM spotManager,
-        uint128 currentPip,
-        uint256 trackingId
+        uint128 currentPip
     );
     event LimitOrderOpened(
         uint64 orderId,
@@ -30,8 +29,7 @@ interface ISpotDex {
         uint256 sizeOut,
         uint128 pip,
         SpotHouseStorage.Side _side,
-        address spotManager,
-        uint256 trackingId
+        address spotManager
     );
 
     event LimitOrderCancelled(
@@ -39,8 +37,7 @@ interface ISpotDex {
         IMatchingEngineAMM spotManager,
         uint128 pip,
         SpotHouseStorage.Side _side,
-        uint64 orderId,
-        uint256 trackingId
+        uint64 orderId
     );
 
     event AllLimitOrderCancelled(
@@ -48,8 +45,7 @@ interface ISpotDex {
         IMatchingEngineAMM spotManager,
         uint128[] pips,
         uint64[] orderIds,
-        SpotHouseStorage.Side[] sides,
-        uint256 trackingId
+        SpotHouseStorage.Side[] sides
     );
 
     event AssetClaimed(
@@ -117,20 +113,4 @@ interface ISpotDex {
     ) external view returns (SpotHouseStorage.PendingLimitOrder[] memory);
 
     function setFactory(address _factoryAddress) external;
-
-    function openMarketOrder(
-        IMatchingEngineAMM _pairManager,
-        SpotHouseStorage.Side _side,
-        uint256 _quantity,
-        address _payer,
-        address _recipient
-    ) external payable returns (uint256[] memory);
-
-    function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        SpotHouseStorage.Side _side,
-        uint256 _quoteAmount,
-        address _payer,
-        address _recipient
-    ) external payable returns (uint256[] memory);
 }
