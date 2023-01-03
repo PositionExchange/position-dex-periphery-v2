@@ -80,8 +80,7 @@ interface ILiquidityManager {
         uint256 indexed nftId,
         uint256 amountBaseAdded,
         uint256 amountQuoteAdded,
-        uint64 indexedPipRange,
-        uint256 trackingId
+        uint64 indexedPipRange
     );
 
     event LiquidityRemoved(
@@ -91,8 +90,7 @@ interface ILiquidityManager {
         uint256 amountBaseRemoved,
         uint256 amountQuoteRemoved,
         uint64 indexedPipRange,
-        uint128 removedLiquidity,
-        uint256 trackingId
+        uint128 removedLiquidity
     );
 
     event LiquidityModified(
@@ -105,8 +103,7 @@ interface ILiquidityManager {
         // 1: decrease
         ModifyType modifyType,
         uint64 indexedPipRange,
-        uint128 modifiedLiquidity,
-        uint256 trackingId
+        uint128 modifiedLiquidity
     );
 
     event LiquidityShiftRange(
@@ -120,7 +117,6 @@ interface ILiquidityManager {
         uint64 newIndexedPipRange,
         uint128 newLiquidity,
         uint256 amountBaseAdded,
-        uint256 amountQuoteAded,
-        uint256 trackingId
+        uint256 amountQuoteAded
     );
 }

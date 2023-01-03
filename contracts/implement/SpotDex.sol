@@ -53,23 +53,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         _openMarketOrder(_pairManager, _side, _quantity, _trader, _trader);
     }
 
-    function openMarketOrder(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quantity,
-        address _payer,
-        address _recipient
-    ) public payable virtual returns (uint256[] memory) {
-        return
-            _openMarketOrder(
-                _pairManager,
-                _side,
-                _quantity,
-                _payer,
-                _recipient
-            );
-    }
-
     function openMarketOrderWithQuote(
         IMatchingEngineAMM _pairManager,
         Side _side,
@@ -84,23 +67,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _trader,
             _trader
         );
-    }
-
-    function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quoteAmount,
-        address _payer,
-        address _recipient
-    ) public payable virtual returns (uint256[] memory) {
-        return
-            _openMarketOrderWithQuote(
-                _pairManager,
-                _side,
-                _quoteAmount,
-                _payer,
-                _recipient
-            );
     }
 
     function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
@@ -808,7 +774,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 state.flipSideOut,
                 state.feeAmount
             ) = _pairManager.openMarketWithQuoteAsset(
-                amountTransferred,
+                _quoteAmount,
                 false,
                 _payer,
                 fee
@@ -932,8 +898,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             openNational,
             side,
             spotManager,
-            currentPip,
-            0
+            currentPip
         );
     }
 
@@ -953,8 +918,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             sizeOut,
             pip,
             _side,
-            spotManager,
-            0
+            spotManager
         );
     }
 
@@ -965,7 +929,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         SpotHouseStorage.Side _side,
         uint64 orderId
     ) internal {
-        emit LimitOrderCancelled(_trader, _pairManager, pip, _side, orderId, 0);
+        emit LimitOrderCancelled(_trader, _pairManager, pip, _side, orderId);
     }
 
     function emitAllLimitOrderCancelled(
@@ -980,8 +944,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _pairManager,
             _listPips,
             _orderIds,
-            _listSides,
-            0
+            _listSides
         );
     }
 

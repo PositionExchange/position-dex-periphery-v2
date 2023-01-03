@@ -93,8 +93,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             baseAmountRemoved,
             quoteAmountRemoved,
             liquidityData.indexedPipRange,
-            liquidityData.liquidity,
-            0
+            liquidityData.liquidity
         );
     }
 
@@ -190,8 +189,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange,
-            uint128(_resultAddLiquidity.liquidity),
-            0
+            uint128(_resultAddLiquidity.liquidity)
         );
     }
 
@@ -262,8 +260,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             quoteAmountRemoved,
             ModifyType.DECREASE,
             liquidityData.indexedPipRange,
-            liquidity,
-            0
+            liquidity
         );
     }
 
@@ -450,8 +447,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             targetIndex,
             uint128(state.resultAddLiquidity.liquidity),
             state.resultAddLiquidity.baseAmountAdded,
-            state.resultAddLiquidity.quoteAmountAdded,
-            0
+            state.resultAddLiquidity.quoteAmountAdded
         );
     }
 
@@ -605,16 +601,6 @@ abstract contract LiquidityManager is ILiquidityManager {
         ////
         state.pair = _getQuoteAndBase(pool);
 
-        // TODO consider necessary to check it
-        //        state.WBNBAddress = _getWBNBAddress();
-        //        if (state.pair.QuoteAsset == state.WBNBAddress) {
-        //           Require._require(!isBase, "not support");
-        //        }
-        //
-        //        if (state.pair.BaseAsset == state.WBNBAddress) {
-        //           Require._require(isBase, "not support");
-        //        }
-
         if (
             (indexedPipRange < state.currentIndexedPipRange) ||
             (indexedPipRange == state.currentIndexedPipRange &&
@@ -638,12 +624,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             );
 
             if (isBase) {
-                //                uint128 baseReal = LiquidityMath.calculateBaseReal(
-                //                    state.maxPip,
-                //                    amountModify,
-                //                    state.currentPrice
-                //                );
-
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
                     .calculateQuoteVirtualFromBaseReal(
@@ -657,12 +637,6 @@ abstract contract LiquidityManager is ILiquidityManager {
                         uint128(Math.sqrt(pool.basisPoint()))
                     );
             } else {
-                //                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
-                //                    state.minPip,
-                //                    amountModify,
-                //                    state.currentPrice
-                //                );
-
                 state.quoteAmountModify = amountModify;
                 state.baseAmountModify =
                     LiquidityHelper.calculateBaseVirtualFromQuoteReal(
@@ -717,15 +691,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.pool
         );
 
-        console.log(
-            "_resultAddLiquidity.quoteAmountAdded: ",
-            _resultAddLiquidity.quoteAmountAdded
-        );
-        console.log(
-            "_resultAddLiquidity.baseAmountAdded: ",
-            _resultAddLiquidity.baseAmountAdded
-        );
-
         uint256 amountModifySecondAsset = depositLiquidity(
             params.pool,
             user,
@@ -759,8 +724,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
-            params.indexedPipRange,
-            0
+            params.indexedPipRange
         );
     }
 
