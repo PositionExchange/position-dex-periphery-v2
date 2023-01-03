@@ -40,7 +40,7 @@ describe("manage liquidity", async () => {
                 {
                     quoteAsset: quote.address,
                     baseAsset: base.address,
-                    basisPoint: BASIS_POINT,
+                    basisPoint: 10_000,
                     maxFindingWordsIndex: 1000,
                     initialPip: 100000,
                     pipRange: 30_000,
