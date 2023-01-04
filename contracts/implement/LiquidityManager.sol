@@ -29,7 +29,7 @@ abstract contract LiquidityManager is ILiquidityManager {
     mapping(uint256 => UserLiquidity.Data)
         public
         override concentratedLiquidity;
-    IPositionStakingDexManager stakingManager;
+//    IPositionStakingDexManager stakingManager;
 
     function addLiquidity(AddLiquidityParams calldata params)
         public

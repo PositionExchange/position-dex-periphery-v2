@@ -107,9 +107,6 @@ contract SpotHouse is
         withdrawBNB = _withdrawBNB;
     }
 
-    function setRouter(address _positionRouter) external onlyOwner {
-        positionRouter = _positionRouter;
-    }
 
     function pause() external onlyOwner {
         _pause();
