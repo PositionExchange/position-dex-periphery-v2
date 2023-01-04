@@ -724,7 +724,8 @@ abstract contract LiquidityManager is ILiquidityManager {
             nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
-            params.indexedPipRange
+            params.indexedPipRange,
+            _resultAddLiquidity.liquidity
         );
     }
 

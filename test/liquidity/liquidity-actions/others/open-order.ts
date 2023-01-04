@@ -4,7 +4,7 @@ describe("OpenOrder", async function(){
     let testHelper: TestLiquidity
 
     beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(1_000, false)
+        testHelper = await deployAndCreateRouterHelper(10_000, false)
     })
 
 
@@ -51,6 +51,30 @@ describe("OpenOrder", async function(){
     Id: 4
     BalanceBase: 1020
     BalanceQuote: 880
+`)
+    })
+    it ("OpenOrderWithQuote-1", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 2
+    Asset: base
+    Side: 0
+    Quantity: 10
+    Price: 60000
+- S2: OpenMarket
+  Action:
+    id: 2
+    asset: quote
+    Side: 1
+    Quantity: 4
+  User:
+    Id: 2
+    BalanceBase: 1020
+    BalanceQuote: 880 
 `)
     })
     it ("OpenOrderWithQuote-No-Liquidity", async () => {

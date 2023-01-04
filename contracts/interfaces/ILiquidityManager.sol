@@ -80,7 +80,8 @@ interface ILiquidityManager {
         uint256 indexed nftId,
         uint256 amountBaseAdded,
         uint256 amountQuoteAdded,
-        uint64 indexedPipRange
+        uint64 indexedPipRange,
+        uint256 addedLiquidity
     );
 
     event LiquidityRemoved(
