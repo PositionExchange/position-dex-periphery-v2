@@ -691,6 +691,9 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.pool
         );
 
+        console.log("_resultAddLiquidity.quoteAmountAdded: ", _resultAddLiquidity.quoteAmountAdded);
+        console.log("_resultAddLiquidity.baseAmountAdded: ", _resultAddLiquidity.baseAmountAdded);
+
         uint256 amountModifySecondAsset = depositLiquidity(
             params.pool,
             user,

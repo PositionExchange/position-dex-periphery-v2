@@ -250,24 +250,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         minPip,
                         state.pairManager
                     );
-                    console.log(
-                        "before recheck  amountBase, amountQuote: ",
-                        amountBase,
-                        amountQuote
-                    );
 
-                    amountBase = recheck(
-                        amountQuote,
-                        amountBase,
-                        maxPip,
-                        minPip,
-                        state
-                    );
-                    console.log(
-                        "before recheck  amountBase, amountQuote: ",
-                        amountBase,
-                        amountQuote
-                    );
+                    amountBase = (amountBase * 9990)/10_000;
 
                     console.log("add liquidity");
                     positionLiquidity.addLiquidityWithRecipient{
@@ -339,13 +323,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         minPip,
                         state.pairManager
                     );
-                    amountBase = recheck(
-                        amountQuote,
-                        amountBase,
-                        maxPip,
-                        minPip,
-                        state
-                    );
+
+                    amountBase = (amountBase * 9990)/10_000;
 
                     positionLiquidity.addLiquidityWithRecipient{
                         value: calculateValue(
@@ -385,45 +364,45 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             user
         );
     }
-
-    function recheck(
-        uint128 amountQuote,
-        uint128 amountBase,
-        uint128 maxPip,
-        uint128 minPip,
-        State memory state
-    ) internal view returns (uint128 amountBaseRecheck) {
-        console.log(
-            "recheck amountQuote, amountBase: ",
-            amountQuote,
-            amountBase
-        );
-        amountBaseRecheck = amountBase;
-        (, uint128 amountQuoteRecheck) = estimate(
-            amountBase,
-            true,
-            state.currentIndexedPipRange,
-            state.currentPip,
-            maxPip,
-            minPip,
-            state.pairManager
-        );
-        console.log("recheck amountQuoteRecheck: ", amountQuoteRecheck);
-
-        if (amountQuoteRecheck > amountQuote) {
-            (uint128 amountBaseDelta, ) = estimate(
-                amountQuoteRecheck - amountQuote,
-                false,
-                state.currentIndexedPipRange,
-                state.currentPip,
-                maxPip,
-                minPip,
-                state.pairManager
-            );
-            console.log("amountBaseDelta: ", amountBaseDelta);
-            amountBaseRecheck = amountBase - amountBaseDelta;
-        }
-    }
+//
+//    function recheck(
+//        uint128 amountQuote,
+//        uint128 amountBase,
+//        uint128 maxPip,
+//        uint128 minPip,
+//        State memory state
+//    ) internal view returns (uint128 amountBaseRecheck) {
+//        console.log(
+//            "recheck amountQuote, amountBase: ",
+//            amountQuote,
+//            amountBase
+//        );
+//        amountBaseRecheck = amountBase;
+//        (, uint128 amountQuoteRecheck) = estimate(
+//            amountBase,
+//            true,
+//            state.currentIndexedPipRange,
+//            state.currentPip,
+//            maxPip,
+//            minPip,
+//            state.pairManager
+//        );
+//        console.log("recheck amountQuoteRecheck: ", amountQuoteRecheck);
+//
+//        if (amountQuoteRecheck > amountQuote) {
+//            (uint128 amountBaseDelta, ) = estimate(
+//                amountQuoteRecheck - amountQuote,
+//                false,
+//                state.currentIndexedPipRange,
+//                state.currentPip,
+//                maxPip,
+//                minPip,
+//                state.pairManager
+//            );
+//            console.log("amountBaseDelta: ", amountBaseDelta);
+//            amountBaseRecheck = amountBase - amountBaseDelta;
+//        }
+//    }
 
     function sqrt(uint256 number) public view returns (uint128) {
         return uint128(Math.sqrt(number));
