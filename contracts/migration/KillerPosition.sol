@@ -232,18 +232,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(
-                                    abi.encodePacked(
-                                        (
-                                            "ERC20: transfer amount exceeds balance"
-                                        )
-                                    )
-                                )) ||
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(abi.encodePacked(("LQ_07"))))
-                        ) {
+                        if ( isCatch(reason) ) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -305,18 +294,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(
-                                    abi.encodePacked(
-                                        (
-                                            "ERC20: transfer amount exceeds balance"
-                                        )
-                                    )
-                                )) ||
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(abi.encodePacked(("LQ_07"))))
-                        ) {
+                        if ( isCatch(reason) )  {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -380,18 +358,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(
-                                    abi.encodePacked(
-                                        (
-                                            "ERC20: transfer amount exceeds balance"
-                                        )
-                                    )
-                                )) ||
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(abi.encodePacked(("LQ_07"))))
-                        ) {
+                        if ( isCatch(reason) ) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -447,18 +414,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(
-                                    abi.encodePacked(
-                                        (
-                                            "ERC20: transfer amount exceeds balance"
-                                        )
-                                    )
-                                )) ||
-                            (keccak256(abi.encodePacked((reason))) ==
-                                keccak256(abi.encodePacked(("LQ_07"))))
-                        ) {
+                        if ( isCatch(reason) )  {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -500,6 +456,16 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             ),
             user
         );
+    }
+
+    function isCatch(string memory reason) internal view returns (bool) {
+        return
+            (keccak256(abi.encodePacked((reason))) ==
+                keccak256(
+                    abi.encodePacked(("ERC20: transfer amount exceeds balance"))
+                )) ||
+            (keccak256(abi.encodePacked((reason))) ==
+                keccak256(abi.encodePacked(("LQ_07"))));
     }
 
     function sqrt(uint256 number) public view returns (uint128) {
@@ -559,12 +525,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         address pair
     ) public view returns (uint128 amountBase, uint128 amountQuote) {
         if (isBase) {
-            //            uint128 baseReal = LiquidityMath.calculateBaseReal(
-            //                maxPip,
-            //                amountVirtual,
-            //                currentPip
-            //            );
-
             amountBase = amountVirtual;
             amountQuote = LiquidityHelper.calculateQuoteVirtualFromBaseReal(
                 LiquidityMath.calculateBaseReal(
