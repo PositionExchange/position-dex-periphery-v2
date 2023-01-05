@@ -107,7 +107,6 @@ contract SpotHouse is
         withdrawBNB = _withdrawBNB;
     }
 
-
     function pause() external onlyOwner {
         _pause();
     }

@@ -144,7 +144,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 (!isToken0Base && token0 == address(WBNB))
             ) {
                 _value = state.amount0;
-                console.log("_value, state.amount0 1: ", _value, state.amount0);
             }
 
             if (
@@ -152,7 +151,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 (isToken0Base && token1 == address(WBNB))
             ) {
                 _value = state.amount1;
-                console.log("_value, state.amount1 3: ", _value, state.amount1);
             }
             /// add only base
             positionLiquidity.addLiquidityWithRecipient{value: _value}(
@@ -173,7 +171,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 (!isToken0Base && token0 == address(WBNB))
             ) {
                 _value = state.amount0;
-                console.log("_value, state.amount0 1: ", _value, state.amount0);
             }
 
             if (
@@ -181,7 +178,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 (isToken0Base && token1 == address(WBNB))
             ) {
                 _value = state.amount1;
-                console.log("_value, state.amount1 3: ", _value, state.amount1);
             }
 
             /// add only quote
@@ -216,23 +212,59 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
                 if (amountQuote <= state.amount1) {
                     console.log("amountQuote <= state.amount1");
-                    positionLiquidity.addLiquidityWithRecipient{
-                        value: calculateValue(
-                            token0,
-                            token1,
-                            amountBase,
-                            amountQuote,
-                            isToken0Base
+
+                    try
+                        positionLiquidity.addLiquidityWithRecipient{
+                            value: calculateValue(
+                                token0,
+                                token1,
+                                amountBase,
+                                amountQuote,
+                                isToken0Base
+                            )
+                        }(
+                            ILiquidityManager.AddLiquidityParams({
+                                pool: IMatchingEngineAMM(state.pairManager),
+                                amountVirtual: uint128(state.amount0),
+                                indexedPipRange: state.currentIndexedPipRange,
+                                isBase: true
+                            }),
+                            user
                         )
-                    }(
-                        ILiquidityManager.AddLiquidityParams({
-                            pool: IMatchingEngineAMM(state.pairManager),
-                            amountVirtual: uint128(state.amount0),
-                            indexedPipRange: state.currentIndexedPipRange,
-                            isBase: true
-                        }),
-                        user
-                    );
+                    {} catch Error(string memory reason) {
+                        if (
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(
+                                    abi.encodePacked(
+                                        (
+                                            "ERC20: transfer amount exceeds balance"
+                                        )
+                                    )
+                                )) ||
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(abi.encodePacked(("LQ_07"))))
+                        ) {
+                            amountQuote = (amountQuote * 9990) / 10_000;
+                            positionLiquidity.addLiquidityWithRecipient{
+                                value: calculateValue(
+                                    token0,
+                                    token1,
+                                    amountBase,
+                                    amountQuote,
+                                    isToken0Base
+                                )
+                            }(
+                                ILiquidityManager.AddLiquidityParams({
+                                    pool: IMatchingEngineAMM(state.pairManager),
+                                    amountVirtual: uint128(amountQuote),
+                                    indexedPipRange: state
+                                        .currentIndexedPipRange,
+                                    isBase: false
+                                }),
+                                user
+                            );
+                        } else revert(reason);
+                    }
                 } else {
                     console.log("amountQuote >= state.amount1");
                     console.log(
@@ -251,26 +283,61 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         state.pairManager
                     );
 
-                    amountBase = (amountBase * 9990)/10_000;
+                    amountBase = (amountBase * 9990) / 10_000;
 
                     console.log("add liquidity");
-                    positionLiquidity.addLiquidityWithRecipient{
-                        value: calculateValue(
-                            token0,
-                            token1,
-                            amountBase,
-                            amountQuote,
-                            isToken0Base
+                    try
+                        positionLiquidity.addLiquidityWithRecipient{
+                            value: calculateValue(
+                                token0,
+                                token1,
+                                amountBase,
+                                amountQuote,
+                                isToken0Base
+                            )
+                        }(
+                            ILiquidityManager.AddLiquidityParams({
+                                pool: IMatchingEngineAMM(state.pairManager),
+                                amountVirtual: amountBase,
+                                indexedPipRange: state.currentIndexedPipRange,
+                                isBase: true
+                            }),
+                            user
                         )
-                    }(
-                        ILiquidityManager.AddLiquidityParams({
-                            pool: IMatchingEngineAMM(state.pairManager),
-                            amountVirtual: amountBase,
-                            indexedPipRange: state.currentIndexedPipRange,
-                            isBase: true
-                        }),
-                        user
-                    );
+                    {} catch Error(string memory reason) {
+                        if (
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(
+                                    abi.encodePacked(
+                                        (
+                                            "ERC20: transfer amount exceeds balance"
+                                        )
+                                    )
+                                )) ||
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(abi.encodePacked(("LQ_07"))))
+                        ) {
+                            amountQuote = (amountQuote * 9990) / 10_000;
+                            positionLiquidity.addLiquidityWithRecipient{
+                                value: calculateValue(
+                                    token0,
+                                    token1,
+                                    amountBase,
+                                    amountQuote,
+                                    isToken0Base
+                                )
+                            }(
+                                ILiquidityManager.AddLiquidityParams({
+                                    pool: IMatchingEngineAMM(state.pairManager),
+                                    amountVirtual: uint128(amountQuote),
+                                    indexedPipRange: state
+                                        .currentIndexedPipRange,
+                                    isBase: false
+                                }),
+                                user
+                            );
+                        } else revert(reason);
+                    }
                 }
             } else {
                 console.log("isToken0Base is false");
@@ -294,23 +361,58 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 if (amountQuote <= state.amount0) {
                     console.log("amountQuote <= state.amount0");
 
-                    positionLiquidity.addLiquidityWithRecipient{
-                        value: calculateValue(
-                            token0,
-                            token1,
-                            amountBase,
-                            amountQuote,
-                            isToken0Base
+                    try
+                        positionLiquidity.addLiquidityWithRecipient{
+                            value: calculateValue(
+                                token0,
+                                token1,
+                                amountBase,
+                                amountQuote,
+                                isToken0Base
+                            )
+                        }(
+                            ILiquidityManager.AddLiquidityParams({
+                                pool: IMatchingEngineAMM(state.pairManager),
+                                amountVirtual: uint128(state.amount1),
+                                indexedPipRange: state.currentIndexedPipRange,
+                                isBase: true
+                            }),
+                            user
                         )
-                    }(
-                        ILiquidityManager.AddLiquidityParams({
-                            pool: IMatchingEngineAMM(state.pairManager),
-                            amountVirtual: uint128(state.amount1),
-                            indexedPipRange: state.currentIndexedPipRange,
-                            isBase: true
-                        }),
-                        user
-                    );
+                    {} catch Error(string memory reason) {
+                        if (
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(
+                                    abi.encodePacked(
+                                        (
+                                            "ERC20: transfer amount exceeds balance"
+                                        )
+                                    )
+                                )) ||
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(abi.encodePacked(("LQ_07"))))
+                        ) {
+                            amountQuote = (amountQuote * 9990) / 10_000;
+                            positionLiquidity.addLiquidityWithRecipient{
+                                value: calculateValue(
+                                    token0,
+                                    token1,
+                                    amountBase,
+                                    amountQuote,
+                                    isToken0Base
+                                )
+                            }(
+                                ILiquidityManager.AddLiquidityParams({
+                                    pool: IMatchingEngineAMM(state.pairManager),
+                                    amountVirtual: uint128(amountQuote),
+                                    indexedPipRange: state
+                                        .currentIndexedPipRange,
+                                    isBase: false
+                                }),
+                                user
+                            );
+                        } else revert(reason);
+                    }
                 } else {
                     console.log("amountQuote > state.amount0");
 
@@ -324,25 +426,60 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         state.pairManager
                     );
 
-                    amountBase = (amountBase * 9990)/10_000;
+                    amountBase = (amountBase * 9990) / 10_000;
 
-                    positionLiquidity.addLiquidityWithRecipient{
-                        value: calculateValue(
-                            token0,
-                            token1,
-                            amountBase,
-                            amountQuote,
-                            isToken0Base
+                    try
+                        positionLiquidity.addLiquidityWithRecipient{
+                            value: calculateValue(
+                                token0,
+                                token1,
+                                amountBase,
+                                amountQuote,
+                                isToken0Base
+                            )
+                        }(
+                            ILiquidityManager.AddLiquidityParams({
+                                pool: IMatchingEngineAMM(state.pairManager),
+                                amountVirtual: amountBase,
+                                indexedPipRange: state.currentIndexedPipRange,
+                                isBase: true
+                            }),
+                            user
                         )
-                    }(
-                        ILiquidityManager.AddLiquidityParams({
-                            pool: IMatchingEngineAMM(state.pairManager),
-                            amountVirtual: amountBase,
-                            indexedPipRange: state.currentIndexedPipRange,
-                            isBase: true
-                        }),
-                        user
-                    );
+                    {} catch Error(string memory reason) {
+                        if (
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(
+                                    abi.encodePacked(
+                                        (
+                                            "ERC20: transfer amount exceeds balance"
+                                        )
+                                    )
+                                )) ||
+                            (keccak256(abi.encodePacked((reason))) ==
+                                keccak256(abi.encodePacked(("LQ_07"))))
+                        ) {
+                            amountQuote = (amountQuote * 9990) / 10_000;
+                            positionLiquidity.addLiquidityWithRecipient{
+                                value: calculateValue(
+                                    token0,
+                                    token1,
+                                    amountBase,
+                                    amountQuote,
+                                    isToken0Base
+                                )
+                            }(
+                                ILiquidityManager.AddLiquidityParams({
+                                    pool: IMatchingEngineAMM(state.pairManager),
+                                    amountVirtual: uint128(amountQuote),
+                                    indexedPipRange: state
+                                        .currentIndexedPipRange,
+                                    isBase: false
+                                }),
+                                user
+                            );
+                        } else revert(reason);
+                    }
                 }
             }
         }
@@ -364,45 +501,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             user
         );
     }
-//
-//    function recheck(
-//        uint128 amountQuote,
-//        uint128 amountBase,
-//        uint128 maxPip,
-//        uint128 minPip,
-//        State memory state
-//    ) internal view returns (uint128 amountBaseRecheck) {
-//        console.log(
-//            "recheck amountQuote, amountBase: ",
-//            amountQuote,
-//            amountBase
-//        );
-//        amountBaseRecheck = amountBase;
-//        (, uint128 amountQuoteRecheck) = estimate(
-//            amountBase,
-//            true,
-//            state.currentIndexedPipRange,
-//            state.currentPip,
-//            maxPip,
-//            minPip,
-//            state.pairManager
-//        );
-//        console.log("recheck amountQuoteRecheck: ", amountQuoteRecheck);
-//
-//        if (amountQuoteRecheck > amountQuote) {
-//            (uint128 amountBaseDelta, ) = estimate(
-//                amountQuoteRecheck - amountQuote,
-//                false,
-//                state.currentIndexedPipRange,
-//                state.currentPip,
-//                maxPip,
-//                minPip,
-//                state.pairManager
-//            );
-//            console.log("amountBaseDelta: ", amountBaseDelta);
-//            amountBaseRecheck = amountBase - amountBaseDelta;
-//        }
-//    }
 
     function sqrt(uint256 number) public view returns (uint128) {
         return uint128(Math.sqrt(number));
@@ -479,12 +577,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 uint128(Math.sqrt(IMatchingEngineAMM(pair).basisPoint()))
             );
         } else {
-            //            uint128 quoteReal = LiquidityMath.calculateQuoteReal(
-            //                minPip,
-            //                amountVirtual,
-            //                currentPip
-            //            );
-
             amountQuote = amountVirtual;
             amountBase =
                 LiquidityHelper.calculateBaseVirtualFromQuoteReal(

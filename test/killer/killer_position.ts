@@ -740,7 +740,7 @@ describe("killer-position", async function () {
 
             await pair.setCurrentPip(7000)
 
-            await setTokenAndDeposit(wbnb.address, reflex.address, 1, 10)
+            await setTokenAndDeposit(base.address, reflex.address, 1, 10)
 
 
             console.log("start migrate")
@@ -762,7 +762,7 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
             await pair.setCurrentPip(89999)
 
-            await setTokenAndDeposit(reflex.address, wbnb.address, 10, 1)
+            await setTokenAndDeposit(reflex.address, base.address, 10, 1)
 
             console.log("start migrate")
 
@@ -784,7 +784,7 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
             await pair.setCurrentPip(60000)
 
-            await setTokenAndDeposit(reflex.address, wbnb.address, 100, 100)
+            await setTokenAndDeposit(reflex.address, base.address, 100, 100)
 
             console.log("start migrate")
 
@@ -806,8 +806,8 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
 
             await pair.setCurrentPip(70000)
-            await setTokenAndDeposit(reflex.address, wbnb.address, 100, 65)
-            await addLiquidity(27.56327023593, 2, true, 121)
+            await setTokenAndDeposit(reflex.address, base.address, 100, 65)
+            await addLiquidity(27.56327023593, 2, false, 121)
 
             console.log("start migrate")
 
@@ -830,7 +830,7 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
 
             await pair.setCurrentPip(70000)
-            await setTokenAndDeposit(reflex.address, wbnb.address, 27.84168710700, 120)
+            await setTokenAndDeposit(reflex.address, base.address, 27.84168710700, 120)
             // await  addLiquidity(27.56327,2,true)
 
             console.log("start migrate")
@@ -855,7 +855,7 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
 
             await pair.setCurrentPip(70000)
-            await setTokenAndDeposit(reflex.address, wbnb.address, 20, 120)
+            await setTokenAndDeposit(reflex.address, base.address, 20, 120)
             // await  addLiquidity(27.56327,2,true)
 
             console.log("start migrate")
@@ -880,7 +880,7 @@ describe("killer-position", async function () {
             console.log("start set and deposit")
 
             await pair.setCurrentPip(70000)
-            await setTokenAndDeposit(reflex.address, wbnb.address, 20, 65)
+            await setTokenAndDeposit(reflex.address, base.address, 20, 65)
             // await  addLiquidity(27.56327,2,true)
 
             console.log("start migrate")
