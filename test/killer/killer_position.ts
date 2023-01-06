@@ -362,7 +362,133 @@ describe("killer-position", async function () {
             // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
             // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
             await getLiquidityInfo(2, 1000001)
-            console.log("balance base: ", toEther((await reflex.balanceOf(deployer.address)).toString()))
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#2', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(70000)
+
+            await setTokenAndDeposit(quote.address, base.address, 100, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#3 -- max index', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(89999)
+
+            await setTokenAndDeposit(base.address, quote.address, 100, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#4 -- min index', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(60000)
+
+            await setTokenAndDeposit(base.address, quote.address, 100, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#9 -- enough', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(70000)
+
+            await setTokenAndDeposit(base.address, quote.address, 22.73969794464, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#10 -- b>Q', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(70000)
+
+            await setTokenAndDeposit(base.address, quote.address, 50, 100)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
+            console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
+
+        });
+
+        it('#10 -- Q>b', async () => {
+
+            console.log("start set and deposit")
+            await pair.setCurrentPip(70000)
+
+            await setTokenAndDeposit(base.address, quote.address, 22.73969794464, 65)
+
+            console.log("start migrate")
+
+            await killer.migratePosition(mockPairUni.address, toWei(1000))
+
+
+            // const liquidity = await dexNFT.liquidity(1000001)
+            // console.log("baseVirtual: ", toEther(liquidity.baseVirtual.toString()))
+            // console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
+            await getLiquidityInfo(2, 1000001)
+            console.log("balance base: ", toEther((await base.balanceOf(deployer.address)).toString()))
             console.log("balance quote: ", toEther((await quote.balanceOf(deployer.address)).toString()))
 
         });

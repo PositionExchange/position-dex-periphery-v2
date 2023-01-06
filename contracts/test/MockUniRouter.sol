@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../interfaces/IWBNB.sol";
 
-import "hardhat/console.sol";
-
 pragma solidity ^0.8.9;
 
 contract MockUniRouter {
@@ -18,7 +16,6 @@ contract MockUniRouter {
     address public WBNB;
 
     receive() external payable {
-        console.log("receive");
         assert(msg.sender == address(WBNB));
         // only accept BNB via fallback from the WBNB contract
     }
@@ -77,15 +74,12 @@ contract MockUniRouter {
     }
 
     function _depositBNB(uint256 _amount) internal {
-        console.log("wbnb: ", WBNB, _amount);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(address(this), _amount));
     }
 
     function _withdrawBNB(address _trader, uint256 _amount) public {
-        console.log("start  withdraw: ");
         IWBNB(WBNB).withdraw(_amount);
-        console.log("withdraw balance: ", address(this).balance);
         payable(_trader).sendValue(address(this).balance);
     }
 
@@ -115,11 +109,9 @@ contract MockUniRouter {
         uint256 deadline
     ) external returns (uint256 amountToken, uint256 amountETH) {
         address caller = msg.sender;
-        console.log("start removeLiquidityETH");
 
         if (token0 == address(WBNB)) {
             amountETH = IWBNB(WBNB).balanceOf(address(this));
-            console.log("token0 amountETH: ", amountETH);
 
             _withdrawBNB(caller, amountETH);
         } else {
@@ -130,7 +122,6 @@ contract MockUniRouter {
 
         if (token1 == address(WBNB)) {
             amountETH = IWBNB(WBNB).balanceOf(address(this));
-            console.log("token1 amountETH: ", amountETH);
 
             _withdrawBNB(caller, amountETH);
         } else {

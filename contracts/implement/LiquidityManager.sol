@@ -20,8 +20,6 @@ import "../staking/PositionStakingDexManager.sol";
 import "../interfaces/ISpotFactory.sol";
 import "../libraries/types/Asset.sol";
 
-import "hardhat/console.sol";
-
 abstract contract LiquidityManager is ILiquidityManager {
     using UserLiquidity for UserLiquidity.Data;
 
@@ -689,15 +687,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.indexedPipRange,
             _getCurrentIndexPipRange(params.pool),
             params.pool
-        );
-
-        console.log(
-            "_resultAddLiquidity.quoteAmountAdded: ",
-            _resultAddLiquidity.quoteAmountAdded
-        );
-        console.log(
-            "_resultAddLiquidity.baseAmountAdded: ",
-            _resultAddLiquidity.baseAmountAdded
         );
 
         uint256 amountModifySecondAsset = depositLiquidity(

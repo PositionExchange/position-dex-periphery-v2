@@ -16,8 +16,6 @@ import "./Block.sol";
 import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
 
-import "hardhat/console.sol";
-
 abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     using Convert for uint256;
 
@@ -747,8 +745,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _payer,
                 fee
             );
-            console.log("state.mainSideOut: ", state.mainSideOut);
-            console.log("state.flipSideOut: ", state.flipSideOut);
 
             Require._require(
                 state.mainSideOut == amountTransferred,
@@ -789,8 +785,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 Asset.Base,
                 state.flipSideOut
             );
-            console.log("state.mainSideOut: ", state.mainSideOut);
-            console.log("state.flipSideOut: ", state.flipSideOut);
             Require._require(
                 state.mainSideOut == _quoteAmount,
                 DexErrors.DEX_MARKET_NOT_FULL_FILL

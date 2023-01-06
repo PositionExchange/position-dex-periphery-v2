@@ -17,8 +17,6 @@ import "../interfaces/ISpotFactory.sol";
 import "../interfaces/IWBNB.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 
-import "hardhat/console.sol";
-
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
@@ -31,10 +29,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         //        assert(msg.sender == address(uniswapRouter));
         // only accept BNB via fallback from the WBNB contract
     }
-     event PositionLiquidityMigrated(
-        address user,
-        uint256 nftId
-     );
+
+    event PositionLiquidityMigrated(address user, uint256 nftId);
 
     constructor(
         IUniswapV2Router01 _uniswapRouter,
@@ -75,7 +71,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return baseToken == pair.token0();
     }
 
-    function migratePosition(IUniswapV2Pair pair, uint256 liquidity) public nonReentrant{
+    function migratePosition(IUniswapV2Pair pair, uint256 liquidity)
+        public
+        nonReentrant
+    {
         State memory state;
         address user = _msgSender();
         address token0 = pair.token0();
@@ -131,13 +130,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         (uint128 minPip, uint128 maxPip) = LiquidityMath.calculatePipRange(
             state.currentIndexedPipRange,
             IMatchingEngineAMM(state.pairManager).pipRange()
-        );
-
-        console.log(
-            "minPip, maxPip, state.currentPip: ",
-            minPip,
-            maxPip,
-            state.currentPip
         );
 
         if (minPip == state.currentPip) {
@@ -203,7 +195,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             maxPip = sqrt(uint256(maxPip) * 10**18);
             minPip = sqrt(uint256(minPip) * 10**18);
             if (isToken0Base) {
-                console.log("isToken0Base is true");
                 (amountBase, amountQuote) = estimate(
                     uint128(state.amount0),
                     true,
@@ -215,8 +206,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 );
 
                 if (amountQuote <= state.amount1) {
-                    console.log("amountQuote <= state.amount1");
-
                     try
                         positionLiquidity.addLiquidityWithRecipient{
                             value: calculateValue(
@@ -236,7 +225,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if ( isCatch(reason) ) {
+                        if (isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -259,13 +248,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         } else revert(reason);
                     }
                 } else {
-                    console.log("amountQuote >= state.amount1");
-                    console.log(
-                        "amountQuote, state.amount1: ",
-                        amountQuote,
-                        state.amount1
-                    );
-
                     (amountBase, amountQuote) = estimate(
                         uint128(state.amount1),
                         false,
@@ -277,8 +259,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     );
 
                     amountBase = (amountBase * 9990) / 10_000;
-
-                    console.log("add liquidity");
                     try
                         positionLiquidity.addLiquidityWithRecipient{
                             value: calculateValue(
@@ -298,7 +278,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if ( isCatch(reason) )  {
+                        if (isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -322,8 +302,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     }
                 }
             } else {
-                console.log("isToken0Base is false");
-
                 (amountBase, amountQuote) = estimate(
                     uint128(state.amount1),
                     true,
@@ -333,16 +311,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     minPip,
                     state.pairManager
                 );
-                console.log(
-                    "amountQuote, state.amount1, uint128(state.amount1) : ",
-                    amountBase,
-                    amountQuote,
-                    uint128(state.amount1)
-                );
 
                 if (amountQuote <= state.amount0) {
-                    console.log("amountQuote <= state.amount0");
-
                     try
                         positionLiquidity.addLiquidityWithRecipient{
                             value: calculateValue(
@@ -362,10 +332,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if ( isCatch(reason) ) {
-                            console.log("amountQuote: ", amountQuote);
+                        if (isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
-                            console.log("amountQuote: ", amountQuote);
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
                                     token0,
@@ -387,8 +355,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         } else revert(reason);
                     }
                 } else {
-                    console.log("amountQuote > state.amount0");
-
                     (amountBase, amountQuote) = estimate(
                         uint128(state.amount0),
                         false,
@@ -420,7 +386,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if ( isCatch(reason) )  {
+                        if (isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
@@ -463,7 +429,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             user
         );
 
-        emit PositionLiquidityMigrated(user, positionLiquidity.tokenID() );
+        emit PositionLiquidityMigrated(user, positionLiquidity.tokenID());
     }
 
     function isCatch(string memory reason) internal view returns (bool) {
@@ -500,13 +466,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 amountQuote,
         bool isToken0Base
     ) public view returns (uint256 value) {
-        console.log(
-            "calculateValue value, amountBase, amountQuote: ",
-            value,
-            amountBase,
-            amountQuote
-        );
-
         if (
             (token0 == address(WBNB) && isToken0Base) ||
             (token1 == address(WBNB) && !isToken0Base)
@@ -520,7 +479,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         ) {
             value = amountQuote;
         }
-        console.log("calculateValue value", value);
     }
 
     function estimate(
@@ -569,7 +527,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 amount,
         address user
     ) internal {
-        console.log("getback token, amount", token, amount);
         if (amount == 0) return;
         if (token == address(WBNB)) {
             payable(user).sendValue(amount);
