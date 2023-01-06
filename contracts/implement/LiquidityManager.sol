@@ -12,7 +12,6 @@ import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/helper/DexErrors.sol";
-import "../interfaces/ILiquidityNFT.sol";
 import "../interfaces/ILiquidityManager.sol";
 import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";

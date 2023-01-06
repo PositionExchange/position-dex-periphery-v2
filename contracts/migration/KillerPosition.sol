@@ -31,6 +31,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         //        assert(msg.sender == address(uniswapRouter));
         // only accept BNB via fallback from the WBNB contract
     }
+     event PositionLiquidityMigrated(
+        address user,
+        uint256 nftId
+     );
 
     constructor(
         IUniswapV2Router01 _uniswapRouter,
@@ -71,7 +75,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return baseToken == pair.token0();
     }
 
-    function migratePosition(IUniswapV2Pair pair, uint256 liquidity) public {
+    function migratePosition(IUniswapV2Pair pair, uint256 liquidity) public nonReentrant{
         State memory state;
         address user = _msgSender();
         address token0 = pair.token0();
@@ -359,7 +363,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         )
                     {} catch Error(string memory reason) {
                         if ( isCatch(reason) ) {
+                            console.log("amountQuote: ", amountQuote);
                             amountQuote = (amountQuote * 9990) / 10_000;
+                            console.log("amountQuote: ", amountQuote);
                             positionLiquidity.addLiquidityWithRecipient{
                                 value: calculateValue(
                                     token0,
@@ -456,6 +462,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             ),
             user
         );
+
+        emit PositionLiquidityMigrated(user, positionLiquidity.tokenID() );
     }
 
     function isCatch(string memory reason) internal view returns (bool) {
