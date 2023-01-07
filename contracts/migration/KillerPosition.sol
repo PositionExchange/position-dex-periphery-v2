@@ -30,7 +30,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         // only accept BNB via fallback from the WBNB contract
     }
 
-    event PositionLiquidityMigrated(address user, uint256 nftId);
+    event PositionLiquidityMigrated(address user, uint256 nftId, uint256 liquidityMigrated);
 
     constructor(
         IUniswapV2Router01 _uniswapRouter,
@@ -429,7 +429,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             user
         );
 
-        emit PositionLiquidityMigrated(user, positionLiquidity.tokenID());
+        emit PositionLiquidityMigrated(user, positionLiquidity.tokenID(), liquidity);
     }
 
     function isCatch(string memory reason) internal view returns (bool) {
