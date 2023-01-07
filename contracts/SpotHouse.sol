@@ -248,10 +248,10 @@ contract SpotHouse is
                     pairManagerAddress,
                     _amount
                 );
-                uint256 _balanceAfter = quoteAsset.balanceOf(
-                    pairManagerAddress
-                );
-                _amount = _balanceAfter - _balanceBefore;
+//                uint256 _balanceAfter = quoteAsset.balanceOf(
+//                    pairManagerAddress
+//                );
+                _amount = quoteAsset.balanceOf(pairManagerAddress) - _balanceBefore;
             }
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
@@ -267,8 +267,7 @@ contract SpotHouse is
                     pairManagerAddress,
                     _amount
                 );
-                uint256 _balanceAfter = baseAsset.balanceOf(pairManagerAddress);
-                _amount = _balanceAfter - _balanceBefore;
+                _amount = baseAsset.balanceOf(pairManagerAddress) - _balanceBefore;
             }
         }
         return _amount;

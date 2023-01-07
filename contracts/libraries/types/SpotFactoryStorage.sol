@@ -21,10 +21,14 @@ abstract contract SpotFactoryStorage is ISpotFactory {
     // owner => pair manager => staking manager
     mapping(address => mapping(address => address))
         public
-        override pairOfStakingManager;
+        override stakingManagerOfPair;
 
-    address public templatePair;
     uint32 public feeShareAmm;
+    address public positionRouter;
+
+    mapping(uint32 => address) public mappingVersionTemplate;
+    uint32 public latestVersion;
+
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -33,7 +37,4 @@ abstract contract SpotFactoryStorage is ISpotFactory {
      */
     uint256[49] private __gap;
 
-    mapping(address => uint256) public trackingRequestId;
-
-    address public positionRouter;
 }

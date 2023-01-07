@@ -3,7 +3,7 @@
  */
 // SPDX-License-Identifier: BUSL-1.1
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -71,7 +71,7 @@ contract PositionSpotFactory is
             abi.encodePacked(creator, address(this), block.timestamp)
         );
 
-        pair = Clones.cloneDeterministic(templatePair, salt);
+        pair = Clones.cloneDeterministic(mappingVersionTemplate[latestVersion], salt);
 
         // save
         pathPairManagers[baseAsset][quoteAsset] = pair;
@@ -113,12 +113,17 @@ contract PositionSpotFactory is
         );
     }
 
+    function getStakingManager(address pair) public view returns(address) {
+        address ownerOfPair = ownerPairManager[pair];
+        return stakingManagerOfPair[ownerOfPair][pair];
+    }
+
     function setStakingManagerForPair(address pair, address stakingManager)
         public
     {
         address owner = msg.sender;
         require(owner == ownerPairManager[pair], DexErrors.DEX_ONLY_OWNER);
-        pairOfStakingManager[pair][owner] = stakingManager;
+        stakingManagerOfPair[pair][owner] = stakingManager;
     }
 
     function getPairManager(address quoteAsset, address baseAsset)
@@ -166,16 +171,6 @@ contract PositionSpotFactory is
         // Just 1 in 2 address needRequire._require != address 0x000
         // Because when we added pair, alreadyRequire._require both of them difference address 0x00
         return allPairManager[pairManager].BaseAsset != address(0);
-    }
-
-    function getTrackingRequestId(address pairManager)
-        external
-        returns (uint256)
-    {
-        if (msg.sender == spotHouse || msg.sender == positionLiquidity) {
-            return trackingRequestId[pairManager]++;
-        }
-        return 0;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -241,8 +236,9 @@ contract PositionSpotFactory is
         ownerPairManager[_pairManager] = msg.sender;
     }
 
-    function updateTemplatePair(address templatePair_) public onlyOwner {
-        templatePair = templatePair_;
+    function updateTemplatePair(address templatePair) public onlyOwner {
+        latestVersion++;
+        mappingVersionTemplate[latestVersion] = templatePair;
     }
 
     // IMPORTANT
