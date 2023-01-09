@@ -174,7 +174,7 @@ contract PositionNondisperseLiquidity is
     {
         address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
 
-        return spotFactory.pairOfStakingManager(ownerOfPool, poolAddress);
+        return spotFactory.stakingManagerOfPair(ownerOfPool, poolAddress);
     }
 
     function getWithdrawBNB() public view returns (IWithdrawBNB) {
