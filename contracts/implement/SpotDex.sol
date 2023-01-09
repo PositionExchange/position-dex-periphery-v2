@@ -580,18 +580,19 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             state.sizeOut = 0;
         }
 
+        uint256 amountBaseOpen = _quoteToBase(
+            quoteAmountTransferred - state.quoteAmountFilled,
+            _pip,
+            state.basicPoint
+        );
         if (_quantity > state.sizeOut) {
             limitOrders[_pairManagerAddress][_trader].push(
                 SpotLimitOrder.Data({
                     pip: _pip,
                     orderId: state.orderId,
                     isBuy: true,
-                    quoteAmount: _baseToQuote(
-                        _quantity - state.sizeOut,
-                        _pip,
-                        state.basicPoint
-                    ).Uint256ToUint128(),
-                    baseAmount: (_quantity - state.sizeOut).Uint256ToUint128(),
+                    quoteAmount: quoteAmountTransferred - state.quoteAmountFilled,
+                    baseAmount: amountBaseOpen,
                     blockNumber: block.number.Uint256ToUint40(),
                     fee: fee
                 })
@@ -602,7 +603,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         emitLimitOrderOpened(
             state.orderId,
             _trader,
-            _quantity - state.sizeOut,
+            amountBaseOpen,
             state.sizeOut,
             _pip,
             Side.BUY,
