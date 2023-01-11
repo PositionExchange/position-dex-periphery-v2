@@ -48,32 +48,31 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     }
 
     function openMarketOrder(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quantity
+        IMatchingEngineAMM pairManager,
+        Side side,
+        uint256 quantity
     ) public payable virtual {
-        _openMarketOrder(_pairManager, _side, _quantity, _msgSender());
+        _openMarketOrder(pairManager, side, quantity, _msgSender());
     }
 
     function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quoteAmount
+        IMatchingEngineAMM pairManager,
+        Side side,
+        uint256 quoteAmount
     ) public payable virtual {
         _openMarketOrderWithQuote(
-            _pairManager,
-            _side,
-            _quoteAmount,
+            pairManager,
+            side,
+            quoteAmount,
             _msgSender()
         );
     }
 
-    function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
+    function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
         public
         virtual
     {
         address _trader = _msgSender();
-
         uint256 refundQuote;
         uint256 refundBase;
         uint256 quoteFilled;
@@ -81,13 +80,13 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         uint256 basicPoint;
 
         (quoteFilled, baseFilled, basicPoint) = getAmountClaimable(
-            _pairManager,
+            pairManager,
             _trader
         );
 
         PendingLimitOrder[]
             memory _listPendingLimitOrder = getPendingLimitOrders(
-                _pairManager,
+                pairManager,
                 _trader
             );
 
@@ -116,7 +115,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _orderIds[i] = _pendingLimitOrder.orderId;
             _listSides[i] = _pendingLimitOrder.isBuy ? Side.BUY : Side.SELL;
 
-            (uint256 refundQuantity, ) = _pairManager.cancelLimitOrder(
+            (uint256 refundQuantity, ) = pairManager.cancelLimitOrder(
                 _pendingLimitOrder.pip,
                 _pendingLimitOrder.orderId
             );
@@ -132,17 +131,17 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             }
         }
 
-        delete limitOrders[address(_pairManager)][_trader];
+        delete limitOrders[address(pairManager)][_trader];
 
         _withdrawCancelAll(
-            _pairManager,
+            pairManager,
             _trader,
             Asset.Quote,
             refundQuote,
             quoteFilled
         );
         _withdrawCancelAll(
-            _pairManager,
+            pairManager,
             _trader,
             Asset.Base,
             refundBase,
@@ -151,7 +150,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
 
         emitAllLimitOrderCancelled(
             _trader,
-            _pairManager,
+            pairManager,
             _listPips,
             _orderIds,
             _listSides
@@ -159,30 +158,30 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     }
 
     function cancelLimitOrder(
-        IMatchingEngineAMM _pairManager,
-        uint64 _orderIdx,
-        uint128 _pip
+        IMatchingEngineAMM pairManager,
+        uint64 orderIdx,
+        uint128 pip
     ) public virtual {
         address _trader = _msgSender();
-        uint256 basicPoint = _basisPoint(_pairManager);
+        uint256 basicPoint = _basisPoint(pairManager);
 
         SpotLimitOrder.Data[] storage _orders = limitOrders[
-            address(_pairManager)
+            address(pairManager)
         ][_trader];
         Require._require(
-            _orderIdx < _orders.length,
+            orderIdx < _orders.length,
             DexErrors.DEX_INVALID_ORDER_ID
         );
 
         // save gas
-        SpotLimitOrder.Data memory _order = _orders[_orderIdx];
+        SpotLimitOrder.Data memory _order = _orders[orderIdx];
 
         Require._require(
             _order.baseAmount != 0 && _order.quoteAmount != 0,
             DexErrors.DEX_NO_LIMIT_TO_CANCEL
         );
 
-        (bool isFilled, , , ) = _pairManager.getPendingOrderDetail(
+        (bool isFilled, , , ) = pairManager.getPendingOrderDetail(
             _order.pip,
             _order.orderId
         );
@@ -192,7 +191,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             DexErrors.DEX_ORDER_MUST_NOT_FILLED
         );
 
-        (uint256 refundQuantity, uint256 partialFilled) = _pairManager
+        (uint256 refundQuantity, uint256 partialFilled) = pairManager
             .cancelLimitOrder(_order.pip, _order.orderId);
 
         if (_order.isBuy) {
@@ -202,13 +201,13 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 basicPoint
             );
 
-            _withdraw(_pairManager, _trader, Asset.Quote, quoteAmount, false);
-            _withdraw(_pairManager, _trader, Asset.Base, partialFilled, true);
+            _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, false);
+            _withdraw(pairManager, _trader, Asset.Base, partialFilled, true);
         } else {
-            _withdraw(_pairManager, _trader, Asset.Base, refundQuantity, false);
+            _withdraw(pairManager, _trader, Asset.Base, refundQuantity, false);
             if (partialFilled > 0) {
                 _withdraw(
-                    _pairManager,
+                    pairManager,
                     _trader,
                     Asset.Quote,
                     _baseToQuote(partialFilled, _order.pip, basicPoint),
@@ -216,35 +215,35 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 );
             }
         }
-        delete _orders[_orderIdx];
+        delete _orders[orderIdx];
 
         emitLimitOrderCancelled(
             _trader,
-            _pairManager,
+            pairManager,
             _order.pip,
             _order.isBuy ? Side.BUY : Side.SELL,
             _order.orderId
         );
     }
 
-    function claimAsset(IMatchingEngineAMM _pairManager) public virtual {
+    function claimAsset(IMatchingEngineAMM pairManager) public virtual {
         address _trader = _msgSender();
 
         (
             uint256 quoteAmount,
             uint256 baseAmount,
             uint256 basicPoint
-        ) = getAmountClaimable(_pairManager, _trader);
+        ) = getAmountClaimable(pairManager, _trader);
         Require._require(
             quoteAmount > 0 || baseAmount > 0,
             DexErrors.DEX_NO_AMOUNT_TO_CLAIM
         );
-        _clearLimitOrder(address(_pairManager), _trader, basicPoint);
+        _clearLimitOrder(address(pairManager), _trader, basicPoint);
 
-        _withdraw(_pairManager, _trader, Asset.Quote, quoteAmount, true);
-        _withdraw(_pairManager, _trader, Asset.Base, baseAmount, true);
+        _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, true);
+        _withdraw(pairManager, _trader, Asset.Base, baseAmount, true);
 
-        emit AssetClaimed(_trader, _pairManager, quoteAmount, baseAmount);
+        emit AssetClaimed(_trader, pairManager, quoteAmount, baseAmount);
     }
 
     function getAmountClaimable(

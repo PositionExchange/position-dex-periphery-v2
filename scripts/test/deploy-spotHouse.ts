@@ -1,5 +1,5 @@
 import {task} from "hardhat/config";
-import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
+import {readConfig, verifyContract, verifyImplContract, writeConfig} from "../utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 
 
@@ -42,5 +42,26 @@ task('upgrade-spot-house-testnet', 'How is your girl friend?', async (taskArgs, 
         SpotHouse
     );
     await verifyImplContract(hre,upgraded.deployTransaction, "contracts/SpotHouse.sol:SpotHouse");
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+task('deploy-house-implement', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config-testnet.json');
+
+    const spotHouse = await hre.ethers.getContractFactory("SpotHouse")
+
+
+    const hardhatDeployContract = await spotHouse.deploy();
+
+    await hardhatDeployContract.deployTransaction.wait(5);
+
+    const address = hardhatDeployContract.address
+    console.log("spotHouse deployed address: ",  address);
+    configData.houseImplement = address
+
+
+    await verifyContract(hre,address, [],"contracts/SpotHouse.sol:SpotHouse");
     await writeConfig('config-testnet.json', configData);
 })

@@ -60,29 +60,29 @@ interface ISpotDex {
     //------------------------------------------------------------------------------------------------------------------
 
     function openLimitOrder(
-        IMatchingEngineAMM _spotManager,
-        SpotHouseStorage.Side _side,
-        uint256 _quantity,
-        uint128 _pip
-    ) external payable;
-
-    function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
         uint256 quantity,
         uint128 pip
     ) external payable;
 
+    function openBuyLimitOrderWithQuote(
+        IMatchingEngineAMM pairManager,
+        SpotHouseStorage.Side side,
+        uint256 quoteAmount,
+        uint128 pip
+    ) external payable;
+
     function openMarketOrder(
-        IMatchingEngineAMM _spotManager,
-        SpotHouseStorage.Side _side,
-        uint256 _quantity
+        IMatchingEngineAMM pairManager,
+        SpotHouseStorage.Side side,
+        uint256 quantity
     ) external payable;
 
     function openMarketOrderWithQuote(
-        IMatchingEngineAMM _pairManager,
-        SpotHouseStorage.Side _side,
-        uint256 _quoteAmount
+        IMatchingEngineAMM pairManager,
+        SpotHouseStorage.Side side,
+        uint256 quoteAmount
     ) external payable;
 
     function cancelLimitOrder(
@@ -91,7 +91,7 @@ interface ISpotDex {
         uint128 _pip
     ) external;
 
-    function claimAsset(IMatchingEngineAMM _spotManager) external;
+    function claimAsset(IMatchingEngineAMM spotManager) external;
 
     function getAmountClaimable(
         IMatchingEngineAMM _spotManager,
@@ -105,7 +105,7 @@ interface ISpotDex {
             uint256 basisPoint
         );
 
-    function cancelAllLimitOrder(IMatchingEngineAMM _spotManager) external;
+    function cancelAllLimitOrder(IMatchingEngineAMM spotManager) external;
 
     function getPendingLimitOrders(
         IMatchingEngineAMM _spotManager,

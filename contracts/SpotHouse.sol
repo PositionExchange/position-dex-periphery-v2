@@ -42,51 +42,51 @@ contract SpotHouse is
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
         Side side,
-        uint256 quoteAmount,
+        uint256 quantity,
         uint128 pip
     ) public payable override(SpotDex) nonReentrant {
-        super.openLimitOrder(pairManager, side, quoteAmount, pip);
+        super.openLimitOrder(pairManager, side, quantity, pip);
     }
 
     function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         Side side,
-        uint256 quantity,
+        uint256 quoteAmount,
         uint128 pip
     ) public payable override(SpotDex) nonReentrant {
-        super.openBuyLimitOrderWithQuote(pairManager, side, quantity, pip);
+        super.openBuyLimitOrderWithQuote(pairManager, side, quoteAmount, pip);
     }
 
     function openMarketOrder(
-        IMatchingEngineAMM _pairManager,
-        Side _side,
-        uint256 _quantity
+        IMatchingEngineAMM pairManager,
+        Side side,
+        uint256 quantity
     ) public payable override(SpotDex) nonReentrant {
-        super.openMarketOrder(_pairManager, _side, _quantity);
+        super.openMarketOrder(pairManager, side, quantity);
     }
 
-    function cancelAllLimitOrder(IMatchingEngineAMM _pairManager)
+    function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
         public
         override(SpotDex)
         nonReentrant
     {
-        super.cancelAllLimitOrder(_pairManager);
+        super.cancelAllLimitOrder(pairManager);
     }
 
     function cancelLimitOrder(
-        IMatchingEngineAMM _pairManager,
-        uint64 _orderIdx,
-        uint128 _pip
+        IMatchingEngineAMM pairManager,
+        uint64 orderIdx,
+        uint128 pip
     ) public override(SpotDex) nonReentrant {
-        super.cancelLimitOrder(_pairManager, _orderIdx, _pip);
+        super.cancelLimitOrder(pairManager, orderIdx, pip);
     }
 
-    function claimAsset(IMatchingEngineAMM _pairManager)
+    function claimAsset(IMatchingEngineAMM pairManager)
         public
         override(SpotDex)
         nonReentrant
     {
-        super.claimAsset(_pairManager);
+        super.claimAsset(pairManager);
     }
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
