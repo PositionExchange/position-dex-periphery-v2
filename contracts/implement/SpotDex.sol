@@ -32,14 +32,19 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         _openLimitOrder(pairManager, quantity, pip, trader, side);
     }
 
-    function openBuyLimitOrderExactInput(
+    function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         Side side,
-        uint256 quantity,
+        uint256 quoteAmount,
         uint128 pip
     ) public payable virtual {
         Require._require(side == Side.BUY, DexErrors.DEX_MUST_ORDER_BUY);
-        _openBuyLimitOrderExactInput(pairManager, quantity, pip, _msgSender());
+        _openBuyLimitOrderWithQuote(
+            pairManager,
+            quoteAmount,
+            pip,
+            _msgSender()
+        );
     }
 
     function openMarketOrder(
@@ -47,7 +52,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         Side _side,
         uint256 _quantity
     ) public payable virtual {
-        _openMarketOrder(_pairManager, _side, _quantity,  _msgSender());
+        _openMarketOrder(_pairManager, _side, _quantity, _msgSender());
     }
 
     function openMarketOrderWithQuote(
@@ -516,9 +521,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         );
     }
 
-    function _openBuyLimitOrderExactInput(
+    function _openBuyLimitOrderWithQuote(
         IMatchingEngineAMM _pairManager,
-        uint256 _quantity,
+        uint256 _quoteAmount,
         uint128 _pip,
         address _trader
     ) internal {
@@ -526,24 +531,22 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         OpenLimitOrderState memory state;
         state.basicPoint = _basisPoint(_pairManager);
 
-        uint256 quoteAmount = _baseToQuote(_quantity, _pip, state.basicPoint);
-
         uint16 fee = _getFee();
 
         uint256 quoteAmountTransferred = _deposit(
             _pairManager,
             _trader,
             Asset.Quote,
-            quoteAmount
+            _quoteAmount
         );
 
-        if (quoteAmountTransferred != quoteAmount) {
-            _quantity = _quoteToBase(
-                quoteAmountTransferred,
-                _pip,
-                state.basicPoint
-            );
-        }
+        //        if (quoteAmountTransferred != quoteAmount) {
+        //        _quantity = _quoteToBase(
+        //            quoteAmountTransferred,
+        //            _pip,
+        //            state.basicPoint
+        //        );
+        //        }
 
         (
             state.orderId,
@@ -552,22 +555,20 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             state.feeAmount
         ) = _pairManager.openLimit(
             _pip,
-            _quantity.Uint256ToUint128(),
+            _quoteToBase(quoteAmountTransferred, _pip, state.basicPoint)
+                .Uint256ToUint128(),
             true,
             _trader,
             quoteAmountTransferred,
             fee
         );
-        uint256 baseAmountReceive = state.sizeOut;
-        if (
-            state.sizeOut == _quantity &&
-            quoteAmountTransferred > state.quoteAmountFilled
-        ) {
-            _quantity = _quoteToBase(
-                quoteAmountTransferred - state.quoteAmountFilled,
-                _pip,
-                state.basicPoint
-            );
+        //        uint256 baseAmountReceive = state.sizeOut;
+        if (quoteAmountTransferred == state.quoteAmountFilled) {
+            //            _quantity = _quoteToBase(
+            //                quoteAmountTransferred - state.quoteAmountFilled,
+            //                _pip,
+            //                state.basicPoint
+            //            );
 
             emitMarketOrderOpened(
                 _trader,
@@ -577,38 +578,36 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _pairManager.getCurrentPip()
             );
-            state.sizeOut = 0;
-        }
-
-        uint256 amountBaseOpen = _quoteToBase(
-            quoteAmountTransferred - state.quoteAmountFilled,
-            _pip,
-            state.basicPoint
-        );
-        if (_quantity > state.sizeOut) {
+        } else {
+            uint256 amountBaseOpen = _quoteToBase(
+                quoteAmountTransferred - state.quoteAmountFilled,
+                _pip,
+                state.basicPoint
+            );
             limitOrders[_pairManagerAddress][_trader].push(
                 SpotLimitOrder.Data({
                     pip: _pip,
                     orderId: state.orderId,
                     isBuy: true,
-                    quoteAmount: quoteAmountTransferred - state.quoteAmountFilled,
-                    baseAmount: amountBaseOpen,
+                    baseAmount: amountBaseOpen.Uint256ToUint128(),
+                    quoteAmount: quoteAmountTransferred.Uint256ToUint128() -
+                        state.quoteAmountFilled.Uint256ToUint128(),
                     blockNumber: block.number.Uint256ToUint40(),
                     fee: fee
                 })
             );
-        }
-        _withdraw(_pairManager, _trader, Asset.Base, baseAmountReceive, false);
 
-        emitLimitOrderOpened(
-            state.orderId,
-            _trader,
-            amountBaseOpen,
-            state.sizeOut,
-            _pip,
-            Side.BUY,
-            _pairManagerAddress
-        );
+            emitLimitOrderOpened(
+                state.orderId,
+                _trader,
+                amountBaseOpen,
+                state.sizeOut,
+                _pip,
+                Side.BUY,
+                _pairManagerAddress
+            );
+        }
+        _withdraw(_pairManager, _trader, Asset.Base, state.sizeOut, false);
     }
 
     struct OpenMarketState {
@@ -712,7 +711,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         Side _side,
         uint256 _quoteAmount,
         address _trader
-    ) internal  {
+    ) internal {
         /// state.mainSideOut is quote asset
         /// state.flipSideOut is base asset
         OpenMarketState memory state;
@@ -795,7 +794,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _pairManager,
             _pairManager.getCurrentPip()
         );
-
     }
 
     function _clearLimitOrder(
@@ -866,7 +864,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         return subListLimitOrder;
     }
 
-
     function emitMarketOrderOpened(
         address trader,
         uint256 quantity,
@@ -932,7 +929,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     }
 
     // INTERNAL FUNCTIONS
-
 
     function _baseToQuote(
         uint256 baseAmount,

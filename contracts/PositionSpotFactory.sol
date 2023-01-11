@@ -71,7 +71,10 @@ contract PositionSpotFactory is
             abi.encodePacked(creator, address(this), block.timestamp)
         );
 
-        pair = Clones.cloneDeterministic(mappingVersionTemplate[latestVersion], salt);
+        pair = Clones.cloneDeterministic(
+            mappingVersionTemplate[latestVersion],
+            salt
+        );
 
         // save
         pathPairManagers[baseAsset][quoteAsset] = pair;
@@ -113,7 +116,7 @@ contract PositionSpotFactory is
         );
     }
 
-    function getStakingManager(address pair) public view returns(address) {
+    function getStakingManager(address pair) public view returns (address) {
         address ownerOfPair = ownerPairManager[pair];
         return stakingManagerOfPair[ownerOfPair][pair];
     }

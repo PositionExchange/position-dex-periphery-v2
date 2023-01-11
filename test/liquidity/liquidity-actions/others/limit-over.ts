@@ -645,4 +645,677 @@ describe("LimitOver", async function(){
     Quantity: 20
 `)
     })
+    it ("Case#1-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 80000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: quote
+    Side: 0
+    Quantity: 20
+    Price: 90000
+  Expect:
+    PendingOrder:
+      Id: 1
+      OrderId: 1
+      Price: 0
+    CurrentPrice:
+       Price: 80000
+`)
+    })
+    it ("Case#1.1-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 80000
+- S2: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 80
+    Price: 90000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 90000
+    CurrentPrice:
+      Price: 80000
+    User:
+      Id: 2
+      BalanceBase: 10010
+      BalanceQuote: 9920
+`)
+    })
+    it ("Case#1.2-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 80000
+- S1: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 90
+    Price: 90000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 90000
+      Size : 1.111
+      Side: 0
+    CurrentPrice:
+      Price: 90000
+    User:
+      Id: 2
+      BalanceBase: 10010
+      BalanceQuote: 9910
+`)
+    })
+    it ("Case#2-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 80000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 85000
+- S3: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 90000
+- S4: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 300
+    Price: 100000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 100000
+      Size : 5
+      Side: 0
+    CurrentPrice:
+      Price: 100000
+    User:
+      Id: 2
+      BalanceBase: 10030
+      BalanceQuote: 9700
+`)
+    })
+    it ("Case#3-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 50.00000000000
+    Price: 90000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 82305
+    CurrentPrice:
+      Price: 82305
+    User:
+      Id: 2
+      BalanceBase: 10006.58727682078
+      BalanceQuote: 9950
+- S3: Expect
+  Pool:
+    Liquidity: 50206.51621274150
+    BaseVirtual: 3.41272317922
+    QuoteVirtual: 93.97595792321
+    BaseReal: 78.102506854488
+    QuoteReal: 642.82848572685
+    IndexPipRange: 2
+`)
+    })
+    it ("Case#4-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 49.99709846296
+    Price: 82305
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 82305
+    CurrentPrice:
+      Price: 82305
+    User:
+      Id: 2
+      BalanceBase: 10006.58727682078
+      BalanceQuote: 9950
+- S3: Expect
+  Pool:
+    Liquidity: 50206.51621274150
+    BaseVirtual: 3.41272317922
+    QuoteVirtual: 93.97595792321
+    BaseReal: 78.102506854488
+    QuoteReal: 642.82848572685
+    IndexPipRange: 2
+
+`)
+    })
+    it ("Case#5-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 60.00000000000
+    Price: 82305
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 82305
+      Size : 1.21499301
+      Side: 0
+    CurrentPrice:
+      Price: 82305
+    User:
+      Id: 2
+      BalanceBase: 10006.58727682078
+      BalanceQuote: 9940
+- S3: Expect
+  Pool:
+    Liquidity: 50206.51621274150
+    BaseVirtual: 3.41272317922
+    QuoteVirtual: 93.97595792321
+    BaseReal: 78.102506854488
+    QuoteReal: 642.82848572685
+    IndexPipRange: 2
+
+`)
+    })
+    it ("Case#6-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 90.00000000000
+    Price: 95000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 95000
+      Size : 1.11873
+      Side: 0
+    CurrentPrice:
+      Price: 95000
+    User:
+      Id: 2
+      BalanceBase: 10010
+      BalanceQuote: 9910
+- S3: Expect
+  Pool:
+    Liquidity: 50206.51621274150
+    BaseVirtual: 0
+    QuoteVirtual: 123.34805629537
+    BaseReal: 74.689783675264
+    QuoteReal: 672.20058409901
+    IndexPipRange: 2
+`)
+    })
+    it ("Case#7-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 10
+    Price: 95000
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 90
+    Price: 95000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 2
+      Price: 95000
+    CurrentPrice:
+      Price: 95000
+    User:
+      Id: 2
+      BalanceBase: 10011.118726
+      BalanceQuote: 9910
+
+`)
+    })
+    it ("Case#8-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 1
+    Price: 82305
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 90
+    Price: 90000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 90000
+      Size : 0.18088906976
+      Side: 0
+    CurrentPrice:
+      Price: 90000
+    User:
+      Id: 2
+      BalanceBase: 10011
+      BalanceQuote: 9910
+`)
+    })
+    it ("Case#9-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 1
+    Price: 82305
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 70
+    Price: 82305
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 2
+      Price: 82305
+      Size : 1.30777777778
+      Side: 0
+    CurrentPrice:
+      Price: 82305
+    User:
+      Id: 2
+      BalanceBase: 10007.58728
+      BalanceQuote: 9930
+`)
+    })
+    it ("Case#10-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 1
+    Price: 85000
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 70
+    Price: 82305
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 82305
+      Size : 2.42998602758
+      Side: 0
+    CurrentPrice:
+      Price: 82305
+    User:
+      Id: 2
+      BalanceBase: 10006.58727682078
+      BalanceQuote: 9930
+`)
+    })
+    it ("Case#11-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 3
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50144.23275463050
+      Liquidity: 197.48688543867
+      BaseVirtual: 10
+      QuoteVirtual: 0
+      BaseReal: 74.643026581062
+      QuoteReal: 671.78723922956
+      IndexPipRange: 3
+      MaxPip: 119999
+      MinPip: 90000
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 193.29471381269
+    Price: 130000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 130000
+      Size : 0.76923
+      Side: 0
+    CurrentPrice:
+      Price: 130000
+    User:
+      Id: 2
+      BalanceBase: 10020
+      BalanceQuote: 9806.70528618731
+`)
+    })
+    it ("Case#12-OpenLimitWithQuote", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 2
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50206.51621274150
+      Liquidity: 224.06810619261
+      BaseVirtual: 10
+      QuoteVirtual: 43.97595792321
+      BaseReal: 84.689783675264
+      QuoteReal: 592.82848572685
+      IndexPipRange: 2
+      MaxPip: 89999
+      MinPip: 60000
+- S2: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 3
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 50144.23275463050
+      Liquidity: 197.48688543867
+      BaseVirtual: 10
+      QuoteVirtual: 0
+      BaseReal: 74.643026581062
+      QuoteReal: 671.78723922956
+      IndexPipRange: 3
+      MaxPip: 119999
+      MinPip: 90000
+- S3: OpenLimit
+  Action:
+    Id: 2
+    Asset: quote
+    Side: 0
+    Quantity: 107.78063656303
+    Price: 95000
+  Expect:
+    PendingOrder:
+      Id: 2
+      OrderId: 1
+      Price: 95000
+      Size : 1.05263157895
+      Side: 0
+    CurrentPrice:
+      Price: 95000
+    User:
+      Id: 2
+      BalanceBase: 10011.99083948418
+      BalanceQuote: 9892.21936343697
+`)
+    })
 })

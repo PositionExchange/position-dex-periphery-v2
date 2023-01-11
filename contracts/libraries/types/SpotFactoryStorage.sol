@@ -29,12 +29,10 @@ abstract contract SpotFactoryStorage is ISpotFactory {
     mapping(uint32 => address) public mappingVersionTemplate;
     uint32 public latestVersion;
 
-
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
     uint256[49] private __gap;
-
 }

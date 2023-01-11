@@ -42,19 +42,19 @@ contract SpotHouse is
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
         Side side,
-        uint256 quantity,
+        uint256 quoteAmount,
         uint128 pip
     ) public payable override(SpotDex) nonReentrant {
-        super.openLimitOrder(pairManager, side, quantity, pip);
+        super.openLimitOrder(pairManager, side, quoteAmount, pip);
     }
 
-    function openBuyLimitOrderExactInput(
+    function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         Side side,
         uint256 quantity,
         uint128 pip
     ) public payable override(SpotDex) nonReentrant {
-        super.openBuyLimitOrderExactInput(pairManager, side, quantity, pip);
+        super.openBuyLimitOrderWithQuote(pairManager, side, quantity, pip);
     }
 
     function openMarketOrder(
@@ -248,10 +248,12 @@ contract SpotHouse is
                     pairManagerAddress,
                     _amount
                 );
-//                uint256 _balanceAfter = quoteAsset.balanceOf(
-//                    pairManagerAddress
-//                );
-                _amount = quoteAsset.balanceOf(pairManagerAddress) - _balanceBefore;
+                //                uint256 _balanceAfter = quoteAsset.balanceOf(
+                //                    pairManagerAddress
+                //                );
+                _amount =
+                    quoteAsset.balanceOf(pairManagerAddress) -
+                    _balanceBefore;
             }
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
@@ -267,7 +269,9 @@ contract SpotHouse is
                     pairManagerAddress,
                     _amount
                 );
-                _amount = baseAsset.balanceOf(pairManagerAddress) - _balanceBefore;
+                _amount =
+                    baseAsset.balanceOf(pairManagerAddress) -
+                    _balanceBefore;
             }
         }
         return _amount;

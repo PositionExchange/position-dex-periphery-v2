@@ -59,5 +59,4 @@ interface ISpotFactory {
         returns (address);
 
     function ownerPairManager(address pair) external view returns (address);
-
 }

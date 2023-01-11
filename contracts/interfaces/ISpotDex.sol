@@ -66,7 +66,7 @@ interface ISpotDex {
         uint128 _pip
     ) external payable;
 
-    function openBuyLimitOrderExactInput(
+    function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
         uint256 quantity,

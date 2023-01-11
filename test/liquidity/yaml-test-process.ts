@@ -59,15 +59,27 @@ export class YamlTestProcess {
         const size = expect.getProp("size");
         const side = expect.getProp("side");
         const price = expect.getProp("price");
+        const id = expect.getProp("id");
 
         return {
             orderId,
             size,
             side,
+            price,
+            id
+        }
+
+    }
+
+    extractPrice(expect) {
+        const price = expect.getProp("Price");
+
+        return {
             price
         }
 
     }
+
     extractPool(expect){
 
         const liquidity = expect.getProp("Liquidity")
@@ -137,13 +149,21 @@ export class YamlTestProcess {
         const expectPool= expectData.getProp("Pool");
         const expectPendingOrder = expectData.getProp("PendingOrder");
         const expectUser = expectData.getProp("User");
+        const expectPrice = expectData.getProp("CurrentPrice");
+
+        if (expectPrice) {
+            console.log("[IT] expectPrice");
+            const extract = this.extractPrice(expectPrice)
+            console.log("extract: ", extract);
+            await this.testHelper.expectPrice(extract.price);
+        }
 
 
         if (expectPendingOrder) {
             console.log("[IT] PendingOrder");
             const extract = this.extractPending(expectPendingOrder)
             console.log("extract: ", extract);
-            await this.testHelper.expectPending(extract.orderId, extract.price, extract.side, extract.size);
+            await this.testHelper.expectPending(extract.orderId, extract.price, extract.side, extract.size, extract.id);
         }
 
         if (expectUser) {
@@ -249,7 +269,14 @@ export class YamlTestProcess {
     async OpenLimit(stepData) {
 
         const action = this.extractAction(stepData.getProp("Action"));
-        if (action) { await this.testHelper.openLimitOrder( action.price, action.side, action.quantity, action.id, {revert : action.revert} )}
+        if (action) { await this.testHelper.openLimitOrder(
+            action.price,
+            action.side,
+            action.quantity,
+            action.id,
+            action.asset.toString().toLowerCase(),
+            {revert : action.revert} )
+        }
         const expectData = stepData.getProp("Expect");
         if (expectData) await this.expectTest(expectData);
     }

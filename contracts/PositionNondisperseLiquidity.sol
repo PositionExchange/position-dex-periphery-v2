@@ -309,7 +309,6 @@ contract PositionNondisperseLiquidity is
         withdrawBNB.withdraw(_trader, _amount);
     }
 
-
     function _msgSender()
         internal
         view

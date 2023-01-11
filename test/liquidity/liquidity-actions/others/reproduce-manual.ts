@@ -258,7 +258,7 @@ it ("OpenMarketWithQuote-sell-4", async () => {
     id: 2
     asset: quote
     Side: 1
-    Quantity: 100
+    Quantity: 10
     `)
     })
 
@@ -550,6 +550,7 @@ it ("OpenMarketWithQuote-fill-limit-amm", async () => {
     Price: 165000
   Expect:
     PendingOrder:
+      Id: 4
       OrderId: 1
       Price: 165000
       Size : 10
