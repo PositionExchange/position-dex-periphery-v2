@@ -534,7 +534,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _quoteAmount
         );
 
-
         (
             state.orderId,
             state.sizeOut,
@@ -550,7 +549,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             fee
         );
         if (quoteAmountTransferred == state.quoteAmountFilled) {
-
             emitMarketOrderOpened(
                 _trader,
                 state.sizeOut,

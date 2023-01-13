@@ -581,3 +581,161 @@ it ("OpenMarketWithQuote-fill-limit-amm", async () => {
  })
 
 })
+describe("OpenMarketWithQuote-Manual", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(10_000, false)
+    })
+
+
+
+it ("OpenMarketWithQuote-fill-limit", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 70000
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 10
+    Price: 60000
+- S2: OpenMarket
+  Action:
+    id: 2
+    asset: quote
+    Side: 1
+    Quantity: 4
+    User:
+      Id: 2
+      BalanceBase: 1024
+      BalanceQuote: 996
+    `)
+ })
+it ("OpenMarketWithQuote-fill-limit-amm", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 165000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 5
+    Asset: base
+    AmountVirtual: 10
+  Expect:
+    Pool:
+      K: 910483.1139089900
+      Liquidity: 954.1923883101
+      BaseVirtual: 10
+      QuoteVirtual: 180.3765750184
+      BaseReal: 234.9059275164
+      QuoteReal: 3875.9478040214
+      IndexPipRange: 5
+      MaxPip: 179999
+      MinPip: 150000
+      FeeGrowthBase: 0  
+      FeeGrowthQuote: 0
+    User:
+      Id: 1
+      TokenId: 1000001
+      Liquidity: 954.19238831013
+      BaseVirtual: 10.00000000000
+      QuoteVirtual: 180.3765750184
+      BalanceBase: 9990.00000
+      BalanceQuote: 9819.62342
+- S2: AddLiquidity
+  Action:
+    Id: 2
+    IndexPipRange: 5
+    Asset: base
+    AmountVirtual: 35
+  Expect:
+    Pool:
+      K: 18437283.0566570000
+      Liquidity: 4293.8657473956
+      BaseVirtual: 45
+      QuoteVirtual: 811.6945875827
+      BaseReal: 1057.0766738240
+      QuoteReal: 17441.7651180963
+      IndexPipRange: 5
+      MaxPip: 179999
+      MinPip: 150000
+      FeeGrowthBase: 0  
+      FeeGrowthQuote: 0
+    User:
+      Id: 2
+      TokenId: 1000002
+      Liquidity: 3339.67335908545
+      BaseVirtual: 35.00000000000
+      QuoteVirtual: 631.31801256436
+      BalanceBase: 9965.00000
+      BalanceQuote: 9368.68199
+- S3: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 5
+    Asset: base
+    AmountVirtual: 55
+  Expect:
+    Pool:
+      K: 91048311.3908989000
+      Liquidity: 9541.9238831013
+      BaseVirtual: 100
+      QuoteVirtual: 1803.7657501839
+      BaseReal: 2349.0592751645
+      QuoteReal: 38759.4780402140
+      IndexPipRange: 5
+      MaxPip: 179999
+      MinPip: 150000
+      FeeGrowthBase: 0  
+      FeeGrowthQuote: 0
+    User:
+      Id: 1
+      TokenId: 1000003
+      Liquidity: 5248.05813570571
+      BaseVirtual: 55.00000000000
+      QuoteVirtual: 992.07116260114
+      BalanceBase: 9935.00000
+      BalanceQuote: 8827.55226
+- S4: OpenLimit
+  Action:
+    Id: 4
+    Asset: base
+    Side: 0
+    Quantity: 10
+    Price: 165000
+  Expect:
+    PendingOrder:
+      OrderId: 1
+      Price: 165000
+      Size : 10
+      Side: 0
+- S5: OpenMarket
+  Action:
+    id: 3
+    asset: quote
+    Side: 1
+    Quantity: 329.30057
+  Expect:
+    Pool:
+      Liquidity: 9541.9238831013
+      BaseVirtual: 110
+      QuoteVirtual: 1639.4651815281
+      BaseReal: 2359.0592751645
+      QuoteReal: 38595.1774715583
+      IndexPipRange: 5
+      MaxPip: 179999
+      MinPip: 150000
+      FeeGrowthBase: 0  
+      FeeGrowthQuote: 0
+    User:
+      Id: 3
+      BalanceBase: 9980.00000
+      BalanceQuote: 10329.30057
+    `)
+ })
+
+})

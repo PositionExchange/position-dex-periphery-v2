@@ -68,6 +68,20 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uniswapRouter = _new;
     }
 
+    function updatePositionLiquidity(
+        IPositionNondisperseLiquidity _positionLiquidity
+    ) public {
+        positionLiquidity = _positionLiquidity;
+    }
+
+    function updateSpotFactory(ISpotFactory _spotFactory) public {
+        spotFactory = _spotFactory;
+    }
+
+    function updateWBNB(IWBNB _WBNB) public {
+        WBNB = _WBNB;
+    }
+
     function isToken0Base(IUniswapV2Pair pair) public view returns (bool) {
         (
             address baseToken,

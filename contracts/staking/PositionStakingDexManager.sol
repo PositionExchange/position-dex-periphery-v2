@@ -770,4 +770,23 @@ contract PositionStakingDexManager is
             );
         }
     }
+
+    function updatePower(address user, address pid)
+        internal
+        returns (uint128 totalPower)
+    {
+        uint256[] memory _userNfts = userNft[user][pid];
+        UserLiquidity.Data memory nftData;
+        uint32 currentIndexedPipRange = uint32(
+            nftData.pool.currentIndexedPipRange()
+        );
+        for (uint256 i = 0; i < _userNfts.length; i++) {
+            nftData = _getLiquidityManager(_userNfts[i]);
+            totalPower += _calculatePower(
+                nftData.indexedPipRange,
+                currentIndexedPipRange,
+                nftData.liquidity
+            );
+        }
+    }
 }
