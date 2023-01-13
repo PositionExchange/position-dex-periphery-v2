@@ -60,12 +60,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         Side side,
         uint256 quoteAmount
     ) public payable virtual {
-        _openMarketOrderWithQuote(
-            pairManager,
-            side,
-            quoteAmount,
-            _msgSender()
-        );
+        _openMarketOrderWithQuote(pairManager, side, quoteAmount, _msgSender());
     }
 
     function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
@@ -539,13 +534,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _quoteAmount
         );
 
-        //        if (quoteAmountTransferred != quoteAmount) {
-        //        _quantity = _quoteToBase(
-        //            quoteAmountTransferred,
-        //            _pip,
-        //            state.basicPoint
-        //        );
-        //        }
 
         (
             state.orderId,
@@ -561,13 +549,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             quoteAmountTransferred,
             fee
         );
-        //        uint256 baseAmountReceive = state.sizeOut;
         if (quoteAmountTransferred == state.quoteAmountFilled) {
-            //            _quantity = _quoteToBase(
-            //                quoteAmountTransferred - state.quoteAmountFilled,
-            //                _pip,
-            //                state.basicPoint
-            //            );
 
             emitMarketOrderOpened(
                 _trader,

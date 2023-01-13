@@ -16,11 +16,14 @@ import "../interfaces/IPositionNondisperseLiquidity.sol";
 import "../interfaces/ISpotFactory.sol";
 import "../interfaces/IWBNB.sol";
 import "../libraries/helper/LiquidityHelper.sol";
+import "../interfaces/IUniswapV2Factory.sol";
+import "../interfaces/ISpotFactory.sol";
 
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
     IUniswapV2Router01 public uniswapRouter;
+    IUniswapV2Factory public uniswapV2Factory;
     IPositionNondisperseLiquidity public positionLiquidity;
     ISpotFactory public spotFactory;
     IWBNB public WBNB;
@@ -73,6 +76,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         ) = spotFactory.getPairManagerSupported(pair.token0(), pair.token1());
 
         return baseToken == pair.token0();
+    }
+
+    function getLpAddress(address matching) public view returns (address) {
+        ISpotFactory.Pair memory pair = spotFactory.getQuoteAndBase(matching);
+        return uniswapV2Factory.getPair(pair.QuoteAsset, pair.BaseAsset);
     }
 
     function migratePosition(IUniswapV2Pair pair, uint256 liquidity)

@@ -248,9 +248,6 @@ contract SpotHouse is
                     pairManagerAddress,
                     _amount
                 );
-                //                uint256 _balanceAfter = quoteAsset.balanceOf(
-                //                    pairManagerAddress
-                //                );
                 _amount =
                     quoteAsset.balanceOf(pairManagerAddress) -
                     _balanceBefore;
