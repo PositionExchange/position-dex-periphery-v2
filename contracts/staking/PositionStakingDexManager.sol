@@ -576,11 +576,8 @@ contract PositionStakingDexManager is
             "only concentrated liquidity"
         );
         updatePool(poolId);
-
         _payOrLockupPendingPosition(poolId, user);
-
         if (positionNondisperseLiquidity.ownerOf(tokenId) == address(this)) {}
-
         return _msgSender();
     }
 
