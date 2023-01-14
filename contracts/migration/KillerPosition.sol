@@ -36,7 +36,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     event PositionLiquidityMigrated(
         address user,
         uint256 nftId,
-        uint256 liquidityMigrated
+        uint256 liquidityMigrated,
+        address lpAddress,
+        address pairManager
     );
 
     constructor(
@@ -458,7 +460,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         emit PositionLiquidityMigrated(
             user,
             positionLiquidity.tokenID(),
-            liquidity
+            liquidity,
+            address(pair),
+            state.pairManager
         );
     }
 
