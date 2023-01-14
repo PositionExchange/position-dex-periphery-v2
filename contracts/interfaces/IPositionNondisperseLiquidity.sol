@@ -4,7 +4,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
-import "./ILiquidityManager.sol";
-import "./ILiquidityNFT.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
-interface IPositionNondisperseLiquidity is ILiquidityManager, ILiquidityNFT {}
+import "./ILiquidityManager.sol";
+import "./ILiquidityManagerNFT.sol";
+
+interface IPositionNondisperseLiquidity is
+    ILiquidityManager,
+    ILiquidityManagerNFT,
+    IERC721Upgradeable
+{}

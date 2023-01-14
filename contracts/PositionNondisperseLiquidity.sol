@@ -30,7 +30,7 @@ contract PositionNondisperseLiquidity is
 
     modifier nftOwnerOrStaking(uint256 nftId) {
         Require._require(
-            (_msgSender() == ownerOf(nftId)) ||
+            _isOwner(nftId, _msgSender()) ||
                 isOwnerWhenStaking(_msgSender(), nftId),
             DexErrors.DEX_ONLY_OWNER
         );
@@ -174,7 +174,7 @@ contract PositionNondisperseLiquidity is
     {
         address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
 
-        return spotFactory.pairOfStakingManager(ownerOfPool, poolAddress);
+        return spotFactory.stakingManagerOfPair(ownerOfPool, poolAddress);
     }
 
     function getWithdrawBNB() public view returns (IWithdrawBNB) {
@@ -309,14 +309,6 @@ contract PositionNondisperseLiquidity is
         withdrawBNB.withdraw(_trader, _amount);
     }
 
-    function _trackingId(address pairManager)
-        internal
-        override(LiquidityManager)
-        returns (uint256)
-    {
-        return spotFactory.getTrackingRequestId(pairManager);
-    }
-
     function _msgSender()
         internal
         view
@@ -335,12 +327,12 @@ contract PositionNondisperseLiquidity is
         return WBNB;
     }
 
-    function _owner(uint256 tokenId)
+    function _isOwner(uint256 tokenId, address user)
         internal
         view
         override(LiquidityManager)
-        returns (address)
+        returns (bool)
     {
-        return ownerOf(tokenId);
+        return ownerOf(tokenId) == user;
     }
 }

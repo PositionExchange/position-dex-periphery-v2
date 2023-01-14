@@ -1,7 +1,7 @@
 import {task} from "hardhat/config";
 import {readConfig} from "./utils-deploy";
 import {
-    PositionNondisperseLiquidity,
+    PositionNondisperseLiquidity, PositionRouter,
     PositionSpotFactory,
     PositionStakingDexManager,
     SpotHouse,
@@ -18,6 +18,8 @@ task ("setup-testnet", async (taskArgs, hre)=>{
     const positionSpotFactory = await hre.ethers.getContractFactory("PositionSpotFactory")
     const withdrawBNB = await hre.ethers.getContractFactory("WithdrawBNB")
     const positionStakingDexManager = await hre.ethers.getContractFactory("PositionStakingDexManager")
+    const positionRouter = await hre.ethers.getContractFactory("PositionRouter")
+
 
 
     console.log(configData)
@@ -26,6 +28,7 @@ task ("setup-testnet", async (taskArgs, hre)=>{
     const instanceSpotFactory =  (await  positionSpotFactory.attach(configData.spotFactory)) as  unknown as PositionSpotFactory;
     const instanceWithdrawBNB =  (await  positionSpotFactory.attach(configData.withdrawBNB)) as  unknown as WithdrawBNB;
     const instancePositionStakingDexManager =  (await  positionStakingDexManager.attach(configData.positionStakingDexManager)) as  unknown as PositionStakingDexManager;
+    const instancePositionRouter =  (await  positionRouter.attach(configData.positionRouter)) as  unknown as PositionRouter;
 
 
     let tx;
@@ -36,6 +39,8 @@ task ("setup-testnet", async (taskArgs, hre)=>{
         tx = await instanceSpotFactory.setPositionLiquidity(configData.positionConcentratedLiquidity);
         await tx.wait(5);
         tx = await  instanceSpotFactory.setFeeShareAmm(6000);
+        await tx.wait(5);
+        tx = await  instanceSpotFactory.setPositionRouter(configData.positionRouter);
         await tx.wait(5);
     }
 
@@ -71,6 +76,14 @@ task ("setup-testnet", async (taskArgs, hre)=>{
         tx = await instanceSpotHouse.setWithdrawBNB(configData.withdrawBNB);
         await tx.wait(5);
         tx = await instanceSpotHouse.setWBNB(configData.WBNB);
+        await tx.wait(5);
+
+    }
+
+    if(configData.positionRouter){
+        console.log("start position router setup")
+
+        tx = await instancePositionRouter.setWithdrawBNB(configData.withdrawBNB);
         await tx.wait(5);
 
     }

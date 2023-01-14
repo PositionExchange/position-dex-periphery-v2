@@ -12,7 +12,6 @@ import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/helper/DexErrors.sol";
-import "../interfaces/ILiquidityNFT.sol";
 import "../interfaces/ILiquidityManager.sol";
 import "../interfaces/IUpdateStakingManager.sol";
 import "../interfaces/ICheckOwnerWhenStaking.sol";
@@ -27,21 +26,22 @@ abstract contract LiquidityManager is ILiquidityManager {
     mapping(uint256 => UserLiquidity.Data)
         public
         override concentratedLiquidity;
-    IPositionStakingDexManager stakingManager;
+
+    //    IPositionStakingDexManager stakingManager;
 
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
         virtual
     {
-        _addLiquidityRecipient(params, _msgSender());
+        _addLiquidityRecipient(params, _msgSender(), _msgSender());
     }
 
     function addLiquidityWithRecipient(
         AddLiquidityParams calldata params,
         address recipient
     ) public payable virtual {
-        _addLiquidityRecipient(params, recipient);
+        _addLiquidityRecipient(params, _msgSender(), recipient);
     }
 
     function removeLiquidity(uint256 nftTokenId) public virtual {
@@ -91,8 +91,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             baseAmountRemoved,
             quoteAmountRemoved,
             liquidityData.indexedPipRange,
-            liquidityData.liquidity,
-            0
+            liquidityData.liquidity
         );
     }
 
@@ -188,8 +187,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange,
-            uint128(_resultAddLiquidity.liquidity),
-            0
+            uint128(_resultAddLiquidity.liquidity)
         );
     }
 
@@ -260,8 +258,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             quoteAmountRemoved,
             ModifyType.DECREASE,
             liquidityData.indexedPipRange,
-            liquidity,
-            0
+            liquidity
         );
     }
 
@@ -448,8 +445,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             targetIndex,
             uint128(state.resultAddLiquidity.liquidity),
             state.resultAddLiquidity.baseAmountAdded,
-            state.resultAddLiquidity.quoteAmountAdded,
-            0
+            state.resultAddLiquidity.quoteAmountAdded
         );
     }
 
@@ -603,16 +599,6 @@ abstract contract LiquidityManager is ILiquidityManager {
         ////
         state.pair = _getQuoteAndBase(pool);
 
-        // TODO consider necessary to check it
-        //        state.WBNBAddress = _getWBNBAddress();
-        //        if (state.pair.QuoteAsset == state.WBNBAddress) {
-        //           Require._require(!isBase, "not support");
-        //        }
-        //
-        //        if (state.pair.BaseAsset == state.WBNBAddress) {
-        //           Require._require(isBase, "not support");
-        //        }
-
         if (
             (indexedPipRange < state.currentIndexedPipRange) ||
             (indexedPipRange == state.currentIndexedPipRange &&
@@ -636,12 +622,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             );
 
             if (isBase) {
-                uint128 baseReal = LiquidityMath.calculateBaseReal(
-                    state.maxPip,
-                    amountModify,
-                    state.currentPrice
-                );
-
                 state.baseAmountModify = amountModify;
                 state.quoteAmountModify = LiquidityHelper
                     .calculateQuoteVirtualFromBaseReal(
@@ -655,12 +635,6 @@ abstract contract LiquidityManager is ILiquidityManager {
                         uint128(Math.sqrt(pool.basisPoint()))
                     );
             } else {
-                uint128 quoteReal = LiquidityMath.calculateQuoteReal(
-                    state.minPip,
-                    amountModify,
-                    state.currentPrice
-                );
-
                 state.quoteAmountModify = amountModify;
                 state.baseAmountModify =
                     LiquidityHelper.calculateBaseVirtualFromQuoteReal(
@@ -693,7 +667,8 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function _addLiquidityRecipient(
         AddLiquidityParams calldata params,
-        address user
+        address user,
+        address recipient
     ) internal {
         Require._require(
             params.amountVirtual != 0,
@@ -731,7 +706,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             DexErrors.LQ_NOT_SUPPORT
         );
 
-        uint256 nftTokenId = mint(user);
+        uint256 nftTokenId = mint(recipient);
 
         concentratedLiquidity[nftTokenId] = UserLiquidity.Data({
             liquidity: uint128(_resultAddLiquidity.liquidity),
@@ -748,7 +723,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             _resultAddLiquidity.baseAmountAdded,
             _resultAddLiquidity.quoteAmountAdded,
             params.indexedPipRange,
-            0
+            _resultAddLiquidity.liquidity
         );
     }
 
@@ -847,9 +822,12 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 deltaLiquidityModify,
         ModifyType modifyType
     ) internal {
+        /// NFT in user wallet
+        if (_isOwner(tokenId, _msgSender())) return;
+
         address stakingManager = getStakingManager(poolAddress);
         if (stakingManager != address(0)) {
-            if (_owner(tokenId) == stakingManager) {
+            if (_isOwner(tokenId, stakingManager)) {
                 Require._require(
                     IUpdateStakingManager(stakingManager)
                         .updateStakingLiquidity(
@@ -891,7 +869,12 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function burn(uint256 tokenId) internal virtual {}
 
-    function _owner(uint256 tokenId) internal view virtual returns (address) {}
+    function _isOwner(uint256 tokenId, address user)
+        internal
+        view
+        virtual
+        returns (bool)
+    {}
 
     function getStakingManager(address poolAddress)
         public

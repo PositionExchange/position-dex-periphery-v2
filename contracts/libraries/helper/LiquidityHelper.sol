@@ -12,7 +12,7 @@ library LiquidityHelper {
         uint128 sqrtCurrentPrice,
         uint128 sqrtPriceMin,
         uint256 sqrtBasicPoint
-    ) internal view returns (uint128) {
+    ) internal pure returns (uint128) {
         return
             uint128(
                 (uint256(baseReal) *
@@ -26,7 +26,7 @@ library LiquidityHelper {
         uint128 quoteReal,
         uint128 sqrtCurrentPrice,
         uint128 sqrtPriceMax
-    ) internal returns (uint128) {
+    ) internal pure returns (uint128) {
         return
             uint128(
                 (uint256(quoteReal) *

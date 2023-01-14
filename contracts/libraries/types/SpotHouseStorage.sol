@@ -41,8 +41,6 @@ contract SpotHouseStorage {
         uint256 sizeOut;
     }
 
-    address public positionRouter;
-
     IWithdrawBNB public withdrawBNB;
 
     /**
@@ -51,6 +49,4 @@ contract SpotHouseStorage {
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
     uint256[49] private __gap;
-
-    mapping(address => uint256) public trackingId;
 }

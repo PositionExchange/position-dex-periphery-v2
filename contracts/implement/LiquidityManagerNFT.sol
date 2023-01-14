@@ -4,14 +4,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/governance/utils/VotesUpgradeable.sol";
+import "../interfaces/ILiquidityManagerNFT.sol";
 
 /// @title Manage the Liquidity NFT
 /// @notice This NFT is voteable
 abstract contract LiquidityManagerNFT is
+    ILiquidityManagerNFT,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable
 {
-    uint256 public tokenID;
+    uint256 public override tokenID;
 
     function supportsInterface(bytes4 interfaceId)
         public

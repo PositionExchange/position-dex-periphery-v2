@@ -192,6 +192,7 @@ export async function deployAndCreateRouterHelper(
     // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
+    console.log("quote: ", quote.address);
     await matching.approveForTest(spotHouse.address, dexNFT.address);
     await dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {
@@ -320,9 +321,14 @@ export class TestLiquidity {
         console.groupEnd();
     }
 
-    async openLimitOrder(pip: number, side: number, size: number,idSender : number, opts?: CallOptions) {
+    async openLimitOrder(pip: number, side: number, size: number, idSender : number, asset  = 'base',  opts?: CallOptions) {
         console.group(`OpenLimitOrder`);
-        await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
+        if ( asset === 'base'){
+            await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
+        }else {
+            console.log("this.users[idSender]: ",this.users[idSender].address);
+            await  this.mockSpotHouse.connect(this.users[idSender]).openBuyLimitOrderWithQuote(this.mockMatching.address, side, toWei(size), pip);
+        }
         const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
         console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
         const currentPrice = await this.getCurrentPrice();
@@ -455,8 +461,16 @@ export class TestLiquidity {
     async setPrice(price: number | string) {
     }
 
+    async  expectPrice (price : number | string) {
 
-    async  expectPending(orderId : number, price : number, side : any, _size : number){
+        const currentPrice = (await this.mockMatching.getCurrentPip()).toString()
+
+        expect(currentPrice).to.be.equal(price.toString())
+    }
+
+
+
+    async  expectPending(orderId : number, price : number, side : any, _size : number, id : number){
 
         console.log("price: ", price);
 
@@ -467,12 +481,20 @@ export class TestLiquidity {
         console.log("isFilled, isBuy, size, partialFilled: ", isFilled.toString(), isBuy.toString(), size.toString(), partialFilled.toString());
 
         console.log("size: ", size,fromWeiAndFormat(size), _size );
-
-        // expect( this.expectDataInRange(fromWeiAndFormat(size), Number(_size), 0.001))
-        //     .to
-        //     .eq(true, `pending base is not correct, expect ${fromWei(size)} in range of to ${_size}`);
-
         await expect( side == SIDE.BUY).to.eq(isBuy);
+
+
+        if (id !== undefined){
+            const orderIdOfTrader = await this.mockSpotHouse.getOrderIdOfTrader(this.mockMatching.address, this.users[id].address,price, orderId )
+
+            const listPendingOrder = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[id].address);
+
+            const order = listPendingOrder[orderIdOfTrader.toString()]
+
+            console.log("order: ", order);
+        }
+
+
 
     }
 
