@@ -14,7 +14,7 @@ interface IPositionReferral {
      * @dev Record referral commission.
      */
     function recordReferralCommission(address referrer, uint256 commission)
-    external;
+        external;
 
     /**
      * @dev Get the referrer address that referred the user.

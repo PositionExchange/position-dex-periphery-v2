@@ -26,6 +26,7 @@
   "homepage": "https://github.com/PositionExchange/position-evm-dex-v2#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.1",

@@ -17,8 +17,6 @@ import "../libraries/helper/U128Math.sol";
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/PositionStakingDexManagerStorage.sol";
 
-
-
 interface IPositionStakingDexManager {}
 
 contract PositionStakingDexManager is
@@ -29,7 +27,6 @@ contract PositionStakingDexManager is
 {
     using SafeMath for uint256;
     using U128Math for uint128;
-
 
     event Deposit(address indexed user, address indexed pid, uint256 amount);
     event Withdraw(address indexed user, address indexed pid, uint256 amount);
@@ -218,6 +215,39 @@ contract PositionStakingDexManager is
         poolInfo[_pid].harvestInterval = _harvestInterval;
     }
 
+    // Update dev address by the previous dev.
+    function setDevAddress(address _devAddress) public onlyOwner {
+        require(_msgSender() == devAddress, "setDevAddress: FORBIDDEN");
+        require(_devAddress != address(0), "setDevAddress: ZERO");
+        devAddress = _devAddress;
+    }
+
+    function setFeeAddress(address _feeAddress) public onlyOwner {
+        require(_msgSender() == feeAddress, "setFeeAddress: FORBIDDEN");
+        require(_feeAddress != address(0), "setFeeAddress: ZERO");
+        feeAddress = _feeAddress;
+    }
+
+    // Update the position referral contract address by the owner
+    function setPositionReferral(IPositionReferral _positionReferral)
+        public
+        onlyOwner
+    {
+        positionReferral = _positionReferral;
+    }
+
+    // Update referral commission rate by the owner
+    function setReferralCommissionRate(uint16 _referralCommissionRate)
+        public
+        onlyOwner
+    {
+        require(
+            _referralCommissionRate <= MAXIMUM_REFERRAL_COMMISSION_RATE,
+            "setReferralCommissionRate: invalid referral commission rate basis points"
+        );
+        referralCommissionRate = _referralCommissionRate;
+    }
+
     // Return reward multiplier over the given _from to _to block.
     function getMultiplier(uint256 _from, uint256 _to)
         public
@@ -307,32 +337,31 @@ contract PositionStakingDexManager is
 
     // Deposit LP tokens to PosiStakingManager for Position allocation.
     function stake(uint256 _nftId) public nonReentrant {
-        _stake(_nftId, address(0));
+        _stake(_nftId, address(0), _msgSender());
     }
 
     function stakeWithReferral(uint256 _nftId, address _referrer)
         public
         nonReentrant
     {
-        _stake(_nftId, _referrer);
+        _stake(_nftId, _referrer, _msgSender());
     }
 
     // Withdraw LP tokens from PosiStakingManager.
     function unstake(uint256 _nftId) public nonReentrant {
-        _unstake(_nftId);
+        _unstake(_nftId, _msgSender());
     }
 
-
     function withdraw(address pid) public nonReentrant {
-        _withdraw(pid);
+        _withdraw(pid, _msgSender());
     }
 
     function harvest(address pid) public nonReentrant {
-        _harvest(pid);
+        _harvest(pid, _msgSender());
     }
 
     function exit(address pid) external nonReentrant {
-        _withdraw(pid);
+        _withdraw(pid, _msgSender());
     }
 
     // Withdraw without caring about rewards. EMERGENCY ONLY.
@@ -353,23 +382,18 @@ contract PositionStakingDexManager is
         }
     }
 
-
-    function _stake(uint256 _nftId, address _referrer) internal {
+    function _stake(
+        uint256 _nftId,
+        address _referrer,
+        address userAddress
+    ) internal {
         UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
         address poolAddress = address(nftData.pool);
-        address userAddress = _msgSender();
         require(
             poolInfo[poolAddress].poolId != address(0x00),
             "pool not created"
         );
         require(poolAddress != address(0x0), "invalid liquidity pool");
-        uint256[] storage nftIds = userNft[userAddress][poolAddress];
-        if (nftIds.length == 0) {
-            nftIds.push(0);
-            nftOwnedIndex[0][poolAddress] = 0;
-        }
-        nftIds.push(_nftId);
-        nftOwnedIndex[_nftId][poolAddress] = nftIds.length - 1;
 
         PoolInfo storage pool = poolInfo[poolAddress];
         UserInfo storage user = userInfo[poolAddress][userAddress];
@@ -382,37 +406,42 @@ contract PositionStakingDexManager is
         ) {
             positionReferral.recordReferral(userAddress, _referrer);
         }
-        payOrLockupPendingPosition(poolAddress);
+        _payOrLockupPendingPosition(poolAddress, _msgSender());
         _transferNFTIn(_nftId);
         uint128 power = _calculatePower(
             nftData.indexedPipRange,
             uint32(nftData.pool.currentIndexedPipRange()),
             nftData.liquidity
         );
+
         user.amount = user.amount.add(power);
         user.rewardDebt = uint128(
             user.amount.mul(pool.accPositionPerShare).div(1e12)
         );
         pool.totalStaked += power;
+
+        uint256[] storage nftIds = userNft[userAddress][poolAddress];
+        if (nftIds.length == 0) {
+            nftIds.push(0);
+            nftOwnedIndex[0][poolAddress] = 0;
+        }
+        nftIds.push(_nftId);
+        nftOwnedIndex[_nftId][poolAddress] = nftIds.length - 1;
         emit Deposit(userAddress, poolAddress, _nftId);
     }
 
-
-
-    function _unstake(uint256 _nftId) internal {
+    function _unstake(uint256 _nftId, address _userAddress) internal {
         UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
         address poolAddress = address(nftData.pool);
 
         PoolInfo storage pool = poolInfo[poolAddress];
-        UserInfo storage user = userInfo[poolAddress][_msgSender()];
+        UserInfo storage user = userInfo[poolAddress][_userAddress];
 
-        removeNftFromUser(_nftId, poolAddress);
-
-        require(user.amount >= nftData.liquidity, "withdraw: not good");
+        //        require(user.amount >= nftData.liquidity, "withdraw: not good");
 
         updatePool(poolAddress);
 
-        payOrLockupPendingPosition(poolAddress);
+        _payOrLockupPendingPosition(poolAddress, _userAddress);
 
         uint128 power = _calculatePower(
             nftData.indexedPipRange,
@@ -426,34 +455,101 @@ contract PositionStakingDexManager is
             user.amount.mul(pool.accPositionPerShare).div(1e12)
         );
         pool.totalStaked -= power;
+        _removeNftFromUser(_nftId, poolAddress, _userAddress);
 
-        emit Withdraw(_msgSender(), poolAddress, _nftId);
+        emit Withdraw(_userAddress, poolAddress, _nftId);
     }
 
+    function _withdraw(address pid, address _userAddress) internal {
+        uint256[] memory nfts = userNft[_userAddress][pid];
 
-    function _withdraw(address pid) internal {
-        uint256[] memory nfts = userNft[_msgSender()][pid];
         for (uint8 index = 1; index < nfts.length; index++) {
             if (nfts[index] > 0) {
-                _unstake(nfts[index]);
+                _unstake(nfts[index], _userAddress);
             }
         }
     }
 
-
-
-    function _harvest(address pid) internal {
-//        PoolInfo storage pool = poolInfo[pid];
-        UserInfo storage user = userInfo[pid][_msgSender()];
+    function _harvest(address pid, address _userAddress) internal {
+        UserInfo storage user = userInfo[pid][_userAddress];
         require(user.amount > 0, "No nft staked");
         updatePool(pid);
-        payOrLockupPendingPosition(pid);
+        _payOrLockupPendingPosition(pid, _userAddress);
         user.rewardDebt = uint128(
             user.amount.mul(poolInfo[pid].accPositionPerShare).div(1e12)
         );
     }
 
+    // Pay or lockup pending Positions.
+    function _payOrLockupPendingPosition(address _pid, address _user) internal {
+        PoolInfo memory pool = poolInfo[_pid];
+        UserInfo storage user = userInfo[_pid][_user];
 
+        if (user.nextHarvestUntil == 0) {
+            user.nextHarvestUntil =
+                uint128(block.timestamp) +
+                pool.harvestInterval;
+        }
+
+        uint256 pending = user
+            .amount
+            .mul(pool.accPositionPerShare)
+            .div(1e12)
+            .sub(user.rewardDebt);
+        if (canHarvest(_pid, _user)) {
+            if (pending > 0 || user.rewardLockedUp > 0) {
+                uint256 totalRewards = pending.add(user.rewardLockedUp);
+
+                // reset lockup
+                totalLockedUpRewards = totalLockedUpRewards.sub(
+                    user.rewardLockedUp
+                );
+                user.rewardLockedUp = 0;
+                user.nextHarvestUntil =
+                    uint128(block.timestamp) +
+                    pool.harvestInterval;
+
+                // send rewards
+                _safePositionTransfer(_user, totalRewards);
+                _payReferralCommission(_user, totalRewards);
+            }
+        } else if (pending > 0) {
+            user.rewardLockedUp = uint128(
+                user.rewardLockedUp.add(uint128(pending))
+            );
+            totalLockedUpRewards = totalLockedUpRewards.add(pending);
+            emit RewardLockedUp(_user, _pid, pending);
+        }
+        _updatePower(_user, _pid);
+    }
+
+    function _removeNftFromUser(uint256 _nftId, address _pid, address _userAddress) internal {
+        uint256[] memory _nftIds = userNft[_userAddress][_pid];
+        uint256 nftIndex = nftOwnedIndex[_nftId][_pid];
+        require(_nftIds[nftIndex] == _nftId, "not gegoId owner");
+        uint256 _nftArrLength = _nftIds.length - 1;
+        uint256 tailId = _nftIds[_nftArrLength];
+        userNft[_userAddress][_pid][nftIndex] = tailId;
+        userNft[_userAddress][_pid][_nftArrLength] = 0;
+        userNft[_userAddress][_pid].pop();
+        nftOwnedIndex[tailId][_pid] = nftIndex;
+        nftOwnedIndex[_nftId][_pid] = 0;
+    }
+
+    // Safe position transfer function, just in case if rounding error causes pool to not have enough Positions.
+    function _safePositionTransfer(address _to, uint256 _amount) internal {
+        uint256 positionBal = position.balanceOf(address(this));
+        if (_amount > positionBal) {
+            _amount = positionBal;
+        }
+        if (_isWhitelistVesting(_msgSender())) {
+            position.transfer(_to, _amount);
+        } else {
+            // receive 5%
+            position.transfer(_to, (_amount * 5) / 100);
+            _addSchedules(_to, _amount);
+        }
+    }
 
     function isOwnerWhenStaking(address user, uint256 nftId)
         external
@@ -479,120 +575,13 @@ contract PositionStakingDexManager is
             _msgSender() == address(positionNondisperseLiquidity),
             "only concentrated liquidity"
         );
-        PoolInfo storage pool = poolInfo[poolId];
-        UserInfo storage user = userInfo[poolId][user];
-
         updatePool(poolId);
 
-        payOrLockupPendingPosition(poolId);
+        _payOrLockupPendingPosition(poolId, user);
 
         if (positionNondisperseLiquidity.ownerOf(tokenId) == address(this)) {}
 
         return _msgSender();
-    }
-
-    // Pay or lockup pending Positions.
-    function payOrLockupPendingPosition(address _pid) internal {
-        PoolInfo memory pool = poolInfo[_pid];
-        UserInfo storage user = userInfo[_pid][_msgSender()];
-
-        if (user.nextHarvestUntil == 0) {
-            user.nextHarvestUntil =
-                uint128(block.timestamp) +
-                pool.harvestInterval;
-        }
-
-        uint256 pending = user
-            .amount
-            .mul(pool.accPositionPerShare)
-            .div(1e12)
-            .sub(user.rewardDebt);
-        if (canHarvest(_pid, _msgSender())) {
-            if (pending > 0 || user.rewardLockedUp > 0) {
-                uint256 totalRewards = pending.add(user.rewardLockedUp);
-
-                // reset lockup
-                totalLockedUpRewards = totalLockedUpRewards.sub(
-                    user.rewardLockedUp
-                );
-                user.rewardLockedUp = 0;
-                user.nextHarvestUntil =
-                    uint128(block.timestamp) +
-                    pool.harvestInterval;
-
-                // send rewards
-                safePositionTransfer(_msgSender(), totalRewards);
-                _payReferralCommission(_msgSender(), totalRewards);
-            }
-        } else if (pending > 0) {
-            user.rewardLockedUp = uint128(
-                user.rewardLockedUp.add(uint128(pending))
-            );
-            totalLockedUpRewards = totalLockedUpRewards.add(pending);
-            emit RewardLockedUp(_msgSender(), _pid, pending);
-        }
-        _updatePower(_msgSender(), _pid);
-    }
-
-    function removeNftFromUser(uint256 _nftId, address _pid) internal {
-        uint256[] memory _nftIds = userNft[_msgSender()][_pid];
-        uint256 nftIndex = nftOwnedIndex[_nftId][_pid];
-        require(_nftIds[nftIndex] == _nftId, "not gegoId owner");
-        uint256 _nftArrLength = _nftIds.length - 1;
-        uint256 tailId = _nftIds[_nftArrLength];
-        userNft[_msgSender()][_pid][nftIndex] = tailId;
-        userNft[_msgSender()][_pid][_nftArrLength] = 0;
-        userNft[_msgSender()][_pid].pop();
-        nftOwnedIndex[tailId][_pid] = nftIndex;
-        nftOwnedIndex[_nftId][_pid] = 0;
-    }
-
-    // Safe position transfer function, just in case if rounding error causes pool to not have enough Positions.
-    function safePositionTransfer(address _to, uint256 _amount) internal {
-        uint256 positionBal = position.balanceOf(address(this));
-        if (_amount > positionBal) {
-            _amount = positionBal;
-        }
-        if (_isWhitelistVesting(_msgSender())) {
-            position.transfer(_to, _amount);
-        } else {
-            // receive 5%
-            position.transfer(_to, (_amount * 5) / 100);
-            _addSchedules(_to, _amount);
-        }
-    }
-
-    // Update dev address by the previous dev.
-    function setDevAddress(address _devAddress) public {
-        require(_msgSender() == devAddress, "setDevAddress: FORBIDDEN");
-        require(_devAddress != address(0), "setDevAddress: ZERO");
-        devAddress = _devAddress;
-    }
-
-    function setFeeAddress(address _feeAddress) public {
-        require(_msgSender() == feeAddress, "setFeeAddress: FORBIDDEN");
-        require(_feeAddress != address(0), "setFeeAddress: ZERO");
-        feeAddress = _feeAddress;
-    }
-
-    // Update the position referral contract address by the owner
-    function setPositionReferral(IPositionReferral _positionReferral)
-        public
-        onlyOwner
-    {
-        positionReferral = _positionReferral;
-    }
-
-    // Update referral commission rate by the owner
-    function setReferralCommissionRate(uint16 _referralCommissionRate)
-        public
-        onlyOwner
-    {
-        require(
-            _referralCommissionRate <= MAXIMUM_REFERRAL_COMMISSION_RATE,
-            "setReferralCommissionRate: invalid referral commission rate basis points"
-        );
-        referralCommissionRate = _referralCommissionRate;
     }
 
     // Pay referral commission to the referrer who referred this user.
@@ -678,11 +667,13 @@ contract PositionStakingDexManager is
         returns (uint128 totalPower)
     {
         uint256[] memory _userNfts = userNft[user][pid];
+
         UserLiquidity.Data memory nftData;
         uint32 currentIndexedPipRange = uint32(
-            nftData.pool.currentIndexedPipRange()
+            IMatchingEngineAMM(pid).currentIndexedPipRange()
         );
         poolInfo[pid].totalStaked -= userInfo[pid][_msgSender()].amount;
+
         for (uint256 i = 0; i < _userNfts.length; i++) {
             nftData = _getLiquidityManager(_userNfts[i]);
             totalPower += _calculatePower(
@@ -694,5 +685,4 @@ contract PositionStakingDexManager is
         userInfo[pid][_msgSender()].amount = totalPower;
         poolInfo[pid].totalStaked += totalPower;
     }
-
 }

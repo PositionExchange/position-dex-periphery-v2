@@ -84,6 +84,12 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         WBNB = _WBNB;
     }
 
+    function updateUniswapV2Factory(IUniswapV2Factory _uniswapV2Factory)
+        public
+    {
+        uniswapV2Factory = _uniswapV2Factory;
+    }
+
     function isToken0Base(IUniswapV2Pair pair) public view returns (bool) {
         (
             address baseToken,

@@ -8,12 +8,9 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 import "../../interfaces/IPositionNondisperseLiquidity.sol";
 import "../../interfaces/IPosiTreasury.sol";
 
-
 import "../../interfaces/IPositionReferral.sol";
 
 abstract contract PositionStakingDexManagerStorage {
-
-
     // Info of each user.
     struct UserInfo {
         uint128 amount; // How many LP tokens the user has provided.
@@ -91,6 +88,4 @@ abstract contract PositionStakingDexManagerStorage {
     mapping(address => mapping(address => uint256[])) public userNft;
     // nftid => poolId => its index in userNft
     mapping(uint256 => mapping(address => uint256)) public nftOwnedIndex;
-
-
 }
