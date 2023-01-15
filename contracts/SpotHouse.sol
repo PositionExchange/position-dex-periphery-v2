@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
@@ -37,6 +38,11 @@ contract SpotHouse is
         __Ownable_init();
         __Pausable_init();
         _initStrategyFee(20);
+        operator = msg.sender;
+    }
+    modifier onlyOperator(){
+        Require._require(_msgSender()== operator, DexErrors.DEX_ONLY_OPERATOR);
+        _;
     }
 
     function openLimitOrder(
@@ -103,10 +109,6 @@ contract SpotHouse is
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) external onlyOwner {
-        withdrawBNB = _withdrawBNB;
-    }
-
     function pause() external onlyOwner {
         _pause();
     }
@@ -115,21 +117,31 @@ contract SpotHouse is
         _unpause();
     }
 
-    function setFactory(address _factoryAddress) external override onlyOwner {
+    function setOperator(address _operator) external onlyOwner {
+        operator = _operator;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // ONLY OPERATOR FUNCTIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    function setFactory(address _factoryAddress) external override onlyOperator {
         require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         spotFactory = ISpotFactory(_factoryAddress);
     }
 
-    function setWBNB(address _wbnb) external onlyOwner {
+    function setWBNB(address _wbnb) external onlyOperator {
         WBNB = _wbnb;
+    }
+
+    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) external onlyOperator {
+        withdrawBNB = _withdrawBNB;
     }
 
     function claimFee(
         IMatchingEngineAMM pairManager,
-        uint256 feeBase,
-        uint256 feeQuote,
         address recipient
-    ) external onlyOwner {
+    ) external onlyOperator {
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             pairManager
         );
@@ -165,7 +177,7 @@ contract SpotHouse is
     function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
         public
         override(StrategyFee)
-        onlyOwner
+        onlyOperator
     {
         super.updateDiscountStrategy(newStrategyDiscount);
     }
@@ -173,7 +185,7 @@ contract SpotHouse is
     function setFee(uint16 _defaultFeePercentage)
         public
         override(StrategyFee)
-        onlyOwner
+        onlyOperator
     {
         super.setFee(_defaultFeePercentage);
     }

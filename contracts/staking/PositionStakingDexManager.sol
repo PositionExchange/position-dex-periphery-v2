@@ -387,7 +387,7 @@ contract PositionStakingDexManager is
         address _referrer,
         address userAddress
     ) internal {
-        UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityData(_nftId);
         address poolAddress = address(nftData.pool);
         require(
             poolInfo[poolAddress].poolId != address(0x00),
@@ -431,7 +431,7 @@ contract PositionStakingDexManager is
     }
 
     function _unstake(uint256 _nftId, address _userAddress) internal {
-        UserLiquidity.Data memory nftData = _getLiquidityManager(_nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityData(_nftId);
         address poolAddress = address(nftData.pool);
 
         PoolInfo storage pool = poolInfo[poolAddress];
@@ -556,7 +556,7 @@ contract PositionStakingDexManager is
         view
         returns (bool, address)
     {
-        UserLiquidity.Data memory nftData = _getLiquidityManager(nftId);
+        UserLiquidity.Data memory nftData = _getLiquidityData(nftId);
         uint256 indexNftId = nftOwnedIndex[nftId][address(nftData.pool)];
         return (
             userNft[user][address(nftData.pool)][indexNftId] == nftId,
@@ -629,7 +629,7 @@ contract PositionStakingDexManager is
         position.transfer(_to, _amount);
     }
 
-    function _getLiquidityManager(uint256 tokenId)
+    function _getLiquidityData(uint256 tokenId)
         internal
         view
         returns (UserLiquidity.Data memory data)
@@ -672,7 +672,7 @@ contract PositionStakingDexManager is
         poolInfo[pid].totalStaked -= userInfo[pid][_msgSender()].amount;
 
         for (uint256 i = 0; i < _userNfts.length; i++) {
-            nftData = _getLiquidityManager(_userNfts[i]);
+            nftData = _getLiquidityData(_userNfts[i]);
             totalPower += _calculatePower(
                 nftData.indexedPipRange,
                 currentIndexedPipRange,
