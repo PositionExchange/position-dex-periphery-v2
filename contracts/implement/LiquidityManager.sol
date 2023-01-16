@@ -894,7 +894,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 stakingManager
             ).isOwnerWhenStaking(user, nftId);
 
-//            Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
+            //            Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
             return isOwner;
         } else {
             //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);

@@ -183,7 +183,6 @@ contract PositionNondisperseLiquidity is
         return withdrawBNB;
     }
 
-
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -196,7 +195,6 @@ contract PositionNondisperseLiquidity is
         counterParties[_account] = false;
     }
 
-
     function setWithdrawBNB(IWithdrawBNB _withdrawBNB) public onlyOwner {
         withdrawBNB = _withdrawBNB;
     }
@@ -208,7 +206,6 @@ contract PositionNondisperseLiquidity is
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
-
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
