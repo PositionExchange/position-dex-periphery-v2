@@ -20,7 +20,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     using Convert for uint256;
 
     /**
-     * @dev see {ISpotHouse-openLimitOrder}
+     * @dev see {ISpotDex-openLimitOrder}
      */
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
@@ -32,6 +32,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         _openLimitOrder(pairManager, quantity, pip, trader, side);
     }
 
+    /**
+     * @dev see {ISpotDex-openBuyLimitOrderWithQuote}
+     */
     function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         Side side,
@@ -47,6 +50,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         );
     }
 
+    /**
+     * @dev see {ISpotDex-openMarketOrder}
+     */
     function openMarketOrder(
         IMatchingEngineAMM pairManager,
         Side side,
@@ -55,6 +61,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         _openMarketOrder(pairManager, side, quantity, _msgSender());
     }
 
+    /**
+     * @dev see {ISpotDex-openMarketOrderWithQuote}
+     */
     function openMarketOrderWithQuote(
         IMatchingEngineAMM pairManager,
         Side side,
@@ -63,6 +72,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         _openMarketOrderWithQuote(pairManager, side, quoteAmount, _msgSender());
     }
 
+    /**
+     * @dev see {ISpotDex-cancelAllLimitOrder}
+     */
     function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
         public
         virtual
@@ -152,6 +164,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         );
     }
 
+    /**
+     * @dev see {ISpotDex-cancelLimitOrder}
+     */
     function cancelLimitOrder(
         IMatchingEngineAMM pairManager,
         uint64 orderIdx,
@@ -221,6 +236,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         );
     }
 
+    /**
+     * @dev see {ISpotDex-claimAsset}
+     */
     function claimAsset(IMatchingEngineAMM pairManager) public virtual {
         address _trader = _msgSender();
 
@@ -241,10 +259,10 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         emit AssetClaimed(_trader, pairManager, quoteAmount, baseAmount);
     }
 
-    function getAmountClaimable(
-        IMatchingEngineAMM _pairManager,
-        address _trader
-    )
+    /**
+     * @dev see {ISpotDex-getAmountClaimable}
+     */
+    function getAmountClaimable(IMatchingEngineAMM pairManager, address trader)
         public
         view
         virtual
@@ -254,13 +272,13 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             uint256 basisPoint
         )
     {
-        address _pairManagerAddress = address(_pairManager);
+        address _pairManagerAddress = address(pairManager);
 
         SpotLimitOrder.Data[] memory listLimitOrder = limitOrders[
             _pairManagerAddress
-        ][_trader];
+        ][trader];
         uint256 i = 0;
-        basisPoint = _basisPoint(_pairManager);
+        basisPoint = _basisPoint(pairManager);
         uint128 _feeBasis = FixedPoint128.BASIC_POINT_FEE;
         IMatchingEngineAMM.ExchangedData memory exData = IMatchingEngineAMM
             .ExchangedData({
@@ -272,7 +290,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         for (i; i < listLimitOrder.length; i++) {
             if (listLimitOrder[i].pip == 0 && listLimitOrder[i].orderId == 0)
                 continue;
-            exData = _pairManager.accumulateClaimableAmount(
+            exData = pairManager.accumulateClaimableAmount(
                 listLimitOrder[i].pip,
                 listLimitOrder[i].orderId,
                 exData,
@@ -284,14 +302,17 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         return (exData.quoteAmount, exData.baseAmount, basisPoint);
     }
 
+    /**
+     * @dev see {ISpotDex-getPendingLimitOrders}
+     */
     function getPendingLimitOrders(
-        IMatchingEngineAMM _pairManager,
-        address _trader
+        IMatchingEngineAMM pairManager,
+        address trader
     ) public view virtual returns (PendingLimitOrder[] memory) {
-        address _pairManagerAddress = address(_pairManager);
+        address _pairManagerAddress = address(pairManager);
         SpotLimitOrder.Data[] storage listLimitOrder = limitOrders[
             _pairManagerAddress
-        ][_trader];
+        ][trader];
         PendingLimitOrder[]
             memory listPendingOrderData = new PendingLimitOrder[](
                 listLimitOrder.length
@@ -303,7 +324,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 bool isBuy,
                 uint256 quantity,
                 uint256 partialFilled
-            ) = _pairManager.getPendingOrderDetail(
+            ) = pairManager.getPendingOrderDetail(
                     listLimitOrder[i].pip,
                     listLimitOrder[i].orderId
                 );
@@ -330,11 +351,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         return blankListPendingOrderData;
     }
 
-    struct BatchPendingLimitOrder {
-        address instance;
-        PendingLimitOrder[] pendingOrders;
-    }
-
+    /**
+     * @dev see {ISpotDex-getBatchPendingLimitOrdersByTrader}
+     */
     function getBatchPendingLimitOrdersByTrader(
         IMatchingEngineAMM pairManager,
         address[] memory traders
@@ -349,6 +368,9 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         }
     }
 
+    /**
+     * @dev see {ISpotDex-getBatchPendingLimitOrdersByPair}
+     */
     function getBatchPendingLimitOrdersByPair(
         IMatchingEngineAMM[] memory pairManagers,
         address trader
@@ -363,20 +385,21 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         }
     }
 
+    /**
+     * @dev see {ISpotDex-getOrderIdOfTrader}
+     */
     function getOrderIdOfTrader(
-        address _pairManager,
-        address _trader,
-        uint128 _pip,
-        uint64 _orderId
+        address pairManager,
+        address trader,
+        uint128 pip,
+        uint64 orderId
     ) public view returns (int256) {
-        SpotLimitOrder.Data[] memory limitOrder = limitOrders[_pairManager][
-            _trader
+        SpotLimitOrder.Data[] memory limitOrder = limitOrders[pairManager][
+            trader
         ];
 
         for (uint256 i = 0; i < limitOrder.length; i++) {
-            if (
-                limitOrder[i].pip == _pip && limitOrder[i].orderId == _orderId
-            ) {
+            if (limitOrder[i].pip == pip && limitOrder[i].orderId == orderId) {
                 return int256(i);
             }
         }
