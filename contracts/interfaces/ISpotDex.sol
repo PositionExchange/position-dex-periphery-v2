@@ -12,8 +12,6 @@ interface ISpotDex {
     // EVENTS
     //------------------------------------------------------------------------------------------------------------------
 
-    event SpotHouseInitialized(address owner);
-
     event MarketOrderOpened(
         address trader,
         uint256 quantity,
@@ -59,6 +57,11 @@ interface ISpotDex {
     // FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    /// @notice open limit order
+    /// @param pairManager the pair want to open limit order
+    /// @param side of order, 0 is buy, 1 is sell
+    /// @param quantity the amount of base open order
+    /// @param pip of limit order
     function openLimitOrder(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
@@ -66,6 +69,11 @@ interface ISpotDex {
         uint128 pip
     ) external payable;
 
+    /// @notice open limit order with input is quote asset
+    /// @param pairManager the pair want to open limit order
+    /// @param side of order, 0 is buy, 1 is sell
+    /// @param quoteAmount the amount of quote open order
+    /// @param pip of limit order
     function openBuyLimitOrderWithQuote(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
@@ -73,30 +81,51 @@ interface ISpotDex {
         uint128 pip
     ) external payable;
 
+    /// @notice open market order with base asset
+    /// @param pairManager the pair want to open limit order
+    /// @param side of order, 0 is buy, 1 is sell
+    /// @param quantity the amount of base open order
     function openMarketOrder(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
         uint256 quantity
     ) external payable;
 
+    /// @notice open market order with quote asset
+    /// @param pairManager the pair want to open limit order
+    /// @param side of order, 0 is buy, 1 is sell
+    /// @param quoteAmount the amount of quote open order
     function openMarketOrderWithQuote(
         IMatchingEngineAMM pairManager,
         SpotHouseStorage.Side side,
         uint256 quoteAmount
     ) external payable;
 
+    /// @notice cancel limit order is pending
+    /// @param pairManager the pair want cancel order
+    /// @param orderIdx the id of list orders are pending
+    /// @param pip the pip of order
     function cancelLimitOrder(
-        IMatchingEngineAMM _spotManager,
-        uint64 _orderIdx,
-        uint128 _pip
+        IMatchingEngineAMM pairManager,
+        uint64 orderIdx,
+        uint128 pip
     ) external;
 
-    function claimAsset(IMatchingEngineAMM spotManager) external;
+    /// @notice cancel all limit order is pending of one pair
+    /// @param pairManager the pair want cancel all order
+    function cancelAllLimitOrder(IMatchingEngineAMM pairManager) external;
 
-    function getAmountClaimable(
-        IMatchingEngineAMM _spotManager,
-        address _trader
-    )
+    /// @notice claim asset base and quote after the order filled or partial filled
+    /// @param pairManager the pair want to claim asset
+    function claimAsset(IMatchingEngineAMM pairManager) external;
+
+    /// @notice get amount of assets can claim of trader and pair
+    /// @param pairManager the pair want to get amount
+    /// @param trader check
+    /// @return quoteAsset amount of quote can claim
+    /// @return baseAsset amount of base can claim
+    /// @return basisPoint of pair
+    function getAmountClaimable(IMatchingEngineAMM pairManager, address trader)
         external
         view
         returns (
@@ -105,12 +134,54 @@ interface ISpotDex {
             uint256 basisPoint
         );
 
-    function cancelAllLimitOrder(IMatchingEngineAMM spotManager) external;
-
+    /// @notice get all pending limit order of trader and pair
+    /// @param pairManager the pair want to get pending limit
+    /// @param trader check
+    /// @return the array of list pending order
     function getPendingLimitOrders(
-        IMatchingEngineAMM _spotManager,
-        address _trader
+        IMatchingEngineAMM pairManager,
+        address trader
     ) external view returns (SpotHouseStorage.PendingLimitOrder[] memory);
 
-    function setFactory(address _factoryAddress) external;
+    struct BatchPendingLimitOrder {
+        address instance;
+        SpotHouseStorage.PendingLimitOrder[] pendingOrders;
+    }
+
+    /// @notice get batch pending order of multi traders in 1 pair
+    /// @param pairManager the pair want to get batch pending
+    /// @param traders array of traders
+    /// @return batchPendingOrders the array of list pending order
+    function getBatchPendingLimitOrdersByTrader(
+        IMatchingEngineAMM pairManager,
+        address[] memory traders
+    )
+        external
+        view
+        returns (BatchPendingLimitOrder[] memory batchPendingOrders);
+
+    /// @notice get batch pending order of multi pairs by 1 trade
+    /// @param pairManagers the array of pairs want to get batch pending
+    /// @param trader array of traders
+    /// @return batchPendingOrders the array of list pending order
+    function getBatchPendingLimitOrdersByPair(
+        IMatchingEngineAMM[] memory pairManagers,
+        address trader
+    )
+        external
+        view
+        returns (BatchPendingLimitOrder[] memory batchPendingOrders);
+
+    /// @notice get order id of trader in list pending order
+    /// @param pairManager the pair of get limit pending
+    /// @param trader the trader
+    /// @param pip the pip want to get id
+    /// @param orderId id of order in quote of pip
+    /// @return the order id of trader in list pending orders
+    function getOrderIdOfTrader(
+        address pairManager,
+        address trader,
+        uint128 pip,
+        uint64 orderId
+    ) external view returns (int256);
 }

@@ -29,6 +29,14 @@ contract PositionSpotFactory is
         __Pausable_init();
     }
 
+    /// @notice create new pair
+    /// @param quoteAsset the address of quote
+    /// @param baseAsset the address of base
+    /// @param basisPoint the number of basis point
+    /// @param maxFindingWordsIndex max finding word index can find
+    /// @param initialPip the start pip
+    /// @param pipRange the pip range of liquidity pool
+    /// @param tickSpace tick space for generate orderbook
     function createPairManager(
         address quoteAsset,
         address baseAsset,
@@ -116,11 +124,9 @@ contract PositionSpotFactory is
         );
     }
 
-    function getStakingManager(address pair) public view returns (address) {
-        address ownerOfPair = ownerPairManager[pair];
-        return stakingManagerOfPair[ownerOfPair][pair];
-    }
-
+    /// @notice set staking manager for pair, only owner of pair can set
+    /// @param pair address of pair
+    /// @param stakingManager address of staking manager
     function setStakingManagerForPair(address pair, address stakingManager)
         public
     {
@@ -129,6 +135,17 @@ contract PositionSpotFactory is
         stakingManagerOfPair[owner][pair] = stakingManager;
     }
 
+    /// @notice get staking address from pair address
+    /// @param pair address of pair
+    function getStakingManager(address pair) public view returns (address) {
+        address ownerOfPair = ownerPairManager[pair];
+        return stakingManagerOfPair[ownerOfPair][pair];
+    }
+
+    /// @notice get pair manager from quote asset and base asset
+    /// @param quoteAsset address of quote
+    /// @param baseAsset address of base
+    /// @return spotManager the address of pair address
     function getPairManager(address quoteAsset, address baseAsset)
         external
         view
@@ -138,6 +155,12 @@ contract PositionSpotFactory is
         return pathPairManagers[baseAsset][quoteAsset];
     }
 
+    /// @notice get pair manager from any two address
+    /// @param tokenA address of quote
+    /// @param tokenB address of base
+    /// @return baseToken the address of base asset
+    /// @return quoteToken the address of quote asset
+    /// @return pairManager the address of pair address
     function getPairManagerSupported(address tokenA, address tokenB)
         public
         view
@@ -156,6 +179,9 @@ contract PositionSpotFactory is
         }
     }
 
+    /// @notice get quote and base address from pair manager
+    /// @param pairManager address of pair address
+    /// @return struct pair with base asset, quote asset and pair manager
     function getQuoteAndBase(address pairManager)
         external
         view
@@ -165,6 +191,9 @@ contract PositionSpotFactory is
         return allPairManager[pairManager];
     }
 
+    /// @notice check pair manager exist in posi dex
+    /// @param pairManager address of pair address
+    /// @return return bool type, true is exist, false is no
     function isPairManagerExist(address pairManager)
         external
         view

@@ -29,6 +29,9 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     //    IPositionStakingDexManager stakingManager;
 
+    /**
+     * @dev see {ILiquidityManager-addLiquidity}
+     */
     function addLiquidity(AddLiquidityParams calldata params)
         public
         payable
@@ -37,6 +40,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         _addLiquidityRecipient(params, _msgSender(), _msgSender());
     }
 
+    /**
+     * @dev see {ILiquidityManager-addLiquidityWithRecipient}
+     */
     function addLiquidityWithRecipient(
         AddLiquidityParams calldata params,
         address recipient
@@ -44,6 +50,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         _addLiquidityRecipient(params, _msgSender(), recipient);
     }
 
+    /**
+     * @dev see {ILiquidityManager-removeLiquidity}
+     */
     function removeLiquidity(uint256 nftTokenId) public virtual {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -70,14 +79,14 @@ abstract contract LiquidityManager is ILiquidityManager {
 
         address user = _msgSender();
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Base,
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Quote,
@@ -95,6 +104,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
     }
 
+    /**
+     * @dev see {ILiquidityManager-increaseLiquidity}
+     */
     function increaseLiquidity(
         uint256 nftTokenId,
         uint128 amountModify,
@@ -107,7 +119,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         ];
         address user = _msgSender();
         amountModify = uint128(
-            depositLiquidity(
+            _depositLiquidity(
                 liquidityData.pool,
                 user,
                 isBase ? Asset.Type.Base : Asset.Type.Quote,
@@ -123,7 +135,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             liquidityData.pool
         );
 
-        uint256 amountModifySecondAsset = depositLiquidity(
+        uint256 amountModifySecondAsset = _depositLiquidity(
             liquidityData.pool,
             user,
             isBase ? Asset.Type.Quote : Asset.Type.Base,
@@ -150,14 +162,14 @@ abstract contract LiquidityManager is ILiquidityManager {
                 liquidityData.indexedPipRange
             );
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Base,
             _collectFeeData.feeBaseAmount
         );
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Quote,
@@ -191,6 +203,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
     }
 
+    /**
+     * @dev see {ILiquidityManager-decreaseLiquidity}
+     */
     function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
         public
         virtual
@@ -228,14 +243,14 @@ abstract contract LiquidityManager is ILiquidityManager {
 
         // current 5
         address user = _msgSender();
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Base,
             baseAmountRemoved + _collectFeeData.feeBaseAmount
         );
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Quote,
@@ -272,6 +287,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint128 quoteReceiveEstimate;
     }
 
+    /**
+     * @dev see {ILiquidityManager-shiftRange}
+     */
     function shiftRange(
         uint256 nftTokenId,
         uint32 targetIndex,
@@ -317,7 +335,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         state.user = _msgSender();
 
         amountNeeded = uint128(
-            depositLiquidity(
+            _depositLiquidity(
                 state.liquidityData.pool,
                 state.user,
                 isBase ? Asset.Type.Base : Asset.Type.Quote,
@@ -362,7 +380,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     quoteAmountRemoved -
                     state.collectFeeData.feeQuoteAmount;
                 if (isBase) {
-                    amountTransferred = depositLiquidity(
+                    amountTransferred = _depositLiquidity(
                         state.liquidityData.pool,
                         state.user,
                         Asset.Type.Quote,
@@ -374,7 +392,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     );
                 }
             } else {
-                withdrawLiquidity(
+                _withdrawLiquidity(
                     state.liquidityData.pool,
                     state.user,
                     Asset.Type.Quote,
@@ -393,7 +411,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     baseAmountRemoved -
                     state.collectFeeData.feeBaseAmount;
                 if (!isBase) {
-                    amountTransferred = depositLiquidity(
+                    amountTransferred = _depositLiquidity(
                         state.liquidityData.pool,
                         state.user,
                         Asset.Type.Base,
@@ -406,7 +424,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                     );
                 }
             } else {
-                withdrawLiquidity(
+                _withdrawLiquidity(
                     state.liquidityData.pool,
                     state.user,
                     Asset.Type.Base,
@@ -449,6 +467,9 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
     }
 
+    /**
+     * @dev see {ILiquidityManager-collectFee}
+     */
     function collectFee(uint256 nftTokenId) public virtual {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
@@ -463,14 +484,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
 
         address user = _msgSender();
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Base,
             _collectFeeData.feeBaseAmount
         );
 
-        withdrawLiquidity(
+        _withdrawLiquidity(
             liquidityData.pool,
             user,
             Asset.Type.Quote,
@@ -482,6 +503,9 @@ abstract contract LiquidityManager is ILiquidityManager {
             .newFeeGrowthQuote;
     }
 
+    /**
+     * @dev see {ILiquidityManager-liquidity}
+     */
     function liquidity(uint256 nftTokenId)
         public
         view
@@ -546,13 +570,26 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
     }
 
-    function getAllDataTokens(uint256[] memory tokens)
+    function getAllDataDetailTokens(uint256[] memory tokens)
         public
         view
-        returns (UserLiquidity.Data[] memory)
+        returns (LiquidityDetail[] memory)
     {
-        UserLiquidity.Data[] memory LiquidityData;
-        return LiquidityData;
+        LiquidityDetail[] memory liquidityData = new LiquidityDetail[](
+            tokens.length
+        );
+        for (uint256 i = 0; i < tokens.length; i++) {
+            (
+                liquidityData[i].baseVirtual,
+                liquidityData[i].quoteVirtual,
+                liquidityData[i].liquidity,
+                liquidityData[i].indexedPipRange,
+                liquidityData[i].feeBasePending,
+                liquidityData[i].feeQuotePending,
+                liquidityData[i].pool
+            ) = liquidity(tokens[i]);
+        }
+        return liquidityData;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -674,7 +711,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.amountVirtual != 0,
             DexErrors.LQ_INVALID_NUMBER
         );
-        uint256 _addedAmountVirtual = depositLiquidity(
+        uint256 _addedAmountVirtual = _depositLiquidity(
             params.pool,
             user,
             params.isBase ? Asset.Type.Base : Asset.Type.Quote,
@@ -689,7 +726,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             params.pool
         );
 
-        uint256 amountModifySecondAsset = depositLiquidity(
+        uint256 amountModifySecondAsset = _depositLiquidity(
             params.pool,
             user,
             params.isBase ? Asset.Type.Quote : Asset.Type.Base,
@@ -792,14 +829,14 @@ abstract contract LiquidityManager is ILiquidityManager {
         returns (uint128)
     {}
 
-    function depositLiquidity(
+    function _depositLiquidity(
         IMatchingEngineAMM _pairManager,
         address _payer,
         Asset.Type _asset,
         uint256 _amount
     ) internal virtual returns (uint256 amount) {}
 
-    function withdrawLiquidity(
+    function _withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset.Type _asset,
@@ -857,7 +894,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 stakingManager
             ).isOwnerWhenStaking(user, nftId);
 
-            //           Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
+            //            Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
             return isOwner;
         } else {
             //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);

@@ -40,8 +40,9 @@ contract SpotHouse is
         _initStrategyFee(20);
         operator = msg.sender;
     }
-    modifier onlyOperator(){
-        Require._require(_msgSender()== operator, DexErrors.DEX_ONLY_OPERATOR);
+
+    modifier onlyOperator() {
+        Require._require(_msgSender() == operator, DexErrors.DEX_ONLY_OPERATOR);
         _;
     }
 
@@ -125,7 +126,7 @@ contract SpotHouse is
     // ONLY OPERATOR FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function setFactory(address _factoryAddress) external override onlyOperator {
+    function setFactory(address _factoryAddress) external onlyOperator {
         require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         spotFactory = ISpotFactory(_factoryAddress);
     }
@@ -138,10 +139,10 @@ contract SpotHouse is
         withdrawBNB = _withdrawBNB;
     }
 
-    function claimFee(
-        IMatchingEngineAMM pairManager,
-        address recipient
-    ) external onlyOperator {
+    function claimFee(IMatchingEngineAMM pairManager, address recipient)
+        external
+        onlyOperator
+    {
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             pairManager
         );

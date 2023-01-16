@@ -126,6 +126,9 @@ contract PositionNondisperseLiquidity is
         super.collectFee(nftTokenId);
     }
 
+    /// @dev mint token nft
+    /// @param user the address user will be receive
+    /// @return tokenId the token id minted
     function mint(address user)
         internal
         override(LiquidityManager)
@@ -136,34 +139,33 @@ contract PositionNondisperseLiquidity is
         tokenID = tokenId;
     }
 
+    /// @dev burn token nft
+    /// @param tokenId id of token want to burn
     function burn(uint256 tokenId) internal override(LiquidityManager) {
         _burnNFT(tokenId);
     }
 
-    function getAllToken(address owner)
-        external
-        view
-        returns (UserLiquidity.Data[] memory, uint256[] memory)
-    {
-        uint256[] memory tokens = tokensOfOwner(owner);
-        return (getAllDataTokens(tokens), tokens);
-    }
-
-    function setCounterParty(address _newCounterParty) external onlyOwner {
-        counterParties[_newCounterParty] = true;
-    }
-
-    function revokeCounterParty(address _account) external onlyOwner {
-        counterParties[_account] = false;
-    }
-
+    /// @dev donate pool with base and quote amount
     function donatePool(
         IMatchingEngineAMM pool,
         uint256 base,
         uint256 quote
     ) external {
-        depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
-        depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
+        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
+        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
+    }
+
+    function getAllTokensDetailOfUser(address user)
+        external
+        view
+        returns (LiquidityDetail[] memory, uint256[] memory)
+    {
+        uint256[] memory tokens = tokensOfOwner(user);
+        return (getAllDataDetailTokens(tokens), tokens);
+    }
+
+    function getWBNB() public view returns (address) {
+        return WBNB;
     }
 
     function getStakingManager(address poolAddress)
@@ -181,17 +183,29 @@ contract PositionNondisperseLiquidity is
         return withdrawBNB;
     }
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) public onlyOwner {
-        withdrawBNB = _withdrawBNB;
+    //------------------------------------------------------------------------------------------------------------------
+    // ONLY OWNER FUNCTIONS
+    //------------------------------------------------------------------------------------------------------------------
+
+    function setCounterParty(address _newCounterParty) external onlyOwner {
+        counterParties[_newCounterParty] = true;
     }
 
-    function getWBNB() public view returns (address) {
-        return WBNB;
+    function revokeCounterParty(address _account) external onlyOwner {
+        counterParties[_account] = false;
+    }
+
+    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) public onlyOwner {
+        withdrawBNB = _withdrawBNB;
     }
 
     function setBNB(address _BNB) public onlyOwner {
         WBNB = _BNB;
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // INTERNAL FUNCTIONS
+    //------------------------------------------------------------------------------------------------------------------
 
     function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
         internal
@@ -203,7 +217,7 @@ contract PositionNondisperseLiquidity is
         require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
     }
 
-    function depositLiquidity(
+    function _depositLiquidity(
         IMatchingEngineAMM _pairManager,
         address _payer,
         Asset.Type _asset,
@@ -252,7 +266,7 @@ contract PositionNondisperseLiquidity is
         return _amount;
     }
 
-    function withdrawLiquidity(
+    function _withdrawLiquidity(
         IMatchingEngineAMM _pairManager,
         address _recipient,
         Asset.Type _asset,

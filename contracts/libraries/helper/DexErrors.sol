@@ -21,7 +21,6 @@ library DexErrors {
     string public constant DEX_MAX_FEE = "DEX_17";
     string public constant DEX_ONLY_OPERATOR = "DEX_18";
 
-
     string public constant LQ_NOT_IMPLEMENT_YET = "LQ_01";
     string public constant LQ_EMPTY_STAKING_MANAGER = "LQ_02";
     string public constant LQ_NO_LIQUIDITY = "LQ_03";

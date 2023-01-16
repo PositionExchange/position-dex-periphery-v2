@@ -523,7 +523,11 @@ contract PositionStakingDexManager is
         _updatePower(_user, _pid);
     }
 
-    function _removeNftFromUser(uint256 _nftId, address _pid, address _userAddress) internal {
+    function _removeNftFromUser(
+        uint256 _nftId,
+        address _pid,
+        address _userAddress
+    ) internal {
         uint256[] memory _nftIds = userNft[_userAddress][_pid];
         uint256 nftIndex = nftOwnedIndex[_nftId][_pid];
         require(_nftIds[nftIndex] == _nftId, "not gegoId owner");
