@@ -13,7 +13,7 @@ contract WithdrawBNB is IWithdrawBNB {
     using Address for address payable;
     IWBNB public WBNB;
     address public owner;
-    mapping(address => bool) counterParties;
+    mapping(address => bool) public counterParties;
 
     modifier onlyOwner() {
         require(msg.sender == owner, DexErrors.DEX_ONLY_OWNER);

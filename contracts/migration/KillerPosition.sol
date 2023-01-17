@@ -66,26 +66,26 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     // TODO remove when testing done
-    function updateUniswapRouter(IUniswapV2Router01 _new) public {
+    function updateUniswapRouter(IUniswapV2Router01 _new) external onlyOwner {
         uniswapRouter = _new;
     }
 
     function updatePositionLiquidity(
         IPositionNondisperseLiquidity _positionLiquidity
-    ) public {
+    ) external onlyOwner {
         positionLiquidity = _positionLiquidity;
     }
 
-    function updateSpotFactory(ISpotFactory _spotFactory) public {
+    function updateSpotFactory(ISpotFactory _spotFactory) external onlyOwner {
         spotFactory = _spotFactory;
     }
 
-    function updateWBNB(IWBNB _WBNB) public {
+    function updateWBNB(IWBNB _WBNB) external onlyOwner {
         WBNB = _WBNB;
     }
 
     function updateUniswapV2Factory(IUniswapV2Factory _uniswapV2Factory)
-        public
+        external onlyOwner
     {
         uniswapV2Factory = _uniswapV2Factory;
     }
@@ -229,7 +229,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             maxPip = sqrt(uint256(maxPip) * 10**18);
             minPip = sqrt(uint256(minPip) * 10**18);
             if (isToken0Base) {
-                (amountBase, amountQuote) = estimate(
+                (amountBase, amountQuote) = _estimate(
                     uint128(state.amount0),
                     true,
                     state.currentIndexedPipRange,
@@ -242,7 +242,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 if (amountQuote <= state.amount1) {
                     try
                         positionLiquidity.addLiquidityWithRecipient{
-                            value: calculateValue(
+                            value: _calculateValue(
                                 token0,
                                 token1,
                                 amountBase,
@@ -259,10 +259,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (isCatch(reason)) {
+                        if (_isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
-                                value: calculateValue(
+                                value: _calculateValue(
                                     token0,
                                     token1,
                                     amountBase,
@@ -282,7 +282,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         } else revert(reason);
                     }
                 } else {
-                    (amountBase, amountQuote) = estimate(
+                    (amountBase, amountQuote) = _estimate(
                         uint128(state.amount1),
                         false,
                         state.currentIndexedPipRange,
@@ -295,7 +295,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     amountBase = (amountBase * 9990) / 10_000;
                     try
                         positionLiquidity.addLiquidityWithRecipient{
-                            value: calculateValue(
+                            value: _calculateValue(
                                 token0,
                                 token1,
                                 amountBase,
@@ -312,10 +312,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (isCatch(reason)) {
+                        if (_isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
-                                value: calculateValue(
+                                value: _calculateValue(
                                     token0,
                                     token1,
                                     amountBase,
@@ -336,7 +336,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     }
                 }
             } else {
-                (amountBase, amountQuote) = estimate(
+                (amountBase, amountQuote) = _estimate(
                     uint128(state.amount1),
                     true,
                     state.currentIndexedPipRange,
@@ -349,7 +349,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 if (amountQuote <= state.amount0) {
                     try
                         positionLiquidity.addLiquidityWithRecipient{
-                            value: calculateValue(
+                            value: _calculateValue(
                                 token0,
                                 token1,
                                 amountBase,
@@ -366,10 +366,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (isCatch(reason)) {
+                        if (_isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
-                                value: calculateValue(
+                                value: _calculateValue(
                                     token0,
                                     token1,
                                     amountBase,
@@ -389,7 +389,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                         } else revert(reason);
                     }
                 } else {
-                    (amountBase, amountQuote) = estimate(
+                    (amountBase, amountQuote) = _estimate(
                         uint128(state.amount0),
                         false,
                         state.currentIndexedPipRange,
@@ -403,7 +403,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
                     try
                         positionLiquidity.addLiquidityWithRecipient{
-                            value: calculateValue(
+                            value: _calculateValue(
                                 token0,
                                 token1,
                                 amountBase,
@@ -420,10 +420,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                             user
                         )
                     {} catch Error(string memory reason) {
-                        if (isCatch(reason)) {
+                        if (_isCatch(reason)) {
                             amountQuote = (amountQuote * 9990) / 10_000;
                             positionLiquidity.addLiquidityWithRecipient{
-                                value: calculateValue(
+                                value: _calculateValue(
                                     token0,
                                     token1,
                                     amountBase,
@@ -472,7 +472,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         );
     }
 
-    function isCatch(string memory reason) internal view returns (bool) {
+    function _isCatch(string memory reason) internal view returns (bool) {
         return
             (keccak256(abi.encodePacked((reason))) ==
                 keccak256(
@@ -482,7 +482,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 keccak256(abi.encodePacked(("LQ_07"))));
     }
 
-    function sqrt(uint256 number) public view returns (uint128) {
+    function sqrt(uint256 number) internal view returns (uint128) {
         return uint128(Math.sqrt(number));
     }
 
@@ -499,13 +499,13 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         }
     }
 
-    function calculateValue(
+    function _calculateValue(
         address token0,
         address token1,
         uint128 amountBase,
         uint128 amountQuote,
         bool isToken0Base
-    ) public view returns (uint256 value) {
+    ) internal view returns (uint256 value) {
         if (
             (token0 == address(WBNB) && isToken0Base) ||
             (token1 == address(WBNB) && !isToken0Base)
@@ -521,7 +521,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         }
     }
 
-    function estimate(
+    function _estimate(
         uint128 amountVirtual,
         bool isBase,
         uint32 currentIndexedPipRange,
@@ -529,7 +529,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint128 maxPip,
         uint128 minPip,
         address pair
-    ) public view returns (uint128 amountBase, uint128 amountQuote) {
+    ) internal view returns (uint128 amountBase, uint128 amountQuote) {
         if (isBase) {
             amountBase = amountVirtual;
             amountQuote = LiquidityHelper.calculateQuoteVirtualFromBaseReal(
