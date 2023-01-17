@@ -133,6 +133,7 @@ contract PositionSpotFactory is
         address owner = msg.sender;
         require(owner == ownerPairManager[pair], DexErrors.DEX_ONLY_OWNER);
         stakingManagerOfPair[owner][pair] = stakingManager;
+        emit StakingForPairAdded(pair, stakingManager, owner);
     }
 
     /// @notice get staking address from pair address

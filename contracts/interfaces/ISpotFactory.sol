@@ -14,6 +14,12 @@ interface ISpotFactory {
         uint256 tickSpace
     );
 
+    event StakingForPairAdded(
+        address pairManager,
+        address stakingAddress,
+        address ownerOfPair
+    );
+
     struct Pair {
         address BaseAsset;
         address QuoteAsset;

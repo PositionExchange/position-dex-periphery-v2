@@ -370,8 +370,7 @@ contract PositionRouter is
         uint256 openNational,
         SpotHouseStorage.Side side,
         IMatchingEngineAMM spotManager,
-        uint128 currentPip,
-        uint256 trackingId
+        uint128 currentPip
     );
 
     function emitMarketOrderOpened(
@@ -388,8 +387,7 @@ contract PositionRouter is
             openNational,
             side,
             spotManager,
-            currentPip,
-            0
+            currentPip
         );
     }
 

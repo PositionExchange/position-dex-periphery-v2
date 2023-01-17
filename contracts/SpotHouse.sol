@@ -96,15 +96,6 @@ contract SpotHouse is
         super.claimAsset(pairManager);
     }
 
-    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
-        internal
-        view
-        override(SpotDex)
-        returns (SpotFactoryStorage.Pair memory pair)
-    {
-        pair = spotFactory.getQuoteAndBase(address(_managerAddress));
-        require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
-    }
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
@@ -194,6 +185,16 @@ contract SpotHouse is
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
+
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        override(SpotDex)
+        returns (SpotFactoryStorage.Pair memory pair)
+    {
+        pair = spotFactory.getQuoteAndBase(address(_managerAddress));
+        require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
+    }
 
     function _getFee() internal view override(SpotDex) returns (uint16) {
         return getFeeDiscount();
