@@ -18,10 +18,17 @@ library SpotHouseHelper {
         uint128 feeBase;
     }
 
+    /// @notice calculate the accumulate claim able amount
+    /// @param pairAddress address of pair
+    /// @param pip the pip of order
+    /// @param orderId the id of order in pip
+    /// @param quoteAmount quote amount accumulate
+    /// @param baseAmount base amount accumulate
+    /// @param basisPoint of pair
     function accumulateClaimableAmount(
-        address _pairAddress,
-        uint128 _pip,
-        uint64 _orderId,
+        address pairAddress,
+        uint128 pip,
+        uint64 orderId,
         uint256 quoteAmount,
         uint256 baseAmount,
         uint256 basisPoint
@@ -35,20 +42,20 @@ library SpotHouseHelper {
             int128
         )
     {
-        IMatchingEngineAMM _pairManager = IMatchingEngineAMM(_pairAddress);
+        IMatchingEngineAMM _pairManager = IMatchingEngineAMM(pairAddress);
         (
             bool isFilled,
             bool isBuy,
             uint256 baseSize,
             uint256 partialFilled
-        ) = _pairManager.getPendingOrderDetail(_pip, _orderId);
+        ) = _pairManager.getPendingOrderDetail(pip, orderId);
         uint256 filledSize = isFilled ? baseSize : partialFilled;
         if (isBuy) {
             //BUY => can claim base asset
             baseAmount += filledSize;
         } else {
             // SELL => can claim quote asset
-            quoteAmount += filledSize.baseToQuote(_pip, basisPoint);
+            quoteAmount += filledSize.baseToQuote(pip, basisPoint);
         }
         return (quoteAmount, baseAmount, 0, 0);
     }

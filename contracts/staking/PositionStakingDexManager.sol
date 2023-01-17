@@ -673,7 +673,7 @@ contract PositionStakingDexManager is
         uint32 currentIndexedPipRange = uint32(
             IMatchingEngineAMM(pid).currentIndexedPipRange()
         );
-        poolInfo[pid].totalStaked -= userInfo[pid][_msgSender()].amount;
+        poolInfo[pid].totalStaked -= userInfo[pid][user].amount;
 
         for (uint256 i = 0; i < _userNfts.length; i++) {
             nftData = _getLiquidityData(_userNfts[i]);
@@ -683,7 +683,7 @@ contract PositionStakingDexManager is
                 nftData.liquidity
             );
         }
-        userInfo[pid][_msgSender()].amount = totalPower;
+        userInfo[pid][user].amount = totalPower;
         poolInfo[pid].totalStaked += totalPower;
     }
 }

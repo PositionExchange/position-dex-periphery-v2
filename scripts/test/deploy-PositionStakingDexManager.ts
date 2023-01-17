@@ -36,7 +36,7 @@ task('upgrade-PositionStakingDexManager-testnet', 'How is your girl friend?', as
     const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionStakingDexManager")
 
     const upgraded = await hre.upgrades.upgradeProxy(
-        configData.PositionStakingDexManager,
+        configData.positionStakingDexManager,
         PositionConcentratedLiquidity
     );
     await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");

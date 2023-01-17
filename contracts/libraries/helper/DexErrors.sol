@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.9;
 
+/// @notice list revert reason in dex
 library DexErrors {
     string public constant DEX_ONLY_OWNER = "DEX_01";
     string public constant DEX_EMPTY_ADDRESS = "DEX_02";
