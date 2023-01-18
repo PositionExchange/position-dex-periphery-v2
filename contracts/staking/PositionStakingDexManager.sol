@@ -581,6 +581,9 @@ contract PositionStakingDexManager is
         );
         updatePool(poolId);
         _payOrLockupPendingPosition(poolId, user);
+        userInfo[poolId][user].rewardDebt = uint128(
+            userInfo[poolId][user].amount.mul(poolInfo[poolId].accPositionPerShare).div(1e12)
+        );
         if (positionNondisperseLiquidity.ownerOf(tokenId) == address(this)) {}
         return _msgSender();
     }

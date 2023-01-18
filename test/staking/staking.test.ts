@@ -290,35 +290,79 @@ describe("killer-position", async function () {
         });
 
         it('should stake #2 and shift', async function () {
+            await dexNFT.donatePool(pair.address, toWei(1), toWei(1))
 
-            await addLiquidity(20, 1, true)
+
+
+            await addLiquidity(100, 1, true)
             await staking.stake(1000001)
             await logPower(users[0].address)
             await mine(10);
+
+
             await addLiquidity(100, 1, true)
             await staking.stake(1000002)
             await logPower(users[0].address)
-
             await mine(10);
+
+
+
+
+            console.log("shiftRange");
+            await shiftRange(1000001, 2, 0, true);
+            await logPower(users[0].address)
+
 
             await addLiquidity(100, 1, true)
             await staking.stake(1000003)
             await logPower(users[0].address)
-            await mine(30);
+            await mine(10);
 
-            console.log("shift range")
-            await  shiftRange(1000003, 2, 0, true);
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000004)
             await logPower(users[0].address)
-            await mine(30);
+            await mine(10);
+
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000005)
+            await logPower(users[0].address)
+            await mine(10);
+
 
 
             console.log("harvest");
-            await balanceTokenReward(users[0].address)
             await staking.unstake(1000001)
-            // await staking.harvest(pair.address)
-            await balanceTokenReward(users[0].address)
-        });
+            await mine(10);
+            await staking.harvest(pair.address)
 
+            await mine(10);
+            await staking.exit(pair.address)
+            //
+            // await addLiquidity(100, 1, true)
+            // await staking.stake(1000002)
+            // await logPower(users[0].address)
+            //
+            // await mine(10);
+            //
+            // await addLiquidity(100, 1, true)
+            // await staking.stake(1000003)
+            // await logPower(users[0].address)
+            // await mine(30);
+            //
+            // console.log("shift range")
+            // // await  shiftRange(1000003, 2, 0, true);
+            // await logPower(users[0].address)
+            // await mine(30);
+            //
+            //
+            // console.log("harvest");
+            // await balanceTokenReward(users[0].address)
+            // await staking.unstake(1000001)
+            // // await staking.harvest(pair.address)
+            // await balanceTokenReward(users[0].address)
+        });
 
     })
 
