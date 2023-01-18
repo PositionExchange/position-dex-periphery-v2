@@ -152,6 +152,17 @@ describe("killer-position", async function () {
             {value: ethers.utils.parseEther(valueEther.toString())})
 
     }
+    async function shiftRange(tokenId, targetIndex , amountNeed : number,  isBase: boolean) {
+        await dexNFT.shiftRange(tokenId, targetIndex, toWei(amountNeed), isBase)
+
+    }
+
+    async function logPower(user: string) {
+
+        const power = await staking.userInfo(pair.address, user)
+        console.log("power",power.amount.toString())
+
+    }
     async function balanceTokenReward(user : string) {
         const balance  = await rewardToken.balanceOf(user)
         console.log("Balance of token reward: ", toEther(balance.toString()))
@@ -187,14 +198,14 @@ describe("killer-position", async function () {
 
         it("update increase liquidity", async ()=>{
 
-            await addLiquidity(10, 2, true)
+            await addLiquidity(10, 1, true)
 
             await staking.stake(1000001)
             await mine(1000);
             await increaseLiquidity(1000001, 10, true)
 
 
-            await addLiquidity(10, 2, true)
+            await addLiquidity(10, 1, true)
             await staking.stake(1000002)
             await mine(1000);
 
@@ -203,12 +214,12 @@ describe("killer-position", async function () {
 
         it("update decrease liquidity", async ()=>{
 
-            await addLiquidity(10, 2, true)
+            await addLiquidity(10, 1, true)
 
             await staking.stake(1000001)
             await mine(1000);
 
-            await addLiquidity(100, 2, true)
+            await addLiquidity(100, 1, true)
             await staking.stake(1000002)
             await mine(1000);
             // await staking.harvest(pair.address)
@@ -221,7 +232,7 @@ describe("killer-position", async function () {
 
         it('should stake #1', async function () {
 
-            await addLiquidity(10, 2, true)
+            await addLiquidity(10, 1, true)
 
             await staking.stake(1000001)
 
@@ -230,11 +241,11 @@ describe("killer-position", async function () {
 
         it('should stake #2 and unstake 1', async function () {
 
-            await addLiquidity(20, 2, true)
+            await addLiquidity(20, 1, true)
 
             await staking.stake(1000001)
 
-            await addLiquidity(100, 2, true)
+            await addLiquidity(100, 1, true)
 
             await staking.stake(1000002)
 
@@ -246,12 +257,12 @@ describe("killer-position", async function () {
 
         it('should stake #2 and unstake all', async function () {
 
-            await addLiquidity(20, 2, true)
+            await addLiquidity(20, 1, true)
             await staking.stake(1000001)
             await mine(10);
 
 
-            await addLiquidity(100, 2, true)
+            await addLiquidity(100, 1, true)
 
             await staking.stake(1000002)
 
@@ -263,36 +274,51 @@ describe("killer-position", async function () {
             await staking.withdraw(pair.address)
 
 
-            //
-            //
-            // await balanceTokenReward(users[0].address)
-            // await staking.unstake(1000001)
-            // await balanceTokenReward(users[0].address)
-            // await mine(100);
-            //
-            //
-            // await addLiquidity(50, 2, true)
-            //
-            // await staking.stake(1000003)
-            //
-            // await staking.withdraw(pair.address)
-            // await balanceTokenReward(users[0].address)
-
-
 
         });
         it('should stake #2 and harvest', async function () {
 
-            await addLiquidity(20, 2, true)
+            await addLiquidity(20, 1, true)
             await staking.stake(1000001)
             await mine(10);
-            await addLiquidity(100, 2, true)
+            await addLiquidity(100, 1, true)
             await staking.stake(1000002)
             await mine(10);
             await balanceTokenReward(users[0].address)
             await staking.harvest(pair.address)
             await balanceTokenReward(users[0].address)
         });
+
+        it('should stake #2 and shift', async function () {
+
+            await addLiquidity(20, 1, true)
+            await staking.stake(1000001)
+            await logPower(users[0].address)
+            await mine(10);
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000002)
+            await logPower(users[0].address)
+
+            await mine(10);
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000003)
+            await logPower(users[0].address)
+            await mine(30);
+
+            console.log("shift range")
+            await  shiftRange(1000003, 2, 0, true);
+            await logPower(users[0].address)
+            await mine(30);
+
+
+            console.log("harvest");
+            await balanceTokenReward(users[0].address)
+            await staking.unstake(1000001)
+            // await staking.harvest(pair.address)
+            await balanceTokenReward(users[0].address)
+        });
+
 
     })
 

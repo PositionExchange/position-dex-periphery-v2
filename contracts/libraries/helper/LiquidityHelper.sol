@@ -7,7 +7,6 @@ import "@positionex/matching-engine/contracts/libraries/amm/LiquidityMath.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Math.sol";
 
 library LiquidityHelper {
-
     /// @notice calculate quote virtual from base real
     /// @param baseReal the amount base real
     /// @param sqrtCurrentPrice the sqrt of current price

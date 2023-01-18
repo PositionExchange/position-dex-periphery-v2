@@ -69,6 +69,10 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
+        require(
+            path[0] != WBNB && path[path.length - 1] != WBNB,
+            DexErrors.DEX_NOT_MUST_BNB
+        );
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
         if (sidesAndPairs[0].pairManager == address(0)) {
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
@@ -215,6 +219,11 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
+        require(
+            path[0] != WBNB && path[path.length - 1] != WBNB,
+            DexErrors.DEX_NOT_MUST_BNB
+        );
+
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
         if (sidesAndPairs[0].pairManager == address(0)) {
@@ -341,7 +350,6 @@ contract PositionRouter is
                 mainSideOut == amounts[i],
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );
-            amounts[i + 1] = flipSideOut - fee;
             emitMarketOrderOpened(
                 _trader,
                 sidesAndPairs[i].side == SpotHouseStorage.Side.BUY
@@ -354,6 +362,7 @@ contract PositionRouter is
                 IMatchingEngineAMM(sidesAndPairs[i].pairManager),
                 IMatchingEngineAMM(sidesAndPairs[i].pairManager).getCurrentPip()
             );
+            amounts[i + 1] = flipSideOut - fee;
         }
         _transferAfterBridge(
             amounts[sidesAndPairs.length],

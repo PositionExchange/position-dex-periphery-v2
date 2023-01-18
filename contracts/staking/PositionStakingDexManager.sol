@@ -17,6 +17,8 @@ import "../libraries/helper/U128Math.sol";
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/PositionStakingDexManagerStorage.sol";
 
+import "hardhat/console.sol";
+
 interface IPositionStakingDexManager {}
 
 contract PositionStakingDexManager is
@@ -675,7 +677,10 @@ contract PositionStakingDexManager is
         );
         poolInfo[pid].totalStaked -= userInfo[pid][user].amount;
 
+        console.log("*******START**********");
+
         for (uint256 i = 0; i < _userNfts.length; i++) {
+            console.log("_userNfts[i]: ", _userNfts[i]);
             nftData = _getLiquidityData(_userNfts[i]);
             totalPower += _calculatePower(
                 nftData.indexedPipRange,
@@ -683,7 +688,9 @@ contract PositionStakingDexManager is
                 nftData.liquidity
             );
         }
+        console.log("[_updatePower] totalPower: ", totalPower);
         userInfo[pid][user].amount = totalPower;
         poolInfo[pid].totalStaked += totalPower;
+        console.log("********END*********");
     }
 }

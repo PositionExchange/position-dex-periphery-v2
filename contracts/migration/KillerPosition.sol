@@ -85,7 +85,8 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     function updateUniswapV2Factory(IUniswapV2Factory _uniswapV2Factory)
-        external onlyOwner
+        external
+        onlyOwner
     {
         uniswapV2Factory = _uniswapV2Factory;
     }
