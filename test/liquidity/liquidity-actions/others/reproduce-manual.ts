@@ -739,3 +739,90 @@ it ("OpenMarketWithQuote-fill-limit-amm", async () => {
  })
 
 })
+
+describe("POSI/BNB", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(10_000, false, true, 2000,  "quote", 1_000_000)
+    })
+
+
+
+    it ("OpenOrder", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 3000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    BaseVirtual: 24.073632
+    Asset: base
+  Expect:
+    Pool:
+      Liquidity: 9.849879189561687774
+      BaseVirtual: 24.073632
+      QuoteVirtual: 0.099000111653359784
+      IndexPipRange: 1
+      MaxPip: 3999
+      MinPip: 2000
+- S2: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 0
+    Quantity: 0.001 
+
+    `)
+    })
+
+})
+
+
+
+describe("basisPoint-6", async function(){
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(
+            10_000_000,
+            false,
+            false,
+            2000,
+            'none',
+            100_000
+        )
+    })
+
+
+
+    it ("should basisPoint 6", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 3000
+- S1: AddLiquidity
+  Action:
+    Id: 1
+    IndexPipRange: 1
+    Asset: base
+    AmountVirtual: 24.3168
+  Expect:
+    Pool:
+      Liquidity: 9.94937291874917957
+      BaseVirtual: 24.3168
+      QuoteVirtual: 0.100000112781171499
+      IndexPipRange: 1
+      MaxPip: 3999
+      MinPip: 2000
+- S2: OpenMarket
+  Action:
+    id: 3
+    asset: base
+    Side: 0
+    Quantity: 0.331789
+`)
+    })
+})
