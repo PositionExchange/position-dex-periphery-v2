@@ -2660,7 +2660,7 @@
             "label": "factory",
             "offset": 0,
             "slot": "201",
-            "type": "t_contract(ISpotFactory)20990",
+            "type": "t_contract(ISpotFactory)20879",
             "contract": "PositionRouterStorage",
             "src": "contracts/libraries/types/PositionRouterStorage.sol:13"
           },
@@ -2668,7 +2668,7 @@
             "label": "spotHouse",
             "offset": 0,
             "slot": "202",
-            "type": "t_contract(ISpotHouse)20999",
+            "type": "t_contract(ISpotHouse)20888",
             "contract": "PositionRouterStorage",
             "src": "contracts/libraries/types/PositionRouterStorage.sol:15"
           },
@@ -2676,7 +2676,7 @@
             "label": "withdrawBNB",
             "offset": 0,
             "slot": "203",
-            "type": "t_contract(IWithdrawBNB)21774",
+            "type": "t_contract(IWithdrawBNB)21663",
             "contract": "PositionRouterStorage",
             "src": "contracts/libraries/types/PositionRouterStorage.sol:17"
           },
@@ -2692,7 +2692,7 @@
             "label": "uniSwapRouterV2",
             "offset": 0,
             "slot": "205",
-            "type": "t_contract(IUniswapV2Router02)21697",
+            "type": "t_contract(IUniswapV2Router02)21586",
             "contract": "PositionRouterStorage",
             "src": "contracts/libraries/types/PositionRouterStorage.sol:21"
           },
@@ -2722,19 +2722,19 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(ISpotFactory)20990": {
+          "t_contract(ISpotFactory)20879": {
             "label": "contract ISpotFactory",
             "numberOfBytes": "20"
           },
-          "t_contract(ISpotHouse)20999": {
+          "t_contract(ISpotHouse)20888": {
             "label": "contract ISpotHouse",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)21697": {
+          "t_contract(IUniswapV2Router02)21586": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
           },
-          "t_contract(IWithdrawBNB)21774": {
+          "t_contract(IWithdrawBNB)21663": {
             "label": "contract IWithdrawBNB",
             "numberOfBytes": "20"
           },
@@ -3217,6 +3217,178 @@
           "t_uint64": {
             "label": "uint64",
             "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "549446b1d1bd92ae399541c29ee8bdb8733fe1a6e6bcc28ce0a3f7b53590509b": {
+      "address": "0x594e6c1e174F802A964ce4d397Af5cA5b744F67C",
+      "txHash": "0x5302dd1733142f3f9fc9f56cd8709a53774006498a9cf61c44071f11caa15067",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "factory",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_contract(ISpotFactory)21030",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:13"
+          },
+          {
+            "label": "spotHouse",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_contract(ISpotHouse)21039",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:15"
+          },
+          {
+            "label": "withdrawBNB",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_contract(IWithdrawBNB)21814",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:17"
+          },
+          {
+            "label": "WBNB",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:19"
+          },
+          {
+            "label": "uniSwapRouterV2",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_contract(IUniswapV2Router02)21737",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:21"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PositionRouterStorage",
+            "src": "contracts/libraries/types/PositionRouterStorage.sol:28"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ISpotFactory)21030": {
+            "label": "contract ISpotFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ISpotHouse)21039": {
+            "label": "contract ISpotHouse",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUniswapV2Router02)21737": {
+            "label": "contract IUniswapV2Router02",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IWithdrawBNB)21814": {
+            "label": "contract IWithdrawBNB",
+            "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
           },
           "t_uint8": {
             "label": "uint8",
