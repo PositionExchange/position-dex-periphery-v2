@@ -2816,7 +2816,7 @@
             "label": "vestingSchedule",
             "offset": 0,
             "slot": "151",
-            "type": "t_mapping(t_address,t_mapping(t_enum(Frequency)10921,t_array(t_struct(VestingData)10577_storage)dyn_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_enum(Frequency)10841,t_array(t_struct(VestingData)10497_storage)dyn_storage))",
             "contract": "VestingScheduleBase",
             "src": "@positionex/posi-token/contracts/VestingScheduleBase.sol:8"
           },
@@ -2832,7 +2832,7 @@
             "label": "position",
             "offset": 0,
             "slot": "153",
-            "type": "t_contract(IERC20)7828",
+            "type": "t_contract(IERC20)7748",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:45"
           },
@@ -2840,7 +2840,7 @@
             "label": "posiTreasury",
             "offset": 0,
             "slot": "154",
-            "type": "t_contract(IPosiTreasury)20324",
+            "type": "t_contract(IPosiTreasury)17574",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:46"
           },
@@ -2848,7 +2848,7 @@
             "label": "positionNondisperseLiquidity",
             "offset": 0,
             "slot": "155",
-            "type": "t_contract(IPositionNondisperseLiquidity)20336",
+            "type": "t_contract(IPositionNondisperseLiquidity)17586",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:49"
           },
@@ -2896,7 +2896,7 @@
             "label": "poolInfo",
             "offset": 0,
             "slot": "161",
-            "type": "t_mapping(t_address,t_struct(PoolInfo)22627_storage)",
+            "type": "t_mapping(t_address,t_struct(PoolInfo)18884_storage)",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:63"
           },
@@ -2904,7 +2904,7 @@
             "label": "userInfo",
             "offset": 0,
             "slot": "162",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)22612_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)18869_storage))",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:65"
           },
@@ -2952,7 +2952,7 @@
             "label": "positionReferral",
             "offset": 0,
             "slot": "168",
-            "type": "t_contract(IPositionReferral)20363",
+            "type": "t_contract(IPositionReferral)17613",
             "contract": "PositionStakingDexManagerStorage",
             "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:77"
           },
@@ -3014,7 +3014,7 @@
             "label": "address[]",
             "numberOfBytes": "32"
           },
-          "t_array(t_struct(VestingData)10577_storage)dyn_storage": {
+          "t_array(t_struct(VestingData)10497_storage)dyn_storage": {
             "label": "struct VestingScheduleLogic.VestingData[]",
             "numberOfBytes": "32"
           },
@@ -3034,23 +3034,23 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IERC20)7828": {
+          "t_contract(IERC20)7748": {
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
-          "t_contract(IPosiTreasury)20324": {
+          "t_contract(IPosiTreasury)17574": {
             "label": "contract IPosiTreasury",
             "numberOfBytes": "20"
           },
-          "t_contract(IPositionNondisperseLiquidity)20336": {
+          "t_contract(IPositionNondisperseLiquidity)17586": {
             "label": "contract IPositionNondisperseLiquidity",
             "numberOfBytes": "20"
           },
-          "t_contract(IPositionReferral)20363": {
+          "t_contract(IPositionReferral)17613": {
             "label": "contract IPositionReferral",
             "numberOfBytes": "20"
           },
-          "t_enum(Frequency)10921": {
+          "t_enum(Frequency)10841": {
             "label": "enum VestingFrequencyHelper.Frequency",
             "members": [
               "Daily",
@@ -3074,19 +3074,19 @@
             "label": "mapping(address => mapping(address => uint256[]))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)22612_storage))": {
+          "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)18869_storage))": {
             "label": "mapping(address => mapping(address => struct PositionStakingDexManagerStorage.UserInfo))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_enum(Frequency)10921,t_array(t_struct(VestingData)10577_storage)dyn_storage))": {
+          "t_mapping(t_address,t_mapping(t_enum(Frequency)10841,t_array(t_struct(VestingData)10497_storage)dyn_storage))": {
             "label": "mapping(address => mapping(enum VestingFrequencyHelper.Frequency => struct VestingScheduleLogic.VestingData[]))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_struct(PoolInfo)22627_storage)": {
+          "t_mapping(t_address,t_struct(PoolInfo)18884_storage)": {
             "label": "mapping(address => struct PositionStakingDexManagerStorage.PoolInfo)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_struct(UserInfo)22612_storage)": {
+          "t_mapping(t_address,t_struct(UserInfo)18869_storage)": {
             "label": "mapping(address => struct PositionStakingDexManagerStorage.UserInfo)",
             "numberOfBytes": "32"
           },
@@ -3094,7 +3094,7 @@
             "label": "mapping(address => uint256)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_enum(Frequency)10921,t_array(t_struct(VestingData)10577_storage)dyn_storage)": {
+          "t_mapping(t_enum(Frequency)10841,t_array(t_struct(VestingData)10497_storage)dyn_storage)": {
             "label": "mapping(enum VestingFrequencyHelper.Frequency => struct VestingScheduleLogic.VestingData[])",
             "numberOfBytes": "32"
           },
@@ -3102,7 +3102,7 @@
             "label": "mapping(uint256 => mapping(address => uint256))",
             "numberOfBytes": "32"
           },
-          "t_struct(PoolInfo)22627_storage": {
+          "t_struct(PoolInfo)18884_storage": {
             "label": "struct PositionStakingDexManagerStorage.PoolInfo",
             "members": [
               {
@@ -3150,7 +3150,7 @@
             ],
             "numberOfBytes": "192"
           },
-          "t_struct(UserInfo)22612_storage": {
+          "t_struct(UserInfo)18869_storage": {
             "label": "struct PositionStakingDexManagerStorage.UserInfo",
             "members": [
               {
@@ -3180,7 +3180,7 @@
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(VestingData)10577_storage": {
+          "t_struct(VestingData)10497_storage": {
             "label": "struct VestingScheduleLogic.VestingData",
             "members": [
               {
@@ -3561,6 +3561,482 @@
           "t_uint256": {
             "label": "uint256",
             "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "06f7379b5bb14af8b2c129d4b7656fe7da696c7861af0c1a3b94f594164a59b5": {
+      "address": "0x226d9FF7191069bbBBe845637fBF10e6669CB6EA",
+      "txHash": "0xa59a69673b0c002673fd97d9805b90a790546cbfe1d8fd9e2e11249483d48eea",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "vestingSchedule",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_mapping(t_address,t_mapping(t_enum(Frequency)10246,t_array(t_struct(VestingData)9902_storage)dyn_storage))",
+            "contract": "VestingScheduleBase",
+            "src": "@positionex/posi-token/contracts/VestingScheduleBase.sol:8"
+          },
+          {
+            "label": "_isWhiteListVesting",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VestingScheduleBase",
+            "src": "@positionex/posi-token/contracts/VestingScheduleBase.sol:9"
+          },
+          {
+            "label": "position",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_contract(IERC20)7513",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:45"
+          },
+          {
+            "label": "posiTreasury",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_contract(IPosiTreasury)13629",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:46"
+          },
+          {
+            "label": "positionNondisperseLiquidity",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_contract(IPositionNondisperseLiquidity)13641",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:49"
+          },
+          {
+            "label": "devAddress",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_address",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:52"
+          },
+          {
+            "label": "positionPerBlock",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:54"
+          },
+          {
+            "label": "feeAddress",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_address",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:56"
+          },
+          {
+            "label": "BONUS_MULTIPLIER",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:58"
+          },
+          {
+            "label": "MAXIMUM_HARVEST_INTERVAL",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:60"
+          },
+          {
+            "label": "poolInfo",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_mapping(t_address,t_struct(PoolInfo)14529_storage)",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:63"
+          },
+          {
+            "label": "userInfo",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)14514_storage))",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:65"
+          },
+          {
+            "label": "pools",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:66"
+          },
+          {
+            "label": "totalAllocPoint",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:68"
+          },
+          {
+            "label": "startBlock",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:70"
+          },
+          {
+            "label": "totalLockedUpRewards",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:72"
+          },
+          {
+            "label": "posiStakingPid",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:74"
+          },
+          {
+            "label": "positionReferral",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_contract(IPositionReferral)13668",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:77"
+          },
+          {
+            "label": "referralCommissionRate",
+            "offset": 20,
+            "slot": "168",
+            "type": "t_uint16",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:79"
+          },
+          {
+            "label": "MAXIMUM_REFERRAL_COMMISSION_RATE",
+            "offset": 22,
+            "slot": "168",
+            "type": "t_uint16",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:81"
+          },
+          {
+            "label": "stakingMinted",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_uint256",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:83"
+          },
+          {
+            "label": "harvestFeeShareRate",
+            "offset": 0,
+            "slot": "170",
+            "type": "t_uint16",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:85"
+          },
+          {
+            "label": "userNft",
+            "offset": 0,
+            "slot": "171",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_array(t_uint256)dyn_storage))",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:88"
+          },
+          {
+            "label": "nftOwnedIndex",
+            "offset": 0,
+            "slot": "172",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
+            "contract": "PositionStakingDexManagerStorage",
+            "src": "contracts/libraries/types/PositionStakingDexManagerStorage.sol:90"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(VestingData)9902_storage)dyn_storage": {
+            "label": "struct VestingScheduleLogic.VestingData[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20)7513": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPosiTreasury)13629": {
+            "label": "contract IPosiTreasury",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPositionNondisperseLiquidity)13641": {
+            "label": "contract IPositionNondisperseLiquidity",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPositionReferral)13668": {
+            "label": "contract IPositionReferral",
+            "numberOfBytes": "20"
+          },
+          "t_enum(Frequency)10246": {
+            "label": "enum VestingFrequencyHelper.Frequency",
+            "members": [
+              "Daily",
+              "Weekly",
+              "Monthly",
+              "Bimonthly",
+              "Quarterly",
+              "Biannually"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_array(t_uint256)dyn_storage))": {
+            "label": "mapping(address => mapping(address => uint256[]))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_struct(UserInfo)14514_storage))": {
+            "label": "mapping(address => mapping(address => struct PositionStakingDexManagerStorage.UserInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_enum(Frequency)10246,t_array(t_struct(VestingData)9902_storage)dyn_storage))": {
+            "label": "mapping(address => mapping(enum VestingFrequencyHelper.Frequency => struct VestingScheduleLogic.VestingData[]))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(PoolInfo)14529_storage)": {
+            "label": "mapping(address => struct PositionStakingDexManagerStorage.PoolInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(UserInfo)14514_storage)": {
+            "label": "mapping(address => struct PositionStakingDexManagerStorage.UserInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_enum(Frequency)10246,t_array(t_struct(VestingData)9902_storage)dyn_storage)": {
+            "label": "mapping(enum VestingFrequencyHelper.Frequency => struct VestingScheduleLogic.VestingData[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint256 => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_struct(PoolInfo)14529_storage": {
+            "label": "struct PositionStakingDexManagerStorage.PoolInfo",
+            "members": [
+              {
+                "label": "poolId",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "totalStaked",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "allocPoint",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lastRewardBlock",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "accPositionPerShare",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "depositFeeBP",
+                "type": "t_uint16",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "harvestInterval",
+                "type": "t_uint128",
+                "offset": 2,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(UserInfo)14514_storage": {
+            "label": "struct PositionStakingDexManagerStorage.UserInfo",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "rewardDebt",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "rewardLockedUp",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "nextHarvestUntil",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(VestingData)9902_storage": {
+            "label": "struct VestingScheduleLogic.VestingData",
+            "members": [
+              {
+                "label": "vestingTime",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint192",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint192": {
+            "label": "uint192",
+            "numberOfBytes": "24"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
           },
           "t_uint8": {
             "label": "uint8",
