@@ -69,10 +69,10 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        require(
-            path[0] != WBNB && path[path.length - 1] != WBNB,
-            DexErrors.DEX_NOT_MUST_BNB
-        );
+//        require(
+//            path[0] != WBNB && path[path.length - 1] != WBNB,
+//            DexErrors.DEX_NOT_MUST_BNB
+//        );
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
         if (sidesAndPairs[0].pairManager == address(0)) {
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
@@ -219,10 +219,10 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
-        require(
-            path[0] != WBNB && path[path.length - 1] != WBNB,
-            DexErrors.DEX_NOT_MUST_BNB
-        );
+//        require(
+//            path[0] != WBNB && path[path.length - 1] != WBNB,
+//            DexErrors.DEX_NOT_MUST_BNB
+//        );
 
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
