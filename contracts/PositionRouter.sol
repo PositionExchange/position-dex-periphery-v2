@@ -350,6 +350,7 @@ contract PositionRouter is
                 mainSideOut == amounts[i],
                 DexErrors.DEX_MARKET_NOT_FULL_FILL
             );
+            amounts[i + 1] = flipSideOut;
             emitMarketOrderOpened(
                 _trader,
                 sidesAndPairs[i].side == SpotHouseStorage.Side.BUY
@@ -362,7 +363,7 @@ contract PositionRouter is
                 IMatchingEngineAMM(sidesAndPairs[i].pairManager),
                 IMatchingEngineAMM(sidesAndPairs[i].pairManager).getCurrentPip()
             );
-            amounts[i + 1] = flipSideOut - fee;
+            amounts[i + 1] -= fee;
         }
         _transferAfterBridge(
             amounts[sidesAndPairs.length],
