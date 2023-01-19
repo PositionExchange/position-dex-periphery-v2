@@ -542,6 +542,7 @@ export class TestLiquidity {
     async getCurrentPrice() {
 
         const basisPoint = (await this.mockMatching.basisPoint()).toString()
+        console.log("basisPoint: ", basisPoint);
         return pipToPrice((await this.mockMatching.getCurrentPip()).toString(), Number(basisPoint) );
     }
 

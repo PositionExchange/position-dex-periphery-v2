@@ -774,8 +774,7 @@ describe("POSI/BNB", async function(){
     asset: base
     Side: 0
     Quantity: 0.001 
-
-    `)
+`)
     })
 
 })
@@ -792,7 +791,7 @@ describe("basisPoint-6", async function(){
             false,
             2000,
             'none',
-            100_000
+            1_000_000
         )
     })
 
@@ -808,21 +807,13 @@ describe("basisPoint-6", async function(){
     Id: 1
     IndexPipRange: 1
     Asset: base
-    AmountVirtual: 24.3168
-  Expect:
-    Pool:
-      Liquidity: 9.94937291874917957
-      BaseVirtual: 24.3168
-      QuoteVirtual: 0.100000112781171499
-      IndexPipRange: 1
-      MaxPip: 3999
-      MinPip: 2000
+    AmountVirtual: 1000
 - S2: OpenMarket
   Action:
-    id: 3
+    id: 1
     asset: base
-    Side: 0
-    Quantity: 0.331789
+    Side: 1
+    Quantity: 10
 `)
     })
 })
