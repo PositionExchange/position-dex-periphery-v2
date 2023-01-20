@@ -23,12 +23,14 @@ import "./libraries/helper/Convert.sol";
 import "./interfaces/ISpotHouse.sol";
 import "./implement/SpotDex.sol";
 import "./libraries/extensions/StrategyFee.sol";
+import "./libraries/extensions/BuyBackAndBurn.sol";
 
 contract SpotHouse is
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
     StrategyFee,
+    BuyBackAndBurn,
     SpotDex
 {
     using Convert for uint256;
@@ -95,7 +97,6 @@ contract SpotHouse is
     {
         super.claimAsset(pairManager);
     }
-
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
@@ -180,6 +181,26 @@ contract SpotHouse is
         onlyOperator
     {
         super.setFee(_defaultFeePercentage);
+    }
+
+    function buyBackAndBurn(
+        IMatchingEngineAMM pairManager,
+        address[] memory pathBuyBack
+    ) external override(BuyBackAndBurn) onlyOperator {
+        SpotFactoryStorage.Pair memory _pair = _getQuoteAndBase(pairManager);
+        bool isBase = pathBuyBack[0] == _pair.BaseAsset;
+
+        (uint256 baseFeeFunding, uint256 quoteFeeFunding) = pairManager
+            .getFee();
+
+        uint256 amount = isBase ? baseFeeFunding : quoteFeeFunding;
+        _buyBackAndBurn(pathBuyBack, amount);
+
+        if (isBase) {
+            pairManager.increaseBaseFeeFunding(amount);
+        } else {
+            pairManager.increaseQuoteFeeFunding(amount);
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------------
