@@ -51,4 +51,24 @@ library TransferHelper {
             "TransferHelper::safeTransferETH: ETH transfer failed"
         );
     }
+
+    /// @notice check approve with token and spender
+    /// @param token need check approve
+    /// @param spender need grant permit to transfer token
+    /// @return bool type after check
+    function isApprove(address token, address spender)
+        internal
+        view
+        returns (bool)
+    {
+        return
+            IERC20(token).allowance(address(this), spender) > 0 ? true : false;
+    }
+
+    /// @notice approve token with spender
+    /// @param token need  approve
+    /// @param spender need grant permit to transfer token
+    function approve(address token, address spender) internal {
+        IERC20(token).approve(spender, type(uint256).max);
+    }
 }

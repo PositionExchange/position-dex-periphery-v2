@@ -18,6 +18,8 @@ import "../interfaces/IWBNB.sol";
 import "../libraries/helper/LiquidityHelper.sol";
 import "../interfaces/IUniswapV2Factory.sol";
 import "../interfaces/ISpotFactory.sol";
+import {TransferHelper} from "../libraries/helper/TransferHelper.sol";
+
 
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
@@ -488,15 +490,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     function _approve(address token, address spender) internal {
-        bool isApprove = IERC20(token).allowance(
-            address(this),
-            address(spender)
-        ) > 0
-            ? true
-            : false;
 
-        if (!isApprove) {
-            IERC20(token).approve(spender, type(uint256).max);
+
+        if (!TransferHelper.isApprove(token, spender)) {
+            TransferHelper.approve(token, spender);
         }
     }
 

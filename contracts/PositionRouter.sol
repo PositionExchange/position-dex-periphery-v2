@@ -69,16 +69,16 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-//        require(
-//            path[0] != WBNB && path[path.length - 1] != WBNB,
-//            DexErrors.DEX_NOT_MUST_BNB
-//        );
+        //        require(
+        //            path[0] != WBNB && path[path.length - 1] != WBNB,
+        //            DexErrors.DEX_NOT_MUST_BNB
+        //        );
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
         if (sidesAndPairs[0].pairManager == address(0)) {
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
             _deposit(path[0], _msgSender(), amounts[0]);
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2.swapExactTokensForTokens(
                 amountIn,
@@ -127,8 +127,8 @@ contract PositionRouter is
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
         if (sidesAndPairs[0].pairManager == address(0)) {
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2.swapExactETHForTokens{value: msg.value}(
                 amountOutMin,
@@ -179,8 +179,8 @@ contract PositionRouter is
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
             _deposit(path[0], _msgSender(), amounts[0]);
 
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2.swapExactTokensForETH(
                 amountIn,
@@ -219,10 +219,10 @@ contract PositionRouter is
         address to,
         uint256 deadline
     ) external virtual override ensure(deadline) {
-//        require(
-//            path[0] != WBNB && path[path.length - 1] != WBNB,
-//            DexErrors.DEX_NOT_MUST_BNB
-//        );
+        //        require(
+        //            path[0] != WBNB && path[path.length - 1] != WBNB,
+        //            DexErrors.DEX_NOT_MUST_BNB
+        //        );
 
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
@@ -230,8 +230,8 @@ contract PositionRouter is
             uint256 balanceBefore = IERC20(path[0]).balanceOf(address(this));
             _deposit(path[0], _msgSender(), amountIn);
             uint256 balanceAfter = IERC20(path[0]).balanceOf(address(this));
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2
                 .swapExactTokensForTokensSupportingFeeOnTransferTokens(
@@ -258,8 +258,8 @@ contract PositionRouter is
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
         if (sidesAndPairs[0].pairManager == address(0)) {
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2.swapExactETHForTokensSupportingFeeOnTransferTokens{
                 value: msg.value
@@ -286,8 +286,8 @@ contract PositionRouter is
             _deposit(path[0], _msgSender(), amountIn);
             uint256 balanceAfter = IERC20(path[0]).balanceOf(address(this));
 
-            if (!isApprove(path[0])) {
-                _approve(path[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
             }
             uniSwapRouterV2.swapExactTokensForETHSupportingFeeOnTransferTokens(
                 balanceAfter - balanceBefore,
@@ -473,9 +473,10 @@ contract PositionRouter is
         }
     }
 
-    function _approve(address token) internal {
-        IERC20(token).approve(address(uniSwapRouterV2), type(uint256).max);
-    }
+    //
+    //    function _approve(address token) internal {
+    //        IERC20(token).approve(address(uniSwapRouterV2), type(uint256).max);
+    //    }
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
