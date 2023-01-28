@@ -20,7 +20,6 @@ import "../interfaces/IUniswapV2Factory.sol";
 import "../interfaces/ISpotFactory.sol";
 import {TransferHelper} from "../libraries/helper/TransferHelper.sol";
 
-
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
@@ -490,8 +489,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     function _approve(address token, address spender) internal {
-
-
         if (!TransferHelper.isApprove(token, spender)) {
             TransferHelper.approve(token, spender);
         }

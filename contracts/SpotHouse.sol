@@ -118,6 +118,28 @@ contract SpotHouse is
     // ONLY OPERATOR FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @dev see {BuyBackAndBurn-setPositionRouter}
+     */
+    function setPositionRouter(IPositionRouter _positionRouter)
+        public
+        override(BuyBackAndBurn)
+        onlyOperator
+    {
+        super.setPositionRouter(_positionRouter);
+    }
+
+    /**
+     * @dev see {BuyBackAndBurn-setPosiToken}
+     */
+    function setPosiToken(IERC20 _posiToken)
+        public
+        override(BuyBackAndBurn)
+        onlyOperator
+    {
+        super.setPosiToken(_posiToken);
+    }
+
     function setFactory(address _factoryAddress) external onlyOperator {
         require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
         spotFactory = ISpotFactory(_factoryAddress);
@@ -183,6 +205,9 @@ contract SpotHouse is
         super.setFee(_defaultFeePercentage);
     }
 
+    /**
+     * @dev see {BuyBackAndBurn-buyBackAndBurn}
+     */
     function buyBackAndBurn(
         IMatchingEngineAMM pairManager,
         address[] memory pathBuyBack

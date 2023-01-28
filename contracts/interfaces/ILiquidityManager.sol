@@ -3,9 +3,6 @@ pragma solidity ^0.8.9;
 
 import "../libraries/liquidity/Liquidity.sol";
 
-//import "../spot-exchange/libraries/liquidity/PoolLiquidity.sol";
-//import "../spot-exchange/libraries/liquidity/LiquidityInfo.sol";
-
 interface ILiquidityManager {
     enum ModifyType {
         INCREASE,

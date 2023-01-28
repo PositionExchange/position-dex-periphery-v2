@@ -45,8 +45,23 @@ abstract contract BuyBackAndBurn {
         totalBurned += amounts[pathBuyBack.length - 1];
     }
 
+    /// @notice buy back Posi token and burn it
+    /// @param pairManager the pair of token need sell to buy posi
+    /// @param pathBuyBack path to buy back
     function buyBackAndBurn(
         IMatchingEngineAMM pairManager,
         address[] memory pathBuyBack
     ) external virtual {}
+
+    /// @notice set position router
+    /// @param _positionRouter new address of position router
+    function setPositionRouter(IPositionRouter _positionRouter) public virtual {
+        positionRouter = _positionRouter;
+    }
+
+    /// @notice set position token
+    /// @param _posiToken new address of position token
+    function setPosiToken(IERC20 _posiToken) public virtual {
+        posiToken = _posiToken;
+    }
 }
