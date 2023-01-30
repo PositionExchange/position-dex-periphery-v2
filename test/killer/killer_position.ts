@@ -2,8 +2,8 @@ import {
     ForkMatchingEngineAMM,
     KillerPosition,
     MatchingEngineAMM, MockPairUni,
-    MockUniRouter, PositionNondisperseLiquidity,
-    PositionSpotFactory,
+    MockUniRouter, PositionNondisperseLiquidity, PositionRouter,
+    PositionSpotFactory, SpotHouse,
 } from "../../typeChain";
 import {deployContract, getAccount, toEther, toWei} from "../utils/utils";
 import {deployMockReflexToken, deployMockToken, deployMockWrappedBNB} from "../utils/mock";
