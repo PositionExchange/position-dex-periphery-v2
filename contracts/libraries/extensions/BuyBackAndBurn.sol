@@ -17,8 +17,6 @@ abstract contract BuyBackAndBurn {
 
     IERC20 public posiToken;
 
-    address public dead = 0x000000000000000000000000000000000000dEaD;
-
     uint256 public totalBurned;
 
     event BuyBackAndBurned(
@@ -49,7 +47,7 @@ abstract contract BuyBackAndBurn {
             amounts = positionRouter.swapExactETHForTokens{value: amount}(
                 0,
                 pathBuyBack,
-                dead,
+                _dead(),
                 9999999999
             );
         } else {
@@ -57,13 +55,18 @@ abstract contract BuyBackAndBurn {
                 amount,
                 0,
                 pathBuyBack,
-                dead,
+                _dead(),
                 9999999999
             );
         }
 
         totalBurned += amounts[pathBuyBack.length - 1];
         return amounts;
+    }
+
+
+    function _dead() internal returns(address) {
+        return 0x000000000000000000000000000000000000dEaD;
     }
 
     /// @notice buy back Posi token and burn it
