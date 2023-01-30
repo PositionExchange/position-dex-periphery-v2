@@ -31,4 +31,6 @@ library DexErrors {
     string public constant LQ_INDEX_RANGE_NOT_DIFF = "LQ_05";
     string public constant LQ_INVALID_NUMBER = "LQ_06";
     string public constant LQ_NOT_SUPPORT = "LQ_07";
+    string public constant LQ_MUST_BASE = "LQ_08";
+    string public constant LQ_MUST_QUOTE = "LQ_09";
 }

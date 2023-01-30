@@ -23,6 +23,7 @@ contract PositionSpotFactory is
     OwnableUpgradeable,
     SpotFactoryStorage
 {
+    /// @notice initalization the contract
     function initialize() public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();

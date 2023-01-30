@@ -27,8 +27,6 @@ abstract contract LiquidityManager is ILiquidityManager {
         public
         override concentratedLiquidity;
 
-    //    IPositionStakingDexManager stakingManager;
-
     /**
      * @dev see {ILiquidityManager-addLiquidity}
      */
@@ -641,7 +639,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             (indexedPipRange == state.currentIndexedPipRange &&
                 state.currentPrice == state.maxPip)
         ) {
-            if (isBase) revert("!Base");
+            if (isBase) revert(DexErrors.LQ_MUST_QUOTE);
 
             state.quoteAmountModify = amountModify;
         } else if (
@@ -649,7 +647,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             (indexedPipRange == state.currentIndexedPipRange &&
                 state.currentPrice == state.minPip)
         ) {
-            if (!isBase) revert("!Quote");
+            if (!isBase) revert(DexErrors.LQ_MUST_BASE);
             state.baseAmountModify = amountModify;
         } else if (indexedPipRange == state.currentIndexedPipRange) {
             state.maxPip = uint128(Math.sqrt(uint256(state.maxPip) * 10**18));
