@@ -21,9 +21,18 @@ abstract contract BuyBackAndBurn {
 
     uint256 public totalBurned;
 
-    function _buyBackAndBurn(address[] memory pathBuyBack, uint256 amount)
-        internal
-    {
+    event BuyBackAndBurned(
+        IMatchingEngineAMM pair,
+        address token,
+        uint256 amountBought,
+        uint256 amountPosiBurned
+    );
+
+    function _buyBackAndBurn(
+        address[] memory pathBuyBack,
+        uint256 amount,
+        bool userEther
+    ) internal returns (uint256[] memory) {
         Require._require(
             pathBuyBack[pathBuyBack.length - 1] == address(posiToken),
             DexErrors.DEX_MUST_POSI
@@ -34,15 +43,27 @@ abstract contract BuyBackAndBurn {
         ) {
             TransferHelper.approve(pathBuyBack[0], address(positionRouter));
         }
+        uint256[] memory amounts;
 
-        uint256[] memory amounts = positionRouter.swapExactTokensForTokens(
-            amount,
-            0,
-            pathBuyBack,
-            dead,
-            9999999999
-        );
+        if (userEther) {
+            amounts = positionRouter.swapExactETHForTokens{value: amount}(
+                0,
+                pathBuyBack,
+                dead,
+                9999999999
+            );
+        } else {
+            amounts = positionRouter.swapExactTokensForTokens(
+                amount,
+                0,
+                pathBuyBack,
+                dead,
+                9999999999
+            );
+        }
+
         totalBurned += amounts[pathBuyBack.length - 1];
+        return amounts;
     }
 
     /// @notice buy back Posi token and burn it
@@ -64,4 +85,11 @@ abstract contract BuyBackAndBurn {
     function setPosiToken(IERC20 _posiToken) public virtual {
         posiToken = _posiToken;
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[49] private __gap;
 }

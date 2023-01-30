@@ -2,6 +2,9 @@
  * @author Musket
  */
 // SPDX-License-Identifier: BUSL-1.1
+
+import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
+
 pragma solidity ^0.8.9;
 
 abstract contract StrategyFee {
@@ -15,12 +18,15 @@ abstract contract StrategyFee {
 
     FeeDiscount[] public strategyFee;
 
+    /// @notice init the strategy fee
     function _initStrategyFee(uint16 _defaultFeePercentage) internal {
         defaultFeePercentage = _defaultFeePercentage;
     }
 
     function condition() internal view virtual returns (uint16) {}
 
+    /// @notice get discount of fee when open order
+    /// @return return the discount
     function getFeeDiscount() internal view returns (uint16) {
         uint256 _condition = condition();
         if (strategyFee.length == 0 || _condition == 0) {
@@ -41,6 +47,9 @@ abstract contract StrategyFee {
         return feeDiscountPercent;
     }
 
+    /// @notice update the strategy discount percentage
+    /// @notice newStrategyDiscount the array of struct FeeDiscount
+    /// @dev only operator can call
     function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
         public
         virtual
@@ -55,7 +64,11 @@ abstract contract StrategyFee {
         }
     }
 
+    /// @notice set the default fee
+    /// @dev only operator can call
+    /// @dev _defaultFeePercentage the new default fee
     function setFee(uint16 _defaultFeePercentage) public virtual {
+        Require._require(_defaultFeePercentage > 0, "!0");
         defaultFeePercentage = _defaultFeePercentage;
     }
 }

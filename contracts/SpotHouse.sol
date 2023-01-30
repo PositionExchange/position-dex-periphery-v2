@@ -13,7 +13,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
-import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 
 import "./interfaces/IWBNB.sol";
 import "./libraries/types/SpotHouseStorage.sol";
@@ -35,6 +34,7 @@ contract SpotHouse is
 {
     using Convert for uint256;
 
+    /// @notice initalization the contract
     function initialize() public initializer {
         __ReentrancyGuard_init();
         __Ownable_init();
@@ -141,7 +141,10 @@ contract SpotHouse is
     }
 
     function setFactory(address _factoryAddress) external onlyOperator {
-        require(_factoryAddress != address(0), DexErrors.DEX_EMPTY_ADDRESS);
+        Require._require(
+            _factoryAddress != address(0),
+            DexErrors.DEX_EMPTY_ADDRESS
+        );
         spotFactory = ISpotFactory(_factoryAddress);
     }
 
@@ -164,6 +167,13 @@ contract SpotHouse is
 
         (uint256 baseFeeFunding, uint256 quoteFeeFunding) = pairManager
             .getFee();
+
+        baseFeeFunding =
+            (baseFeeFunding * 9999) /
+            FixedPoint128.BASIC_POINT_FEE;
+        quoteFeeFunding =
+            (quoteFeeFunding * 9999) /
+            FixedPoint128.BASIC_POINT_FEE;
 
         if (_pairAddress.BaseAsset == WBNB) {
             _withdrawBNB(recipient, pairManagerAddress, baseFeeFunding);
@@ -218,14 +228,41 @@ contract SpotHouse is
         (uint256 baseFeeFunding, uint256 quoteFeeFunding) = pairManager
             .getFee();
 
-        uint256 amount = isBase ? baseFeeFunding : quoteFeeFunding;
-        _buyBackAndBurn(pathBuyBack, amount);
+        uint256 amount = isBase
+            ? (baseFeeFunding * 9999) / FixedPoint128.BASIC_POINT_FEE
+            : (quoteFeeFunding * 9999) / FixedPoint128.BASIC_POINT_FEE;
+
+        bool userEther;
+        if (pathBuyBack[0] == WBNB) {
+            _withdrawBNB(address(this), address(pairManager), amount);
+            userEther = true;
+        } else {
+            TransferHelper.transferFrom(
+                IERC20(pathBuyBack[0]),
+                address(pairManager),
+                address(this),
+                amount
+            );
+        }
+
+        uint256[] memory amounts = _buyBackAndBurn(
+            pathBuyBack,
+            amount,
+            userEther
+        );
 
         if (isBase) {
-            pairManager.increaseBaseFeeFunding(amount);
+            pairManager.decreaseBaseFeeFunding(amount);
         } else {
-            pairManager.increaseQuoteFeeFunding(amount);
+            pairManager.decreaseQuoteFeeFunding(amount);
         }
+
+        emit BuyBackAndBurned(
+            pairManager,
+            pathBuyBack[0],
+            amount,
+            amounts[pathBuyBack.length - 1]
+        );
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -239,7 +276,10 @@ contract SpotHouse is
         returns (SpotFactoryStorage.Pair memory pair)
     {
         pair = spotFactory.getQuoteAndBase(address(_managerAddress));
-        require(pair.BaseAsset != address(0), DexErrors.DEX_EMPTY_ADDRESS);
+        Require._require(
+            pair.BaseAsset != address(0),
+            DexErrors.DEX_EMPTY_ADDRESS
+        );
     }
 
     function _getFee() internal view override(SpotDex) returns (uint16) {
@@ -263,7 +303,7 @@ contract SpotHouse is
         internal
         override(SpotDex)
     {
-        require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
+        Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
     }
