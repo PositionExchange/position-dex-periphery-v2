@@ -74,11 +74,9 @@ contract SpotHouse is
         super.openMarketOrder(pairManager, side, quantity);
     }
 
-    function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
-        public
-        override(SpotDex)
-        nonReentrant
-    {
+    function cancelAllLimitOrder(
+        IMatchingEngineAMM pairManager
+    ) public override(SpotDex) nonReentrant {
         super.cancelAllLimitOrder(pairManager);
     }
 
@@ -90,11 +88,9 @@ contract SpotHouse is
         super.cancelLimitOrder(pairManager, orderIdx, pip);
     }
 
-    function claimAsset(IMatchingEngineAMM pairManager)
-        public
-        override(SpotDex)
-        nonReentrant
-    {
+    function claimAsset(
+        IMatchingEngineAMM pairManager
+    ) public override(SpotDex) nonReentrant {
         super.claimAsset(pairManager);
     }
 
@@ -121,22 +117,18 @@ contract SpotHouse is
     /**
      * @dev see {BuyBackAndBurn-setPositionRouter}
      */
-    function setPositionRouter(IPositionRouter _positionRouter)
-        public
-        override(BuyBackAndBurn)
-        onlyOperator
-    {
+    function setPositionRouter(
+        IPositionRouter _positionRouter
+    ) public override(BuyBackAndBurn) onlyOperator {
         super.setPositionRouter(_positionRouter);
     }
 
     /**
      * @dev see {BuyBackAndBurn-setPosiToken}
      */
-    function setPosiToken(IERC20 _posiToken)
-        public
-        override(BuyBackAndBurn)
-        onlyOperator
-    {
+    function setPosiToken(
+        IERC20 _posiToken
+    ) public override(BuyBackAndBurn) onlyOperator {
         super.setPosiToken(_posiToken);
     }
 
@@ -156,10 +148,10 @@ contract SpotHouse is
         withdrawBNB = _withdrawBNB;
     }
 
-    function claimFee(IMatchingEngineAMM pairManager, address recipient)
-        external
-        onlyOperator
-    {
+    function claimFee(
+        IMatchingEngineAMM pairManager,
+        address recipient
+    ) external onlyOperator {
         SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
             pairManager
         );
@@ -199,19 +191,15 @@ contract SpotHouse is
         pairManager.resetFee(baseFeeFunding, quoteFeeFunding);
     }
 
-    function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
-        public
-        override(StrategyFee)
-        onlyOperator
-    {
+    function updateDiscountStrategy(
+        FeeDiscount[] memory newStrategyDiscount
+    ) public override(StrategyFee) onlyOperator {
         super.updateDiscountStrategy(newStrategyDiscount);
     }
 
-    function setFee(uint16 _defaultFeePercentage)
-        public
-        override(StrategyFee)
-        onlyOperator
-    {
+    function setFee(
+        uint16 _defaultFeePercentage
+    ) public override(StrategyFee) onlyOperator {
         super.setFee(_defaultFeePercentage);
     }
 
@@ -269,7 +257,9 @@ contract SpotHouse is
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+    function _getQuoteAndBase(
+        IMatchingEngineAMM _managerAddress
+    )
         internal
         view
         override(SpotDex)
@@ -299,10 +289,10 @@ contract SpotHouse is
         return msg.sender;
     }
 
-    function _depositBNB(address _pairManagerAddress, uint256 _amount)
-        internal
-        override(SpotDex)
-    {
+    function _depositBNB(
+        address _pairManagerAddress,
+        uint256 _amount
+    ) internal override(SpotDex) {
         Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
@@ -443,11 +433,10 @@ contract SpotHouse is
     }
 
     // _feeCalculator calculate fee
-    function _feeCalculator(uint256 _amount, uint16 _fee)
-        internal
-        pure
-        returns (uint256 feeCalculatedAmount)
-    {
+    function _feeCalculator(
+        uint256 _amount,
+        uint16 _fee
+    ) internal pure returns (uint256 feeCalculatedAmount) {
         if (_fee == 0) {
             return 0;
         }

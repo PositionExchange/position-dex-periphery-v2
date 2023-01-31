@@ -3,19 +3,20 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/governance/utils/VotesUpgradeable.sol";
 import "../interfaces/ILiquidityManagerNFT.sol";
 
 /// @title Manage the Liquidity NFT
 /// @notice This NFT is voteable
-abstract contract LiquidityManagerNFT is
+contract LiquidityManagerNFT is
     ILiquidityManagerNFT,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable
 {
     uint256 public override tokenID;
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
@@ -24,21 +25,13 @@ abstract contract LiquidityManagerNFT is
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeConsecutiveTokenTransfer(
-        address from,
-        address to,
-        uint256, /*first*/
-        uint96 size
-    ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
-        super._beforeConsecutiveTokenTransfer(from, to, 0, size);
-    }
-
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchSize
     ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
     /**
@@ -49,9 +42,10 @@ abstract contract LiquidityManagerNFT is
     function _afterTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchSize
     ) internal virtual override {
-        super._afterTokenTransfer(from, to, tokenId);
+        super._afterTokenTransfer(from, to, tokenId, batchSize);
     }
 
     /**
@@ -59,11 +53,9 @@ abstract contract LiquidityManagerNFT is
      * @param owner address owning the tokens
      * @return uint256[] List of token IDs owned by the requested address
      */
-    function tokensOfOwner(address owner)
-        public
-        view
-        returns (uint256[] memory)
-    {
+    function tokensOfOwner(
+        address owner
+    ) public view returns (uint256[] memory) {
         uint256 balance = balanceOf(owner);
         uint256[] memory tokens = new uint256[](balance);
 

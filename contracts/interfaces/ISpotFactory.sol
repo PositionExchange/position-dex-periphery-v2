@@ -47,26 +47,24 @@ interface ISpotFactory {
     /// @param quoteAsset the address of quote asset
     /// @param baseAsset the address of base asset
     /// @return pairManager the address of pair manager
-    function getPairManager(address quoteAsset, address baseAsset)
-        external
-        view
-        returns (address pairManager);
+    function getPairManager(
+        address quoteAsset,
+        address baseAsset
+    ) external view returns (address pairManager);
 
     /// @notice get the quote asset and base asset
     /// @param pairManager the address of pair
     /// @return struct of quote and base
-    function getQuoteAndBase(address pairManager)
-        external
-        view
-        returns (Pair memory);
+    function getQuoteAndBase(
+        address pairManager
+    ) external view returns (Pair memory);
 
     /// @notice check pair manager is exist
     /// @param pairManager the address of pair
     /// @return true if exist, false if not exist
-    function isPairManagerExist(address pairManager)
-        external
-        view
-        returns (bool);
+    function isPairManagerExist(
+        address pairManager
+    ) external view returns (bool);
 
     /// @notice check pair and assets is supported with random two token
     /// @param tokenA the first token
@@ -74,23 +72,22 @@ interface ISpotFactory {
     /// @return baseToken the address of base token
     /// @return quoteToken the address of quote token
     /// @return pairManager the address of pair
-    function getPairManagerSupported(address tokenA, address tokenB)
+    function getPairManagerSupported(
+        address tokenA,
+        address tokenB
+    )
         external
         view
-        returns (
-            address baseToken,
-            address quoteToken,
-            address pairManager
-        );
+        returns (address baseToken, address quoteToken, address pairManager);
 
     /// @notice get staking manager of pair
     /// @param owner the owner of pair
     /// @param pair the address of pair
     /// @return the address of contract staking manager
-    function stakingManagerOfPair(address owner, address pair)
-        external
-        view
-        returns (address);
+    function stakingManagerOfPair(
+        address owner,
+        address pair
+    ) external view returns (address);
 
     /// @notice get owner of pair
     /// @param pair the address of pair

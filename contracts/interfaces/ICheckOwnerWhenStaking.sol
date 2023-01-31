@@ -10,8 +10,8 @@ interface ICheckOwnerWhenStaking {
     /// @param tokenId id of the nft
     /// @return isOwner true if is owner, false otherwise
     /// @return caller address of the delegate call
-    function isOwnerWhenStaking(address user, uint256 tokenId)
-        external
-        view
-        returns (bool isOwner, address caller);
+    function isOwnerWhenStaking(
+        address user,
+        uint256 tokenId
+    ) external view returns (bool isOwner, address caller);
 }

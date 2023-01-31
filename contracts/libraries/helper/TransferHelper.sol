@@ -56,11 +56,10 @@ library TransferHelper {
     /// @param token need check approve
     /// @param spender need grant permit to transfer token
     /// @return bool type after check
-    function isApprove(address token, address spender)
-        internal
-        view
-        returns (bool)
-    {
+    function isApprove(
+        address token,
+        address spender
+    ) internal view returns (bool) {
         return
             IERC20(token).allowance(address(this), spender) > 0 ? true : false;
     }

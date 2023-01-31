@@ -51,11 +51,10 @@ contract WithdrawBNB is IWithdrawBNB {
         counterParties[_account] = false;
     }
 
-    function withdraw(address recipient, uint256 amount)
-        external
-        override
-        onlyCounterParty
-    {
+    function withdraw(
+        address recipient,
+        uint256 amount
+    ) external override onlyCounterParty {
         WBNB.withdraw(amount);
         payable(recipient).sendValue(amount);
     }

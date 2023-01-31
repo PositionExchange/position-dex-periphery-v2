@@ -35,7 +35,7 @@ contract MockTokenTreasury is Ownable {
     address public insuranceFund;
     IPositionToken public posi;
 
-    uint256 public maxMintAmount = 10 * 100000 * 10**18;
+    uint256 public maxMintAmount = 10 * 100000 * 10 ** 18;
 
     modifier onlyCounterParty() {
         require(
@@ -80,11 +80,9 @@ contract MockTokenTreasury is Ownable {
         maxMintAmount = amount;
     }
 
-    function calulateMintAmount(uint256 amount)
-        private
-        view
-        returns (uint256 amountToMint)
-    {
+    function calulateMintAmount(
+        uint256 amount
+    ) private view returns (uint256 amountToMint) {
         uint256 baseAmount = posi.BASE_MINT();
         amountToMint = baseAmount * (amount / baseAmount + 1);
         require(amountToMint < maxMintAmount, "Max exceed");

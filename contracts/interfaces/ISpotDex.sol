@@ -125,14 +125,13 @@ interface ISpotDex {
     /// @return quoteAsset amount of quote can claim
     /// @return baseAsset amount of base can claim
     /// @return basisPoint of pair
-    function getAmountClaimable(IMatchingEngineAMM pairManager, address trader)
+    function getAmountClaimable(
+        IMatchingEngineAMM pairManager,
+        address trader
+    )
         external
         view
-        returns (
-            uint256 quoteAsset,
-            uint256 baseAsset,
-            uint256 basisPoint
-        );
+        returns (uint256 quoteAsset, uint256 baseAsset, uint256 basisPoint);
 
     /// @notice get all pending limit order of trader and pair
     /// @param pairManager the pair want to get pending limit
