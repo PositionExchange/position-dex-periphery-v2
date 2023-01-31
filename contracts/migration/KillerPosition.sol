@@ -85,10 +85,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         WBNB = _WBNB;
     }
 
-    function updateUniswapV2Factory(IUniswapV2Factory _uniswapV2Factory)
-        external
-        onlyOwner
-    {
+    function updateUniswapV2Factory(
+        IUniswapV2Factory _uniswapV2Factory
+    ) external onlyOwner {
         uniswapV2Factory = _uniswapV2Factory;
     }
 
@@ -107,10 +106,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return uniswapV2Factory.getPair(pair.QuoteAsset, pair.BaseAsset);
     }
 
-    function migratePosition(IUniswapV2Pair pair, uint256 liquidity)
-        public
-        nonReentrant
-    {
+    function migratePosition(
+        IUniswapV2Pair pair,
+        uint256 liquidity
+    ) public nonReentrant {
         State memory state;
         address user = _msgSender();
         address token0 = pair.token0();
@@ -227,9 +226,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         } else {
             uint128 amountBase;
             uint128 amountQuote;
-            state.currentPip = sqrt(uint256(state.currentPip) * 10**18);
-            maxPip = sqrt(uint256(maxPip) * 10**18);
-            minPip = sqrt(uint256(minPip) * 10**18);
+            state.currentPip = sqrt(uint256(state.currentPip) * 10 ** 18);
+            maxPip = sqrt(uint256(maxPip) * 10 ** 18);
+            minPip = sqrt(uint256(minPip) * 10 ** 18);
             if (isToken0Base) {
                 (amountBase, amountQuote) = _estimate(
                     uint128(state.amount0),
@@ -557,11 +556,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return msg.sender;
     }
 
-    function _getBack(
-        address token,
-        uint128 amount,
-        address user
-    ) internal {
+    function _getBack(address token, uint128 amount, address user) internal {
         if (amount == 0) return;
         if (token == address(WBNB)) {
             payable(user).sendValue(amount);
@@ -570,11 +565,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         }
     }
 
-    function _balanceOf(address token, address instance)
-        internal
-        view
-        returns (uint256)
-    {
+    function _balanceOf(
+        address token,
+        address instance
+    ) internal view returns (uint256) {
         if (token == address(WBNB)) {
             return instance.balance;
         }

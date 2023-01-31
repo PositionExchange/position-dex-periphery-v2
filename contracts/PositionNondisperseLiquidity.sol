@@ -54,12 +54,9 @@ contract PositionNondisperseLiquidity is
         spotFactory = _sportFactory;
     }
 
-    function addLiquidity(AddLiquidityParams calldata params)
-        public
-        payable
-        override(LiquidityManager)
-        nonReentrant
-    {
+    function addLiquidity(
+        AddLiquidityParams calldata params
+    ) public payable override(LiquidityManager) nonReentrant {
         super.addLiquidity(params);
     }
 
@@ -70,16 +67,16 @@ contract PositionNondisperseLiquidity is
         super.addLiquidityWithRecipient(params, recipient);
     }
 
-    function removeLiquidity(uint256 nftTokenId)
-        public
-        override(LiquidityManager)
-        nonReentrant
-        nftOwner(nftTokenId)
-    {
+    function removeLiquidity(
+        uint256 nftTokenId
+    ) public override(LiquidityManager) nonReentrant nftOwner(nftTokenId) {
         super.removeLiquidity(nftTokenId);
     }
 
-    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity)
+    function decreaseLiquidity(
+        uint256 nftTokenId,
+        uint128 liquidity
+    )
         public
         override(LiquidityManager)
         nonReentrant
@@ -117,7 +114,9 @@ contract PositionNondisperseLiquidity is
         super.shiftRange(nftTokenId, targetIndex, amountNeeded, isBase);
     }
 
-    function collectFee(uint256 nftTokenId)
+    function collectFee(
+        uint256 nftTokenId
+    )
         public
         override(LiquidityManager)
         nonReentrant
@@ -129,11 +128,9 @@ contract PositionNondisperseLiquidity is
     /// @dev mint token nft
     /// @param user the address user will be receive
     /// @return tokenId the token id minted
-    function mint(address user)
-        internal
-        override(LiquidityManager)
-        returns (uint256 tokenId)
-    {
+    function mint(
+        address user
+    ) internal override(LiquidityManager) returns (uint256 tokenId) {
         tokenId = tokenID + 1;
         _mint(user, tokenId);
         tokenID = tokenId;
@@ -155,11 +152,9 @@ contract PositionNondisperseLiquidity is
         _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
     }
 
-    function getAllTokensDetailOfUser(address user)
-        external
-        view
-        returns (LiquidityDetail[] memory, uint256[] memory)
-    {
+    function getAllTokensDetailOfUser(
+        address user
+    ) external view returns (LiquidityDetail[] memory, uint256[] memory) {
         uint256[] memory tokens = tokensOfOwner(user);
         return (getAllDataDetailTokens(tokens), tokens);
     }
@@ -168,12 +163,9 @@ contract PositionNondisperseLiquidity is
         return WBNB;
     }
 
-    function getStakingManager(address poolAddress)
-        public
-        view
-        override(LiquidityManager)
-        returns (address)
-    {
+    function getStakingManager(
+        address poolAddress
+    ) public view override(LiquidityManager) returns (address) {
         address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
 
         return spotFactory.stakingManagerOfPair(ownerOfPool, poolAddress);
@@ -207,7 +199,9 @@ contract PositionNondisperseLiquidity is
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+    function _getQuoteAndBase(
+        IMatchingEngineAMM _managerAddress
+    )
         internal
         view
         override(LiquidityManager)
@@ -302,9 +296,10 @@ contract PositionNondisperseLiquidity is
         }
     }
 
-    function _depositBNB(address _pairManagerAddress, uint256 _amount)
-        internal
-    {
+    function _depositBNB(
+        address _pairManagerAddress,
+        uint256 _amount
+    ) internal {
         Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
@@ -341,12 +336,10 @@ contract PositionNondisperseLiquidity is
         return WBNB;
     }
 
-    function _isOwner(uint256 tokenId, address user)
-        internal
-        view
-        override(LiquidityManager)
-        returns (bool)
-    {
+    function _isOwner(
+        uint256 tokenId,
+        address user
+    ) internal view override(LiquidityManager) returns (bool) {
         return ownerOf(tokenId) == user;
     }
 }

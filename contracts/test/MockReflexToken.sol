@@ -17,7 +17,7 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        _mint(msg.sender, 10000 * 10**18);
+        _mint(msg.sender, 10000 * 10 ** 18);
     }
 
     function mint(address recipient, uint256 amount) public {
@@ -53,22 +53,16 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
     /**
      * @dev See {IERC20-balanceOf}.
      */
-    function balanceOf(address account)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256) {
         return _balances[account];
     }
 
-    function transfer(address to, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function transfer(
+        address to,
+        uint256 amount
+    ) public virtual override returns (bool) {
         address owner = _msgSender();
         _transfer(owner, to, amount);
         return true;
@@ -77,22 +71,17 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function allowance(
+        address owner,
+        address spender
+    ) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
-    function approve(address spender, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function approve(
+        address spender,
+        uint256 amount
+    ) public virtual override returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, amount);
         return true;
@@ -109,21 +98,19 @@ contract MockReflexToken is Context, IERC20, IERC20Metadata {
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue
+    ) public virtual returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, _allowances[owner][spender] + addedValue);
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue
+    ) public virtual returns (bool) {
         address owner = _msgSender();
         uint256 currentAllowance = _allowances[owner][spender];
         require(
