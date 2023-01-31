@@ -307,6 +307,14 @@ export class YamlTestProcess {
         if (expectData) await this.expectTest(expectData);
     }
 
+    async CancelAllLimitOrder(stepData) {
+
+        const action = this.extractAction(stepData.getProp("Action"));
+        if (action) { await this.testHelper.cancelAllLimitOrder(action.price, action.orderId, action.id, {revert : action.revert} )}
+        const expectData = stepData.getProp("Expect");
+        if (expectData) await this.expectTest(expectData);
+    }
+
     async Expect(stepData) {
         if (stepData) await this.expectTest(stepData);
     }

@@ -817,3 +817,139 @@ describe("basisPoint-6", async function(){
 `)
     })
 })
+
+
+describe("cancel-all-limit-order", async () => {
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(1_000_000, true, false, 30000,  )
+    })
+
+
+
+    it ("Cancel-All", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 652547
+- S1: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 52.418027262
+    Price: 671386
+- S2: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 139.46225042572198
+    Price: 775465
+- S3: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 192.86650427261443
+    Price: 710617
+- S4: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 94.91299088996044
+    Price: 730940
+- S5: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 99.66288628498255
+    Price: 622868
+- S6: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 131.74886564862416
+- S7: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 152.15113297521154
+    Price: 742048
+- S8: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 57.79453010416853
+- S9: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 114.92474495743375
+    Price: 776413
+- S10: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 14.122056643382152
+    Price: 699558
+- S11: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 76.2969334323995
+    Price: 757360
+- S12: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 192.75277576350504
+- S13: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 1
+    Quantity: 108.7149368706765
+- S14: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 31.824787147864498
+    Price: 809094
+- S15: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 1
+    Quantity: 196.8796762685193
+    Price: 800882
+- S16: OpenLimit
+  Action:
+    Id: 1
+    Asset: base
+    Side: 0
+    Quantity: 81.32980718139507
+    Price: 799287
+- S17: OpenMarket
+  Action:
+    id: 1
+    asset: base
+    Side: 0
+    Quantity: 75.31970310024023
+- S18: CancelAllLimitOrder
+  Action:
+    id: 1
+`)
+    })
+})
