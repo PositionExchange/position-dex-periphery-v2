@@ -894,62 +894,56 @@ describe("cancel-all-limit-order", async () => {
     Side: 0
     Quantity: 114.92474495743375
     Price: 776413
-- S10: OpenLimit
+`)
+    })
+})
+
+describe("swap", async () => {
+    let testHelper: TestLiquidity
+
+    beforeEach(async () => {
+        testHelper = await deployAndCreateRouterHelper(1_000_000, true, false, 2000  )
+    })
+
+
+
+    it ("swap", async () => {
+        return testHelper.process(`
+- S0: SetCurrentPrice
+  Action: 
+    Price: 3000
+- S1: AddLiquidity
   Action:
     Id: 1
+    IndexPipRange: 1
     Asset: base
-    Side: 0
-    Quantity: 14.122056643382152
-    Price: 699558
-- S11: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 0
-    Quantity: 76.2969334323995
-    Price: 757360
-- S12: OpenMarket
-  Action:
-    id: 1
-    asset: base
-    Side: 1
-    Quantity: 192.75277576350504
-- S13: OpenMarket
-  Action:
-    id: 1
-    asset: base
-    Side: 1
-    Quantity: 108.7149368706765
-- S14: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 31.824787147864498
-    Price: 809094
-- S15: OpenLimit
+    AmountVirtual: 50
+- S2: OpenLimit
   Action:
     Id: 1
     Asset: base
     Side: 1
-    Quantity: 196.8796762685193
-    Price: 800882
-- S16: OpenLimit
+    Quantity: 1.2
+    Price: 3030
+- S3: OpenLimit
   Action:
     Id: 1
     Asset: base
-    Side: 0
-    Quantity: 81.32980718139507
-    Price: 799287
-- S17: OpenMarket
+    Side: 1
+    Quantity: 0.6
+    Price: 3025
+- S4: OpenMarket
   Action:
     id: 1
-    asset: base
+    asset: quote
     Side: 0
-    Quantity: 75.31970310024023
-- S18: CancelAllLimitOrder
+    Quantity: 2
+- S5: OpenMarket
   Action:
     id: 1
+    asset: quote
+    Side: 0
+    Quantity: 2
 `)
     })
 })
