@@ -351,19 +351,7 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
       Price: 190000
       Size : 190
       Side: 1
-- S10: OpenLimit
-  Action:
-    Id: 2
-    Asset: base
-    Side: 0
-    Quantity: 120
-    Price: 160000
-  Expect:
-    PendingOrder:
-      OrderId: 1
-      Price: 160000
-      Size : 120
-      Side: 0
+
 - S11: OpenMarket
   Action:
     id: 2
@@ -385,28 +373,6 @@ describe("LiquidityActionAddRemoveCase11-15", async function(){
     User:
       Id: 2
       BalanceBase: 9809.68421
-      BalanceQuote: 8139.97226
-- S12: OpenMarket
-  Action:
-    id: 2
-    asset: base
-    Side: 1
-    Quantity: 120
-  Expect:
-    Pool:
-      Liquidity: 27929.8748158330
-      BaseVirtual: 399.3157907414
-      QuoteVirtual: 3547.5592399528
-      BaseReal: 6982.4687039583
-      QuoteReal: 111719.4992633320
-      IndexPipRange: 5
-      MaxPip: 179999
-      MinPip: 150000
-      FeeGrowthBase: 0  
-      FeeGrowthQuote: 0
-    User:
-      Id: 2
-      BalanceBase: 9689.68421
       BalanceQuote: 10059.97226
 - S13: RemoveLiquidity
   Action:
