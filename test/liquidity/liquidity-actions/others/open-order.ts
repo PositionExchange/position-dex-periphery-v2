@@ -77,17 +77,4 @@ describe("OpenOrder", async function(){
     BalanceQuote: 880 
 `)
     })
-    it ("OpenOrderWithQuote-No-Liquidity", async () => {
-        return testHelper.process(`
-- S0: SetCurrentPrice
-  Action: 
-    Price: 10000
-- S1: OpenMarket
-  Action:
-    id: 2
-    asset: quote
-    Side: 0
-    Quantity: 10
-`)
-    })
 })

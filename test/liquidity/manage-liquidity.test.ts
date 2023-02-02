@@ -12,7 +12,7 @@ import {deployMockToken} from "../utils/mock";
 import {exchange} from "../../typeChain/@positionex/matching-engine/contracts/libraries";
 import {expect} from "chai";
 
-describe("manage liquidity", async () => {
+describe("manage liquidity",  () => {
     let matching: ForkMatchingEngineAMM
     let spotHouse: MockSpotHouse
     let factory: PositionSpotFactory
@@ -23,7 +23,7 @@ describe("manage liquidity", async () => {
 
 
     let users: any[] = [];
-    before("", async () => {
+    beforeEach("", async () => {
             users = await getAccount() as unknown as any[];
             const deployer = users[0];
             matching = await deployContract("ForkMatchingEngineAMM", deployer);
@@ -33,8 +33,6 @@ describe("manage liquidity", async () => {
             quote = await deployMockToken("Quote");
             base = await deployMockToken("Base");
 
-
-            console.log("TTT", quote, base)
 
             await matching.initialize(
                 {
@@ -46,19 +44,20 @@ describe("manage liquidity", async () => {
                     pipRange: 30_000,
                     tickSpace: 1,
                     owner: deployer.address,
-                    positionLiquidity: deployer.address,
-                    spotHouse: deployer.address,
+                    positionLiquidity: dexNFT.address,
+                    spotHouse: spotHouse.address,
                     feeShareAmm: 0,
                     router : deployer.address
                 }
             );
 
+            await factory.initialize();
             await spotHouse.initialize();
 
             await spotHouse.setFactory(factory.address);
 
-            await dexNFT.setFactory(factory.address)
             await dexNFT.initialize()
+            await dexNFT.setFactory(factory.address)
 
             await factory.addPairManagerManual(matching.address, base.address, quote.address);
             await matching.setCounterParty02(spotHouse.address);
@@ -124,7 +123,7 @@ describe("manage liquidity", async () => {
 
             const dataBefore = await dexNFT.concentratedLiquidity(1000001)
             console.log(dataBefore.toString());
-            console.log("liquidity: ", dataBefore.liquidity.toString());
+            console.log("liquidity: ", dataBefore.liquidity.toString(), (await dexNFT.tokenID()).toString());
             expect(dataBefore.pool).to.equal(matching.address)
             console.log("dexNFT: ", dexNFT.address)
 

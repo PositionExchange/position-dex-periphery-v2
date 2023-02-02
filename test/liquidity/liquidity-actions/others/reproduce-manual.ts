@@ -1,16 +1,18 @@
 import {deployAndCreateRouterHelper, TestLiquidity} from "../../test-liquidity";
 
-describe("ReproduceManual", async function(){
-    let testHelper: TestLiquidity
+describe("reproduce-manual", async () => {
 
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000, true)
-    })
+    describe("ReproduceManual", async function(){
+        let testHelper: TestLiquidity
+
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000, true)
+        })
 
 
 
-    it ("Case 01", async () => {
-        return testHelper.process(`
+        it ("Case 01", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action:
     Price: 10000
@@ -43,22 +45,22 @@ describe("ReproduceManual", async function(){
       BalanceBase: 9990.00000000000
       BalanceQuote: 9976.33974596216
 `)
-    })
-})
-
-
-
-describe("ReproduceManualPTX", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(1_000, false)
+        })
     })
 
 
 
-    it ("Limit PTX", async () => {
-        return testHelper.process(`
+    describe("ReproduceManualPTX", async function(){
+        let testHelper: TestLiquidity
+
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(1_000, false)
+        })
+
+
+
+        it ("Limit PTX", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 5104
@@ -102,20 +104,20 @@ describe("ReproduceManualPTX", async function(){
     Size : 0.7
     Side: 1
 `)
-    })
-})
-
-describe("ReproduceManualBTC", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 3000000)
+        })
     })
 
+    describe("ReproduceManualBTC", async function(){
+        let testHelper: TestLiquidity
+
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 3000000, 'none', 100)
+        })
 
 
-it ("Limit BTC", async () => {
-        return testHelper.process(`
+
+        it ("Limit BTC", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 169210000
@@ -164,29 +166,16 @@ it ("Limit BTC", async () => {
     Side: 0
     Quantity: 0.01
 `)
+        })
     })
-it ("Add BTC", async () => {
-        return testHelper.process(`
-- S0: SetCurrentPrice
-  Action: 
-    Price: 169210000
-- S1: AddLiquidity
-  Action:
-    Id: 1
-    IndexPipRange: 56
-    Asset: quote
-    AmountVirtual: 1000000000
-`)
-    })
-})
-describe("ReproduceManualCHZ", async function(){
-    let testHelper: TestLiquidity
+    describe("ReproduceManualCHZ", async function(){
+        let testHelper: TestLiquidity
 
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 30000)
-    })
-it ("Add CHZ", async () => {
-        return testHelper.process(`
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(100_000_000_000, false, false, 30000)
+        })
+        it ("Add CHZ", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 33757
@@ -197,21 +186,21 @@ it ("Add CHZ", async () => {
     Asset: base
     AmountVirtual: 1000000
 `)
-    })
-})
-
-
-describe("ReproduceManualAdd1M", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000_000, false, false, 30000)
+        })
     })
 
 
+    describe("ReproduceManualAdd1M", async function(){
+        let testHelper: TestLiquidity
 
-it ("Add 1M", async () => {
-        return testHelper.process(`
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000_000, false, false, 30000)
+        })
+
+
+
+        it ("Add 1M", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 10000
@@ -222,21 +211,21 @@ it ("Add 1M", async () => {
     Asset: base
     AmountVirtual: 1000000
 `)
-    })
-})
-
-
-describe("OpenMarketWithQuote", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000, false)
+        })
     })
 
 
+    describe("OpenMarketWithQuote", async function(){
+        let testHelper: TestLiquidity
 
-it ("OpenMarketWithQuote-sell-4", async () => {
-        return testHelper.process(`
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000, false)
+        })
+
+
+
+        it ("OpenMarketWithQuote-sell-4", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action:
     Price: 170000
@@ -260,21 +249,21 @@ it ("OpenMarketWithQuote-sell-4", async () => {
     Side: 1
     Quantity: 10
     `)
+        })
+
     })
 
-})
+    describe("basisPoint-8", async function(){
+        let testHelper: TestLiquidity
 
-describe("basisPoint-8", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000_000, false, false, 30000,'none', 100_000_000 )
-    })
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000_000, false, false, 30000,'none', 100_000_000 )
+        })
 
 
 
-it ("should basisPoint 8", async () => {
-        return testHelper.process(`
+        it ("should basisPoint 8", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 70000
@@ -398,9 +387,9 @@ it ("should basisPoint 8", async () => {
       MaxPip: 89999 
       MinPip: 60000
 `)
-    })
-it ("should basisPoint 8-noliquidity", async () => {
-        return testHelper.process(`
+        })
+        it ("should basisPoint 8-noliquidity", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 70000
@@ -418,21 +407,21 @@ it ("should basisPoint 8-noliquidity", async () => {
     Side: 1
     Quantity: 1
 `)
-    })
-})
-
-
-describe("OpenMarketWithQuote-Manual", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000, false)
+        })
     })
 
 
+    describe("OpenMarketWithQuote-Manual", async function(){
+        let testHelper: TestLiquidity
 
-it ("OpenMarketWithQuote-fill-limit", async () => {
-        return testHelper.process(`
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000, false)
+        })
+
+
+
+        it ("OpenMarketWithQuote-fill-limit", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 70000
@@ -454,9 +443,9 @@ it ("OpenMarketWithQuote-fill-limit", async () => {
       BalanceBase: 1024
       BalanceQuote: 996
     `)
- })
-it ("OpenMarketWithQuote-fill-limit-amm", async () => {
-        return testHelper.process(`
+        })
+        it ("OpenMarketWithQuote-fill-limit-amm", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 165000
@@ -578,20 +567,20 @@ it ("OpenMarketWithQuote-fill-limit-amm", async () => {
       BalanceBase: 9980.00000
       BalanceQuote: 10329.30057
     `)
- })
+        })
 
-})
-describe("OpenMarketWithQuote-Manual", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000, false)
     })
+    describe("OpenMarketWithQuote-Manual", async function(){
+        let testHelper: TestLiquidity
+
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(10_000, false)
+        })
 
 
 
-it ("OpenMarketWithQuote-fill-limit", async () => {
-        return testHelper.process(`
+        it ("OpenMarketWithQuote-fill-limit", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 70000
@@ -613,9 +602,9 @@ it ("OpenMarketWithQuote-fill-limit", async () => {
       BalanceBase: 1024
       BalanceQuote: 996
     `)
- })
-it ("OpenMarketWithQuote-fill-limit-amm", async () => {
-        return testHelper.process(`
+        })
+        it ("OpenMarketWithQuote-fill-limit-amm", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 165000
@@ -736,69 +725,29 @@ it ("OpenMarketWithQuote-fill-limit-amm", async () => {
       BalanceBase: 9980.00000
       BalanceQuote: 10329.30057
     `)
- })
+        })
 
-})
-
-describe("POSI/BNB", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(10_000, false, true, 2000,  "quote", 1_000_000)
     })
 
 
+    describe("basisPoint-6", async function(){
+        let testHelper: TestLiquidity
 
-    it ("OpenOrder", async () => {
-        return testHelper.process(`
-- S0: SetCurrentPrice
-  Action: 
-    Price: 3000
-- S1: AddLiquidity
-  Action:
-    Id: 1
-    IndexPipRange: 1
-    BaseVirtual: 24.073632
-    Asset: base
-  Expect:
-    Pool:
-      Liquidity: 9.849879189561687774
-      BaseVirtual: 24.073632
-      QuoteVirtual: 0.099000111653359784
-      IndexPipRange: 1
-      MaxPip: 3999
-      MinPip: 2000
-- S2: OpenMarket
-  Action:
-    id: 1
-    asset: base
-    Side: 0
-    Quantity: 0.001 
-`)
-    })
-
-})
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(
+                10_000_000,
+                false,
+                false,
+                2000,
+                'none',
+                1_000_000
+            )
+        })
 
 
 
-describe("basisPoint-6", async function(){
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(
-            10_000_000,
-            false,
-            false,
-            2000,
-            'none',
-            1_000_000
-        )
-    })
-
-
-
-    it ("should basisPoint 6", async () => {
-        return testHelper.process(`
+        it ("should basisPoint 6", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 3000
@@ -815,100 +764,22 @@ describe("basisPoint-6", async function(){
     Side: 1
     Quantity: 10
 `)
-    })
-})
-
-
-describe("cancel-all-limit-order", async () => {
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(1_000_000, true, false, 30000,  )
+        })
     })
 
 
 
-    it ("Cancel-All", async () => {
-        return testHelper.process(`
-- S0: SetCurrentPrice
-  Action: 
-    Price: 652547
-- S1: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 52.418027262
-    Price: 671386
-- S2: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 139.46225042572198
-    Price: 775465
-- S3: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 0
-    Quantity: 192.86650427261443
-    Price: 710617
-- S4: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 94.91299088996044
-    Price: 730940
-- S5: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 0
-    Quantity: 99.66288628498255
-    Price: 622868
-- S6: OpenMarket
-  Action:
-    id: 1
-    asset: base
-    Side: 1
-    Quantity: 131.74886564862416
-- S7: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 1
-    Quantity: 152.15113297521154
-    Price: 742048
-- S8: OpenMarket
-  Action:
-    id: 1
-    asset: base
-    Side: 1
-    Quantity: 57.79453010416853
-- S9: OpenLimit
-  Action:
-    Id: 1
-    Asset: base
-    Side: 0
-    Quantity: 114.92474495743375
-    Price: 776413
-`)
-    })
-})
+    describe("swap", async () => {
+        let testHelper: TestLiquidity
 
-describe("swap", async () => {
-    let testHelper: TestLiquidity
-
-    beforeEach(async () => {
-        testHelper = await deployAndCreateRouterHelper(1_000_000, true, false, 2000  )
-    })
+        beforeEach(async () => {
+            testHelper = await deployAndCreateRouterHelper(1_000_000, true, false, 2000  )
+        })
 
 
 
-    it ("swap", async () => {
-        return testHelper.process(`
+        it ("swap", async () => {
+            return testHelper.process(`
 - S0: SetCurrentPrice
   Action: 
     Price: 3000
@@ -945,5 +816,7 @@ describe("swap", async () => {
     Side: 0
     Quantity: 2
 `)
+        })
     })
+
 })

@@ -577,7 +577,9 @@ describe("LiquidityActionCase06-10", async function(){
       Id: 3
       BalanceBase: 9985
       BalanceQuote: 10198.7913211474
-- S6: Expect
+- S6: ClaimAsset
+  Action:
+    Id: 2
   User:
     Id: 2
     BalanceBase: 10010

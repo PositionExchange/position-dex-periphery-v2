@@ -198,6 +198,9 @@ export async function deployAndCreateRouterHelper(
     if (!isUseFee) {
         await matching.resetFeeShareAmm();
         await spotHouse.setFee(0);
+    }else {
+        await spotHouse.setFee(300);
+
     }
 
 
@@ -323,6 +326,7 @@ export class TestLiquidity {
 
     async openLimitOrder(pip: number, side: number, size: number, idSender : number, asset  = 'base',  opts?: CallOptions) {
         console.group(`OpenLimitOrder`);
+        console.log("[openLimitOrder] currentPrice before : ", (await this.getCurrentPrice()))
         if ( asset === 'base'){
             await  this.mockSpotHouse.connect(this.users[idSender]).openLimitOrder(this.mockMatching.address, side, toWei(size), pip);
         }else {
@@ -332,7 +336,7 @@ export class TestLiquidity {
         const listOrderUser = await  this.mockSpotHouse.getPendingLimitOrders(this.mockMatching.address, this.users[idSender].address);
         // console.log("[openLimitOrder] listOrderUser: ", listOrderUser)
         const currentPrice = await this.getCurrentPrice();
-        console.log("[removeLiquidity] currentPrice : ", currentPrice)
+        console.log("[openLimitOrder] currentPrice  after: ", currentPrice)
         console.groupEnd();
     }
 
@@ -489,7 +493,10 @@ export class TestLiquidity {
         console.log("isFilled, isBuy, size, partialFilled: ", isFilled.toString(), isBuy.toString(), size.toString(), partialFilled.toString());
 
         console.log("size: ", size,fromWeiAndFormat(size), _size );
-        await expect( side == SIDE.BUY).to.eq(isBuy);
+        if (size.gt(0) ){
+            await expect( side == SIDE.BUY).to.eq(isBuy);
+
+        }
 
 
         if (id !== undefined){

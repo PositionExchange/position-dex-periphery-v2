@@ -249,7 +249,7 @@ describe("LiquidityActionAddRemoveCase21-25", async function(){
     Id: 3
     asset: base
     Side: 1
-    Quantity: 35.21549357899340
+    Quantity: 35.215
   Expect:
     Pool:
       Liquidity: 366.8658314300

@@ -67,7 +67,6 @@ abstract contract StrategyFee {
     /// @dev only operator can call
     /// @dev _defaultFeePercentage the new default fee
     function setFee(uint16 _defaultFeePercentage) public virtual {
-        Require._require(_defaultFeePercentage > 0, "!0");
         defaultFeePercentage = _defaultFeePercentage;
     }
 }

@@ -871,6 +871,7 @@ describe("LimitOver", async function(){
       Id: 2
       OrderId: 1
       Price: 82305
+      Side: 0
     CurrentPrice:
       Price: 82305
     User:
