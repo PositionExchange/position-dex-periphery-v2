@@ -31,10 +31,9 @@ contract MockToken is ERC20 {
         return _symbolT;
     }
 
-    function changNameAndSymbol(
-        string memory newName,
-        string memory newSymbol
-    ) public {
+    function changNameAndSymbol(string memory newName, string memory newSymbol)
+        public
+    {
         require(msg.sender == owner, "only owner can change name and symbol");
         _nameT = newName;
         _symbolT = newSymbol;

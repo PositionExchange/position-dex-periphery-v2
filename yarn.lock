@@ -731,10 +731,10 @@
     proper-lockfile "^4.1.1"
     solidity-ast "^0.4.15"
 
-"@positionex/matching-engine@1.3.5":
-  version "1.3.5"
-  resolved "https://registry.npmjs.org/@positionex/matching-engine/-/matching-engine-1.3.5.tgz"
-  integrity sha512-ZODNEIZ7qua8yYzIkAbeDvZEhti7CrZfnziwCMvgHn3rycODyYPcxKPrXM82xwMOdr0oBpS3TMwsPmI2EUAwUw==
+"@positionex/matching-engine@1.3.6":
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@positionex/matching-engine/-/matching-engine-1.3.6.tgz#710e4af3ae1842c5bf26f2c68e760463227fc8dc"
+  integrity sha512-fwIRI+32vbU65LiQab7FNhM7+XOOU4THmyjcbTDAf+1vuZVHR7O1YfGeQBB0YxCM3Rpwqa1ub85QSnqsAL9/fg==
   dependencies:
     "@openzeppelin/contracts" "^4.7.3"
     "@openzeppelin/contracts-upgradeable" "^4.8.0-rc.1"
