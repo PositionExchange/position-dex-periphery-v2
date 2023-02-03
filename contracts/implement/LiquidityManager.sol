@@ -751,7 +751,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         });
 
         emit LiquidityAdded(
-            user,
+            recipient,
             address(params.pool),
             nftTokenId,
             _resultAddLiquidity.baseAmountAdded,
