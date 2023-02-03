@@ -14,9 +14,7 @@ contract LiquidityManagerNFT is
 {
     uint256 public override tokenID;
 
-    function supportsInterface(
-        bytes4 interfaceId
-    )
+    function supportsInterface(bytes4 interfaceId)
         public
         view
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
@@ -53,9 +51,11 @@ contract LiquidityManagerNFT is
      * @param owner address owning the tokens
      * @return uint256[] List of token IDs owned by the requested address
      */
-    function tokensOfOwner(
-        address owner
-    ) public view returns (uint256[] memory) {
+    function tokensOfOwner(address owner)
+        public
+        view
+        returns (uint256[] memory)
+    {
         uint256 balance = balanceOf(owner);
         uint256[] memory tokens = new uint256[](balance);
 

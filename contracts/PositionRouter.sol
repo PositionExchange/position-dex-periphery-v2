@@ -414,14 +414,17 @@ contract PositionRouter is
         return token.balanceOf(to) - balanceBefore;
     }
 
-    function _deposit(address token, address from, uint256 amount) internal {
+    function _deposit(
+        address token,
+        address from,
+        uint256 amount
+    ) internal {
         IERC20(token).transferFrom(from, address(this), amount);
     }
 
-    function _depositBNB(
-        address _pairManagerAddress,
-        uint256 _amount
-    ) internal {
+    function _depositBNB(address _pairManagerAddress, uint256 _amount)
+        internal
+    {
         require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
@@ -487,9 +490,10 @@ contract PositionRouter is
         withdrawBNB = _withdrawBNB;
     }
 
-    function setUniSwpRouter(
-        IUniswapV2Router02 _newUniSwpRouter
-    ) public onlyOwner {
+    function setUniSwpRouter(IUniswapV2Router02 _newUniSwpRouter)
+        public
+        onlyOwner
+    {
         uniSwapRouterV2 = _newUniSwpRouter;
     }
 
@@ -505,9 +509,11 @@ contract PositionRouter is
     // VIEWS FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function getSideAndPairManager(
-        address[] calldata path
-    ) public view returns (SpotHouseStorage.Side side, address pairManager) {
+    function getSideAndPairManager(address[] calldata path)
+        public
+        view
+        returns (SpotHouseStorage.Side side, address pairManager)
+    {
         address quoteToken;
         (, quoteToken, pairManager) = isPosiDexSupportPair(
             path[0],
@@ -530,9 +536,11 @@ contract PositionRouter is
         address quoteToken;
     }
 
-    function getSidesAndPairs(
-        address[] calldata path
-    ) public view returns (SideAndPair[] memory) {
+    function getSidesAndPairs(address[] calldata path)
+        public
+        view
+        returns (SideAndPair[] memory)
+    {
         SideAndPair[] memory sidesAndPairs = new SideAndPair[](path.length - 1);
         address baseToken;
         address quoteToken;
@@ -559,10 +567,11 @@ contract PositionRouter is
         return sidesAndPairs;
     }
 
-    function getReserves(
-        address tokenA,
-        address tokenB
-    ) external view returns (uint256 reservesA, uint256 reservesB) {
+    function getReserves(address tokenA, address tokenB)
+        external
+        view
+        returns (uint256 reservesA, uint256 reservesB)
+    {
         (reservesA, reservesB, ) = IUniswapV2Pair(
             IUniswapV2Factory(uniSwapRouterV2.factory()).getPair(tokenA, tokenB)
         ).getReserves();
@@ -575,14 +584,15 @@ contract PositionRouter is
                 : false;
     }
 
-    function isPosiDexSupportPair(
-        address tokenA,
-        address tokenB
-    )
+    function isPosiDexSupportPair(address tokenA, address tokenB)
         public
         view
         override
-        returns (address baseToken, address quoteToken, address pairManager)
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        )
     {
         (baseToken, quoteToken, pairManager) = factory.getPairManagerSupported(
             tokenA,
@@ -590,10 +600,13 @@ contract PositionRouter is
         );
     }
 
-    function getAmountsOut(
-        uint256 amountIn,
-        address[] calldata path
-    ) public view virtual override returns (uint256[] memory amounts) {
+    function getAmountsOut(uint256 amountIn, address[] calldata path)
+        public
+        view
+        virtual
+        override
+        returns (uint256[] memory amounts)
+    {
         (
             SpotHouseStorage.Side side,
             address pairManagerAddress
@@ -630,10 +643,13 @@ contract PositionRouter is
         }
     }
 
-    function getAmountsIn(
-        uint256 amountOut,
-        address[] calldata path
-    ) public view virtual override returns (uint256[] memory amounts) {
+    function getAmountsIn(uint256 amountOut, address[] calldata path)
+        public
+        view
+        virtual
+        override
+        returns (uint256[] memory amounts)
+    {
         (
             SpotHouseStorage.Side side,
             address pairManagerAddress

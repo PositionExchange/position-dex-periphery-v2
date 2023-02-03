@@ -50,9 +50,10 @@ abstract contract StrategyFee {
     /// @notice update the strategy discount percentage
     /// @notice newStrategyDiscount the array of struct FeeDiscount
     /// @dev only operator can call
-    function updateDiscountStrategy(
-        FeeDiscount[] memory newStrategyDiscount
-    ) public virtual {
+    function updateDiscountStrategy(FeeDiscount[] memory newStrategyDiscount)
+        public
+        virtual
+    {
         delete strategyFee;
 
         if (newStrategyDiscount.length != 0) {

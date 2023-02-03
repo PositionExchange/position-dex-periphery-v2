@@ -8,12 +8,12 @@ import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol"
 import "@positionex/matching-engine/contracts/libraries/helper/TradeConvert.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/FixedPoint128.sol";
+import "@positionex/matching-engine/contracts/libraries/helper/Convert.sol";
 
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "./Block.sol";
-import "../libraries/helper/Convert.sol";
 import "../interfaces/ISpotDex.sol";
 
 abstract contract SpotDex is ISpotDex, SpotHouseStorage {
@@ -75,9 +75,10 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     /**
      * @dev see {ISpotDex-cancelAllLimitOrder}
      */
-    function cancelAllLimitOrder(
-        IMatchingEngineAMM pairManager
-    ) public virtual {
+    function cancelAllLimitOrder(IMatchingEngineAMM pairManager)
+        public
+        virtual
+    {
         address _trader = _msgSender();
         uint256 refundQuote;
         uint256 refundBase;
@@ -261,14 +262,15 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     /**
      * @dev see {ISpotDex-getAmountClaimable}
      */
-    function getAmountClaimable(
-        IMatchingEngineAMM pairManager,
-        address trader
-    )
+    function getAmountClaimable(IMatchingEngineAMM pairManager, address trader)
         public
         view
         virtual
-        returns (uint256 quoteAmount, uint256 baseAmount, uint256 basisPoint)
+        returns (
+            uint256 quoteAmount,
+            uint256 baseAmount,
+            uint256 basisPoint
+        )
     {
         address _pairManagerAddress = address(pairManager);
 
@@ -404,9 +406,12 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         return -1;
     }
 
-    function _getQuoteAndBase(
-        IMatchingEngineAMM _managerAddress
-    ) internal view virtual returns (SpotFactoryStorage.Pair memory pair) {}
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        virtual
+        returns (SpotFactoryStorage.Pair memory pair)
+    {}
 
     struct OpenLimitOrderState {
         uint64 orderId;
@@ -943,17 +948,19 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         return TradeConvert.quoteToBase(quoteAmount, pip, basisPoint);
     }
 
-    function _basisPoint(
-        IMatchingEngineAMM _pairManager
-    ) internal view returns (uint256) {
+    function _basisPoint(IMatchingEngineAMM _pairManager)
+        internal
+        view
+        returns (uint256)
+    {
         return _pairManager.basisPoint();
     }
 
     // HOOK
-    function _depositBNB(
-        address _pairManagerAddress,
-        uint256 _amount
-    ) internal virtual {}
+    function _depositBNB(address _pairManagerAddress, uint256 _amount)
+        internal
+        virtual
+    {}
 
     function _withdrawBNB(
         address _trader,

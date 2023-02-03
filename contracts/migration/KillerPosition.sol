@@ -85,18 +85,18 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         WBNB = _WBNB;
     }
 
-    function updateUniswapV2Factory(
-        IUniswapV2Factory _uniswapV2Factory
-    ) external onlyOwner {
+    function updateUniswapV2Factory(IUniswapV2Factory _uniswapV2Factory)
+        external
+        onlyOwner
+    {
         uniswapV2Factory = _uniswapV2Factory;
     }
 
     function isToken0Base(IUniswapV2Pair pair) public view returns (bool) {
-        (
-            address baseToken,
-            address quoteToken,
-            address pairManager
-        ) = spotFactory.getPairManagerSupported(pair.token0(), pair.token1());
+        (address baseToken, , ) = spotFactory.getPairManagerSupported(
+            pair.token0(),
+            pair.token1()
+        );
 
         return baseToken == pair.token0();
     }
@@ -106,10 +106,10 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return uniswapV2Factory.getPair(pair.QuoteAsset, pair.BaseAsset);
     }
 
-    function migratePosition(
-        IUniswapV2Pair pair,
-        uint256 liquidity
-    ) public nonReentrant {
+    function migratePosition(IUniswapV2Pair pair, uint256 liquidity)
+        public
+        nonReentrant
+    {
         State memory state;
         address user = _msgSender();
         address token0 = pair.token0();
@@ -154,7 +154,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         state.balance0 = _balanceOf(token0, address(this));
         state.balance1 = _balanceOf(token1, address(this));
 
-        bool isToken0Base = state.baseToken == pair.token0();
+        bool _isToken0Base = state.baseToken == pair.token0();
 
         state.currentIndexedPipRange = uint32(
             IMatchingEngineAMM(state.pairManager).currentIndexedPipRange()
@@ -171,15 +171,15 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             uint256 _value;
 
             if (
-                (isToken0Base && token0 == address(WBNB)) ||
-                (!isToken0Base && token0 == address(WBNB))
+                (_isToken0Base && token0 == address(WBNB)) ||
+                (!_isToken0Base && token0 == address(WBNB))
             ) {
                 _value = state.amount0;
             }
 
             if (
-                (!isToken0Base && token1 == address(WBNB)) ||
-                (isToken0Base && token1 == address(WBNB))
+                (!_isToken0Base && token1 == address(WBNB)) ||
+                (_isToken0Base && token1 == address(WBNB))
             ) {
                 _value = state.amount1;
             }
@@ -187,7 +187,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             positionLiquidity.addLiquidityWithRecipient{value: _value}(
                 ILiquidityManager.AddLiquidityParams({
                     pool: IMatchingEngineAMM(state.pairManager),
-                    amountVirtual: isToken0Base
+                    amountVirtual: _isToken0Base
                         ? uint128(state.amount0)
                         : uint128(state.amount1),
                     indexedPipRange: state.currentIndexedPipRange,
@@ -198,15 +198,15 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         } else if (maxPip == state.currentPip) {
             uint256 _value;
             if (
-                (isToken0Base && token0 == address(WBNB)) ||
-                (!isToken0Base && token0 == address(WBNB))
+                (_isToken0Base && token0 == address(WBNB)) ||
+                (!_isToken0Base && token0 == address(WBNB))
             ) {
                 _value = state.amount0;
             }
 
             if (
-                (!isToken0Base && token1 == address(WBNB)) ||
-                (isToken0Base && token1 == address(WBNB))
+                (!_isToken0Base && token1 == address(WBNB)) ||
+                (_isToken0Base && token1 == address(WBNB))
             ) {
                 _value = state.amount1;
             }
@@ -215,7 +215,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             positionLiquidity.addLiquidityWithRecipient{value: _value}(
                 ILiquidityManager.AddLiquidityParams({
                     pool: IMatchingEngineAMM(state.pairManager),
-                    amountVirtual: isToken0Base
+                    amountVirtual: _isToken0Base
                         ? uint128(state.amount1)
                         : uint128(state.amount0),
                     indexedPipRange: state.currentIndexedPipRange,
@@ -226,14 +226,13 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         } else {
             uint128 amountBase;
             uint128 amountQuote;
-            state.currentPip = sqrt(uint256(state.currentPip) * 10 ** 18);
-            maxPip = sqrt(uint256(maxPip) * 10 ** 18);
-            minPip = sqrt(uint256(minPip) * 10 ** 18);
-            if (isToken0Base) {
+            state.currentPip = sqrt(uint256(state.currentPip) * 10**18);
+            maxPip = sqrt(uint256(maxPip) * 10**18);
+            minPip = sqrt(uint256(minPip) * 10**18);
+            if (_isToken0Base) {
                 (amountBase, amountQuote) = _estimate(
                     uint128(state.amount0),
                     true,
-                    state.currentIndexedPipRange,
                     state.currentPip,
                     maxPip,
                     minPip,
@@ -248,7 +247,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 token1,
                                 amountBase,
                                 amountQuote,
-                                isToken0Base
+                                _isToken0Base
                             )
                         }(
                             ILiquidityManager.AddLiquidityParams({
@@ -268,7 +267,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                     token1,
                                     amountBase,
                                     amountQuote,
-                                    isToken0Base
+                                    _isToken0Base
                                 )
                             }(
                                 ILiquidityManager.AddLiquidityParams({
@@ -286,7 +285,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     (amountBase, amountQuote) = _estimate(
                         uint128(state.amount1),
                         false,
-                        state.currentIndexedPipRange,
                         state.currentPip,
                         maxPip,
                         minPip,
@@ -301,7 +299,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 token1,
                                 amountBase,
                                 amountQuote,
-                                isToken0Base
+                                _isToken0Base
                             )
                         }(
                             ILiquidityManager.AddLiquidityParams({
@@ -321,7 +319,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                     token1,
                                     amountBase,
                                     amountQuote,
-                                    isToken0Base
+                                    _isToken0Base
                                 )
                             }(
                                 ILiquidityManager.AddLiquidityParams({
@@ -340,7 +338,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 (amountBase, amountQuote) = _estimate(
                     uint128(state.amount1),
                     true,
-                    state.currentIndexedPipRange,
                     state.currentPip,
                     maxPip,
                     minPip,
@@ -355,7 +352,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 token1,
                                 amountBase,
                                 amountQuote,
-                                isToken0Base
+                                _isToken0Base
                             )
                         }(
                             ILiquidityManager.AddLiquidityParams({
@@ -375,7 +372,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                     token1,
                                     amountBase,
                                     amountQuote,
-                                    isToken0Base
+                                    _isToken0Base
                                 )
                             }(
                                 ILiquidityManager.AddLiquidityParams({
@@ -393,7 +390,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     (amountBase, amountQuote) = _estimate(
                         uint128(state.amount0),
                         false,
-                        state.currentIndexedPipRange,
                         state.currentPip,
                         maxPip,
                         minPip,
@@ -409,7 +405,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 token1,
                                 amountBase,
                                 amountQuote,
-                                isToken0Base
+                                _isToken0Base
                             )
                         }(
                             ILiquidityManager.AddLiquidityParams({
@@ -429,7 +425,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                     token1,
                                     amountBase,
                                     amountQuote,
-                                    isToken0Base
+                                    _isToken0Base
                                 )
                             }(
                                 ILiquidityManager.AddLiquidityParams({
@@ -473,7 +469,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         );
     }
 
-    function _isCatch(string memory reason) internal view returns (bool) {
+    function _isCatch(string memory reason) internal pure returns (bool) {
         return
             (keccak256(abi.encodePacked((reason))) ==
                 keccak256(
@@ -483,7 +479,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                 keccak256(abi.encodePacked(("LQ_07"))));
     }
 
-    function sqrt(uint256 number) internal view returns (uint128) {
+    function sqrt(uint256 number) internal pure returns (uint128) {
         return uint128(Math.sqrt(number));
     }
 
@@ -494,31 +490,30 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     function _calculateValue(
-        address token0,
-        address token1,
-        uint128 amountBase,
-        uint128 amountQuote,
-        bool isToken0Base
+        address _token0,
+        address _token1,
+        uint128 _amountBase,
+        uint128 _amountQuote,
+        bool _isToken0Base
     ) internal view returns (uint256 value) {
         if (
-            (token0 == address(WBNB) && isToken0Base) ||
-            (token1 == address(WBNB) && !isToken0Base)
+            (_token0 == address(WBNB) && _isToken0Base) ||
+            (_token1 == address(WBNB) && !_isToken0Base)
         ) {
-            value = amountBase;
+            value = _amountBase;
         }
 
         if (
-            (token0 == address(WBNB) && !isToken0Base) ||
-            (token1 == address(WBNB) && isToken0Base)
+            (_token0 == address(WBNB) && !_isToken0Base) ||
+            (_token1 == address(WBNB) && _isToken0Base)
         ) {
-            value = amountQuote;
+            value = _amountQuote;
         }
     }
 
     function _estimate(
         uint128 amountVirtual,
         bool isBase,
-        uint32 currentIndexedPipRange,
         uint128 currentPip,
         uint128 maxPip,
         uint128 minPip,
@@ -556,7 +551,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return msg.sender;
     }
 
-    function _getBack(address token, uint128 amount, address user) internal {
+    function _getBack(
+        address token,
+        uint128 amount,
+        address user
+    ) internal {
         if (amount == 0) return;
         if (token == address(WBNB)) {
             payable(user).sendValue(amount);
@@ -565,10 +564,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         }
     }
 
-    function _balanceOf(
-        address token,
-        address instance
-    ) internal view returns (uint256) {
+    function _balanceOf(address token, address instance)
+        internal
+        view
+        returns (uint256)
+    {
         if (token == address(WBNB)) {
             return instance.balance;
         }

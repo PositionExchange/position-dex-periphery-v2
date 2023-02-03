@@ -33,9 +33,10 @@ interface ILiquidityManager {
     /// @dev get all data of nft
     /// @param tokens array of tokens
     /// @return list array of struct LiquidityDetail
-    function getAllDataDetailTokens(
-        uint256[] memory tokens
-    ) external view returns (LiquidityDetail[] memory);
+    function getAllDataDetailTokens(uint256[] memory tokens)
+        external
+        view
+        returns (LiquidityDetail[] memory);
 
     /// @notice get data of tokens
     /// @param tokenId the id of token
@@ -44,9 +45,7 @@ interface ILiquidityManager {
     /// @return feeGrowthBase checkpoint of fee base
     /// @return feeGrowthQuote checkpoint of fee quote
     /// @return pool the pool liquidity provide
-    function concentratedLiquidity(
-        uint256 tokenId
-    )
+    function concentratedLiquidity(uint256 tokenId)
         external
         view
         returns (
@@ -60,9 +59,7 @@ interface ILiquidityManager {
     /// @dev get data of nft
     /// @notice provide liquidity for pool
     /// @param params struct of AddLiquidityParams
-    function addLiquidity(
-        AddLiquidityParams calldata params
-    ) external payable virtual;
+    function addLiquidity(AddLiquidityParams calldata params) external payable;
 
     /// @dev get data of nft
     /// @notice provide liquidity for pool with recipient nft id
@@ -71,12 +68,12 @@ interface ILiquidityManager {
     function addLiquidityWithRecipient(
         AddLiquidityParams calldata params,
         address recipient
-    ) external payable virtual;
+    ) external payable;
 
     /// @dev remove liquidity
     /// @notice remove liquidity of token id and transfer asset
     /// @param nftTokenId id of token
-    function removeLiquidity(uint256 nftTokenId) external virtual;
+    function removeLiquidity(uint256 nftTokenId) external;
 
     /// @dev remove liquidity
     /// @notice increase liquidity
@@ -87,16 +84,13 @@ interface ILiquidityManager {
         uint256 nftTokenId,
         uint128 amountModify,
         bool isBase
-    ) external payable virtual;
+    ) external payable;
 
     /// @dev decrease liquidity and transfer asset
     /// @notice increase liquidity
     /// @param nftTokenId id of token
     /// @param liquidity amount decrease
-    function decreaseLiquidity(
-        uint256 nftTokenId,
-        uint128 liquidity
-    ) external virtual;
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidity) external;
 
     /// @dev shiftRange to other index of range
     /// @notice increase liquidity
@@ -109,12 +103,12 @@ interface ILiquidityManager {
         uint32 targetIndex,
         uint128 amountNeeded,
         bool isBase
-    ) external payable virtual;
+    ) external payable;
 
     /// @dev collect fee reward and transfer asset
     /// @notice collect fee reward
     /// @param nftTokenId id of token
-    function collectFee(uint256 nftTokenId) external virtual;
+    function collectFee(uint256 nftTokenId) external;
 
     /// @notice get liquidity detail of token id
     /// @param baseVirtual base amount with impairment loss
@@ -124,12 +118,9 @@ interface ILiquidityManager {
     /// @param feeBasePending amount fee base pending to collect
     /// @param feeQuotePending amount fee quote pending to collect
     /// @param pool provide liquidity
-    function liquidity(
-        uint256 nftTokenId
-    )
+    function liquidity(uint256 nftTokenId)
         external
         view
-        virtual
         returns (
             uint128 baseVirtual,
             uint128 quoteVirtual,

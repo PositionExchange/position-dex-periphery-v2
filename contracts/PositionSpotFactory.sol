@@ -99,7 +99,7 @@ contract PositionSpotFactory is
             IMatchingEngineAMM.InitParams({
                 quoteAsset: IERC20(quoteAsset),
                 baseAsset: IERC20(baseAsset),
-                basisPoint: 10 ** basisPoint,
+                basisPoint: 10**basisPoint,
                 maxFindingWordsIndex: maxFindingWordsIndex,
                 initialPip: initialPip,
                 pipRange: pipRange,
@@ -115,7 +115,7 @@ contract PositionSpotFactory is
         emit PairManagerInitialized(
             quoteAsset,
             baseAsset,
-            10 ** basisPoint,
+            10**basisPoint,
             maxFindingWordsIndex,
             initialPip,
             creator,
@@ -128,10 +128,9 @@ contract PositionSpotFactory is
     /// @notice set staking manager for pair, only owner of pair can set
     /// @param pair address of pair
     /// @param stakingManager address of staking manager
-    function setStakingManagerForPair(
-        address pair,
-        address stakingManager
-    ) public {
+    function setStakingManagerForPair(address pair, address stakingManager)
+        public
+    {
         address owner = msg.sender;
         require(owner == ownerPairManager[pair], DexErrors.DEX_ONLY_OWNER);
         stakingManagerOfPair[owner][pair] = stakingManager;
@@ -149,10 +148,12 @@ contract PositionSpotFactory is
     /// @param quoteAsset address of quote
     /// @param baseAsset address of base
     /// @return spotManager the address of pair address
-    function getPairManager(
-        address quoteAsset,
-        address baseAsset
-    ) external view override(ISpotFactory) returns (address spotManager) {
+    function getPairManager(address quoteAsset, address baseAsset)
+        external
+        view
+        override(ISpotFactory)
+        returns (address spotManager)
+    {
         return pathPairManagers[baseAsset][quoteAsset];
     }
 
@@ -162,14 +163,15 @@ contract PositionSpotFactory is
     /// @return baseToken the address of base asset
     /// @return quoteToken the address of quote asset
     /// @return pairManager the address of pair address
-    function getPairManagerSupported(
-        address tokenA,
-        address tokenB
-    )
+    function getPairManagerSupported(address tokenA, address tokenB)
         public
         view
         override
-        returns (address baseToken, address quoteToken, address pairManager)
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        )
     {
         if (pathPairManagers[tokenA][tokenB] != address(0)) {
             return (tokenA, tokenB, pathPairManagers[tokenA][tokenB]);
@@ -182,18 +184,24 @@ contract PositionSpotFactory is
     /// @notice get quote and base address from pair manager
     /// @param pairManager address of pair address
     /// @return struct pair with base asset, quote asset and pair manager
-    function getQuoteAndBase(
-        address pairManager
-    ) external view override(ISpotFactory) returns (Pair memory) {
+    function getQuoteAndBase(address pairManager)
+        external
+        view
+        override(ISpotFactory)
+        returns (Pair memory)
+    {
         return allPairManager[pairManager];
     }
 
     /// @notice check pair manager exist in posi dex
     /// @param pairManager address of pair address
     /// @return return bool type, true is exist, false is no
-    function isPairManagerExist(
-        address pairManager
-    ) external view override(ISpotFactory) returns (bool) {
+    function isPairManagerExist(address pairManager)
+        external
+        view
+        override(ISpotFactory)
+        returns (bool)
+    {
         // Just 1 in 2 address needRequire._require != address 0x000
         // Because when we added pair, alreadyRequire._require both of them difference address 0x00
         return allPairManager[pairManager].BaseAsset != address(0);
@@ -215,9 +223,10 @@ contract PositionSpotFactory is
         feeShareAmm = _feeShareAmm;
     }
 
-    function setPositionLiquidity(
-        address _positionLiquidity
-    ) external onlyOwner {
+    function setPositionLiquidity(address _positionLiquidity)
+        external
+        onlyOwner
+    {
         Require._require(
             _positionLiquidity != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
@@ -280,10 +289,10 @@ contract PositionSpotFactory is
         });
     }
 
-    function addAllowedAddress(
-        address _address,
-        bool allow
-    ) external onlyOwner {
+    function addAllowedAddress(address _address, bool allow)
+        external
+        onlyOwner
+    {
         allowedAddressAddPair[_address] = allow;
     }
 }

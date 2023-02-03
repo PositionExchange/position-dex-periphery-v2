@@ -31,10 +31,10 @@ contract MockUniRouter {
         token1 = _token1;
     }
 
-    function deposit(
-        uint256 amountToken0,
-        uint256 amountToken1
-    ) public payable {
+    function deposit(uint256 amountToken0, uint256 amountToken1)
+        public
+        payable
+    {
         address caller = msg.sender;
         if (token0 == address(WBNB)) {
             _depositBNB(amountToken0);

@@ -30,9 +30,11 @@ abstract contract LiquidityManager is ILiquidityManager {
     /**
      * @dev see {ILiquidityManager-addLiquidity}
      */
-    function addLiquidity(
-        AddLiquidityParams calldata params
-    ) public payable virtual {
+    function addLiquidity(AddLiquidityParams calldata params)
+        public
+        payable
+        virtual
+    {
         _addLiquidityRecipient(params, _msgSender(), _msgSender());
     }
 
@@ -202,24 +204,24 @@ abstract contract LiquidityManager is ILiquidityManager {
     /**
      * @dev see {ILiquidityManager-decreaseLiquidity}
      */
-    function decreaseLiquidity(
-        uint256 nftTokenId,
-        uint128 liquidity
-    ) public virtual {
-        Require._require(liquidity != 0, DexErrors.LQ_INVALID_NUMBER);
+    function decreaseLiquidity(uint256 nftTokenId, uint128 liquidityAmount)
+        public
+        virtual
+    {
+        Require._require(liquidityAmount != 0, DexErrors.LQ_INVALID_NUMBER);
 
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[
             nftTokenId
         ];
 
-        if (liquidity > liquidityData.liquidity) {
-            liquidity = liquidityData.liquidity;
+        if (liquidityAmount > liquidityData.liquidity) {
+            liquidityAmount = liquidityData.liquidity;
         }
 
         (
             uint128 baseAmountRemoved,
             uint128 quoteAmountRemoved
-        ) = _removeLiquidity(liquidityData, liquidity);
+        ) = _removeLiquidity(liquidityData, liquidityAmount);
 
         UserLiquidity.CollectFeeData
             memory _collectFeeData = estimateCollectFee(
@@ -231,7 +233,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             );
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity - liquidity,
+            liquidityData.liquidity - liquidityAmount,
             liquidityData.indexedPipRange,
             _collectFeeData.newFeeGrowthBase,
             _collectFeeData.newFeeGrowthQuote
@@ -257,7 +259,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             user,
             nftTokenId,
             address(liquidityData.pool),
-            liquidity,
+            liquidityAmount,
             ModifyType.DECREASE
         );
 
@@ -269,7 +271,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             quoteAmountRemoved,
             ModifyType.DECREASE,
             liquidityData.indexedPipRange,
-            liquidity
+            liquidityAmount
         );
     }
 
@@ -502,9 +504,7 @@ abstract contract LiquidityManager is ILiquidityManager {
     /**
      * @dev see {ILiquidityManager-liquidity}
      */
-    function liquidity(
-        uint256 nftTokenId
-    )
+    function liquidity(uint256 nftTokenId)
         public
         view
         virtual
@@ -568,9 +568,11 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
     }
 
-    function getAllDataDetailTokens(
-        uint256[] memory tokens
-    ) public view returns (LiquidityDetail[] memory) {
+    function getAllDataDetailTokens(uint256[] memory tokens)
+        public
+        view
+        returns (LiquidityDetail[] memory)
+    {
         LiquidityDetail[] memory liquidityData = new LiquidityDetail[](
             tokens.length
         );
@@ -629,7 +631,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             _getPipRange(pool)
         );
 
-        ////
         state.pair = _getQuoteAndBase(pool);
 
         if (
@@ -648,10 +649,10 @@ abstract contract LiquidityManager is ILiquidityManager {
             if (!isBase) revert(DexErrors.LQ_MUST_BASE);
             state.baseAmountModify = amountModify;
         } else if (indexedPipRange == state.currentIndexedPipRange) {
-            state.maxPip = uint128(Math.sqrt(uint256(state.maxPip) * 10 ** 18));
-            state.minPip = uint128(Math.sqrt(uint256(state.minPip) * 10 ** 18));
+            state.maxPip = uint128(Math.sqrt(uint256(state.maxPip) * 10**18));
+            state.minPip = uint128(Math.sqrt(uint256(state.minPip) * 10**18));
             state.currentPrice = uint128(
-                Math.sqrt(uint256(state.currentPrice) * 10 ** 18)
+                Math.sqrt(uint256(state.currentPrice) * 10**18)
             );
 
             if (isBase) {
@@ -762,13 +763,13 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function _removeLiquidity(
         UserLiquidity.Data memory liquidityData,
-        uint128 liquidity
+        uint128 liquidityAmount
     ) internal returns (uint128 baseAmount, uint128 quoteAmount) {
-        if (liquidity == 0) return (baseAmount, quoteAmount);
+        if (liquidityAmount == 0) return (baseAmount, quoteAmount);
         return
             liquidityData.pool.removeLiquidity(
                 IAutoMarketMakerCore.RemoveLiquidity({
-                    liquidity: liquidity,
+                    liquidity: liquidityAmount,
                     indexedPipRange: liquidityData.indexedPipRange,
                     feeGrowthBase: liquidityData.feeGrowthBase,
                     feeGrowthQuote: liquidityData.feeGrowthQuote
@@ -780,7 +781,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         IMatchingEngineAMM pool,
         uint256 feeGrowthBase,
         uint256 feeGrowthQuote,
-        uint128 liquidity,
+        uint128 liquidityAmount,
         uint32 indexedPipRange
     ) public view returns (UserLiquidity.CollectFeeData memory _feeData) {
         (
@@ -796,31 +797,36 @@ abstract contract LiquidityManager is ILiquidityManager {
 
         _feeData.feeBaseAmount = Math.mulDiv(
             _feeData.newFeeGrowthBase - feeGrowthBase,
-            liquidity,
+            liquidityAmount,
             FixedPoint128.Q_POW18
         );
         _feeData.feeQuoteAmount = Math.mulDiv(
             _feeData.newFeeGrowthQuote - feeGrowthQuote,
-            liquidity,
+            liquidityAmount,
             FixedPoint128.Q_POW18
         );
     }
 
-    function _getPipRange(
-        IMatchingEngineAMM pool
-    ) internal returns (uint128 pipRange) {
+    function _getPipRange(IMatchingEngineAMM pool)
+        internal
+        view
+        returns (uint128 pipRange)
+    {
         return pool.pipRange();
     }
 
-    function _getCurrentIndexPipRange(
-        IMatchingEngineAMM pool
-    ) internal returns (uint256) {
+    function _getCurrentIndexPipRange(IMatchingEngineAMM pool)
+        internal
+        view
+        returns (uint256)
+    {
         return pool.currentIndexedPipRange();
     }
 
-    function _getCurrentPrice(
-        IMatchingEngineAMM pool
-    ) internal returns (uint128) {}
+    function _getCurrentPrice(IMatchingEngineAMM pool)
+        internal
+        returns (uint128)
+    {}
 
     function _depositLiquidity(
         IMatchingEngineAMM _pairManager,
@@ -836,9 +842,12 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint256 _amount
     ) internal virtual {}
 
-    function _getQuoteAndBase(
-        IMatchingEngineAMM _managerAddress
-    ) internal view virtual returns (ISpotFactory.Pair memory pair) {}
+    function _getQuoteAndBase(IMatchingEngineAMM _managerAddress)
+        internal
+        view
+        virtual
+        returns (ISpotFactory.Pair memory pair)
+    {}
 
     function _getWBNBAddress() internal view virtual returns (address) {}
 
@@ -872,10 +881,11 @@ abstract contract LiquidityManager is ILiquidityManager {
         }
     }
 
-    function isOwnerWhenStaking(
-        address user,
-        uint256 nftId
-    ) public view returns (bool) {
+    function isOwnerWhenStaking(address user, uint256 nftId)
+        public
+        view
+        returns (bool)
+    {
         UserLiquidity.Data memory liquidityData = concentratedLiquidity[nftId];
         address stakingManager = getStakingManager(address(liquidityData.pool));
         if (stakingManager != address(0)) {
@@ -883,7 +893,10 @@ abstract contract LiquidityManager is ILiquidityManager {
                 stakingManager
             ).isOwnerWhenStaking(user, nftId);
 
-            //            Require._require(caller == address(this),DexErrors.LQ_NOT_IMPLEMENT_YET);
+            Require._require(
+                caller == address(this),
+                DexErrors.LQ_NOT_IMPLEMENT_YET
+            );
             return isOwner;
         } else {
             //            revert(DexErrors.LQ_EMPTY_STAKING_MANAGER);
@@ -895,16 +908,23 @@ abstract contract LiquidityManager is ILiquidityManager {
 
     function burn(uint256 tokenId) internal virtual {}
 
-    function _isOwner(
-        uint256 tokenId,
-        address user
-    ) internal view virtual returns (bool) {}
+    function _isOwner(uint256 tokenId, address user)
+        internal
+        view
+        virtual
+        returns (bool)
+    {}
 
-    function getStakingManager(
-        address poolAddress
-    ) public view virtual returns (address) {}
+    function getStakingManager(address poolAddress)
+        public
+        view
+        virtual
+        returns (address)
+    {}
 
-    function _trackingId(
-        address pairManager
-    ) internal virtual returns (uint256) {}
+    function _trackingId(address pairManager)
+        internal
+        virtual
+        returns (uint256)
+    {}
 }

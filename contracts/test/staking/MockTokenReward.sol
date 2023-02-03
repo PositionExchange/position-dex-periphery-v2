@@ -14,13 +14,13 @@ contract MockTokenReward is ERC20, Ownable {
     }
 
     constructor() public ERC20("Mock Reward Token", "MRT") {
-        _mint(msg.sender, 10_000_000 * 10 ** 18);
+        _mint(msg.sender, 10_000_000 * 10**18);
     }
 
-    function treasuryTransfer(
-        address recipient,
-        uint256 amount
-    ) public onlyTreasury {
+    function treasuryTransfer(address recipient, uint256 amount)
+        public
+        onlyTreasury
+    {
         _transfer(_msgSender(), recipient, amount);
     }
 

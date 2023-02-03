@@ -32,7 +32,16 @@ library SpotHouseHelper {
         uint256 quoteAmount,
         uint256 baseAmount,
         uint256 basisPoint
-    ) internal view returns (uint256, uint256, int128, int128) {
+    )
+        internal
+        view
+        returns (
+            uint256,
+            uint256,
+            int128,
+            int128
+        )
+    {
         IMatchingEngineAMM _pairManager = IMatchingEngineAMM(pairAddress);
         (
             bool isFilled,

@@ -91,10 +91,11 @@ contract PositionStakingDexManager is
 
     //    // get position per block form the staking manager share to the contract
 
-    function getPlayerIds(
-        address owner,
-        address pid
-    ) public view returns (uint256[] memory) {
+    function getPlayerIds(address owner, address pid)
+        public
+        view
+        returns (uint256[] memory)
+    {
         return userNft[owner][pid];
     }
 
@@ -124,15 +125,17 @@ contract PositionStakingDexManager is
         posiTreasury = _posiTreasury;
     }
 
-    function setPositionEarningToken(
-        IERC20 _positionEarningToken
-    ) public onlyOwner {
+    function setPositionEarningToken(IERC20 _positionEarningToken)
+        public
+        onlyOwner
+    {
         position = _positionEarningToken;
     }
 
-    function updatePositionLiquidityPool(
-        address _newLiquidityPool
-    ) public onlyOwner {
+    function updatePositionLiquidityPool(address _newLiquidityPool)
+        public
+        onlyOwner
+    {
         positionNondisperseLiquidity = IPositionNondisperseLiquidity(
             _newLiquidityPool
         );
@@ -226,16 +229,18 @@ contract PositionStakingDexManager is
     }
 
     // Update the position referral contract address by the owner
-    function setPositionReferral(
-        IPositionReferral _positionReferral
-    ) public onlyOwner {
+    function setPositionReferral(IPositionReferral _positionReferral)
+        public
+        onlyOwner
+    {
         positionReferral = _positionReferral;
     }
 
     // Update referral commission rate by the owner
-    function setReferralCommissionRate(
-        uint16 _referralCommissionRate
-    ) public onlyOwner {
+    function setReferralCommissionRate(uint16 _referralCommissionRate)
+        public
+        onlyOwner
+    {
         require(
             _referralCommissionRate <= MAXIMUM_REFERRAL_COMMISSION_RATE,
             "setReferralCommissionRate: invalid referral commission rate basis points"
@@ -244,18 +249,20 @@ contract PositionStakingDexManager is
     }
 
     // Return reward multiplier over the given _from to _to block.
-    function getMultiplier(
-        uint256 _from,
-        uint256 _to
-    ) public view returns (uint256) {
+    function getMultiplier(uint256 _from, uint256 _to)
+        public
+        view
+        returns (uint256)
+    {
         return _to.sub(_from).mul(BONUS_MULTIPLIER);
     }
 
     // View function to see pending Positions on frontend.
-    function pendingPosition(
-        address _pid,
-        address _user
-    ) external view returns (uint256) {
+    function pendingPosition(address _pid, address _user)
+        external
+        view
+        returns (uint256)
+    {
         PoolInfo memory pool = poolInfo[_pid];
         UserInfo memory user = userInfo[_pid][_user];
         uint256 accPositionPerShare = pool.accPositionPerShare;
@@ -280,10 +287,11 @@ contract PositionStakingDexManager is
     }
 
     // View function to see if user can harvest Positions.
-    function canHarvest(
-        address _pid,
-        address _user
-    ) public view returns (bool) {
+    function canHarvest(address _pid, address _user)
+        public
+        view
+        returns (bool)
+    {
         UserInfo memory user = userInfo[_pid][_user];
         return block.timestamp >= user.nextHarvestUntil;
     }
@@ -332,10 +340,10 @@ contract PositionStakingDexManager is
         _stake(_nftId, address(0), _msgSender());
     }
 
-    function stakeWithReferral(
-        uint256 _nftId,
-        address _referrer
-    ) public nonReentrant {
+    function stakeWithReferral(uint256 _nftId, address _referrer)
+        public
+        nonReentrant
+    {
         _stake(_nftId, _referrer, _msgSender());
     }
 
@@ -359,7 +367,6 @@ contract PositionStakingDexManager is
     // Withdraw without caring about rewards. EMERGENCY ONLY.
     function emergencyWithdraw(address _pid) public nonReentrant {
         UserInfo storage user = userInfo[_pid][_msgSender()];
-        uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
         user.rewardLockedUp = 0;
@@ -547,10 +554,11 @@ contract PositionStakingDexManager is
         }
     }
 
-    function isOwnerWhenStaking(
-        address user,
-        uint256 nftId
-    ) external view returns (bool, address) {
+    function isOwnerWhenStaking(address user, uint256 nftId)
+        external
+        view
+        returns (bool, address)
+    {
         UserLiquidity.Data memory nftData = _getLiquidityData(nftId);
         uint256 indexNftId = nftOwnedIndex[nftId][address(nftData.pool)];
         return (
@@ -623,16 +631,18 @@ contract PositionStakingDexManager is
         );
     }
 
-    function _transferLockedToken(
-        address _to,
-        uint192 _amount
-    ) internal override {
+    function _transferLockedToken(address _to, uint192 _amount)
+        internal
+        override
+    {
         position.transfer(_to, _amount);
     }
 
-    function _getLiquidityData(
-        uint256 tokenId
-    ) internal view returns (UserLiquidity.Data memory data) {
+    function _getLiquidityData(uint256 tokenId)
+        internal
+        view
+        returns (UserLiquidity.Data memory data)
+    {
         (
             data.liquidity,
             data.indexedPipRange,
@@ -646,7 +656,7 @@ contract PositionStakingDexManager is
         uint32 indexedPipRangeNft,
         uint32 currentIndexedPipRange,
         uint256 liquidity
-    ) internal view returns (uint128 power) {
+    ) internal pure returns (uint128 power) {
         if (indexedPipRangeNft > currentIndexedPipRange) {
             power = uint128(
                 liquidity / ((indexedPipRangeNft - currentIndexedPipRange) + 1)
@@ -658,10 +668,10 @@ contract PositionStakingDexManager is
         }
     }
 
-    function _updatePower(
-        address user,
-        address pid
-    ) internal returns (uint128 totalPower) {
+    function _updatePower(address user, address pid)
+        internal
+        returns (uint128 totalPower)
+    {
         uint256[] memory _userNfts = userNft[user][pid];
 
         UserLiquidity.Data memory nftData;

@@ -64,7 +64,7 @@ abstract contract BuyBackAndBurn {
         return amounts;
     }
 
-    function _dead() internal returns (address) {
+    function _dead() internal pure returns (address) {
         return 0x000000000000000000000000000000000000dEaD;
     }
 
