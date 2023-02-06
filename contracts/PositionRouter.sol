@@ -149,13 +149,7 @@ contract PositionRouter is
         address[] calldata path,
         address to,
         uint256 deadline
-    )
-        external
-        virtual
-        override
-        ensure(deadline)
-        returns (uint256[] memory amounts)
-    {
+    ) external virtual override ensure(deadline) returns (uint256[] memory) {
         revert("No support");
     }
 
@@ -207,7 +201,7 @@ contract PositionRouter is
         virtual
         override
         ensure(deadline)
-        returns (uint256[] memory amounts)
+        returns (uint256[] memory)
     {
         revert("No support");
     }

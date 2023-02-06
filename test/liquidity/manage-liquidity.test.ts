@@ -125,10 +125,8 @@ describe("manage liquidity",  () => {
             console.log(dataBefore.toString());
             console.log("liquidity: ", dataBefore.liquidity.toString(), (await dexNFT.tokenID()).toString());
             expect(dataBefore.pool).to.equal(matching.address)
-            console.log("dexNFT: ", dexNFT.address)
 
             await dexNFT.increaseLiquidity( 1000001, toWei(100), false);
-            console.log("dexNFT: ", dexNFT.address)
 
             const dataAfter = await dexNFT.concentratedLiquidity(1000001)
             console.log('dataAfter', dataAfter.toString());
