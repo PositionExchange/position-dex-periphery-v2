@@ -239,7 +239,6 @@ abstract contract LiquidityManager is ILiquidityManager {
             _collectFeeData.newFeeGrowthQuote
         );
 
-        // current 5
         address user = _msgSender();
         _withdrawLiquidity(
             liquidityData.pool,
@@ -512,9 +511,10 @@ abstract contract LiquidityManager is ILiquidityManager {
             uint128 baseVirtual,
             uint128 quoteVirtual,
             uint128 liquidity,
+            uint128 power,
             uint256 indexedPipRange,
-            uint256 feeBasePending,
-            uint256 feeQuotePending,
+            uint128 feeBasePending,
+            uint128 feeQuotePending,
             IMatchingEngineAMM pool
         )
     {
@@ -526,6 +526,7 @@ abstract contract LiquidityManager is ILiquidityManager {
                 baseVirtual,
                 quoteVirtual,
                 liquidity,
+                power,
                 indexedPipRange,
                 feeBasePending,
                 feeQuotePending,
@@ -557,10 +558,17 @@ abstract contract LiquidityManager is ILiquidityManager {
                 );
         }
 
+        power = _calculatePower(
+            liquidityData.indexedPipRange,
+            uint32(_getCurrentIndexPipRange(liquidityData.pool)),
+            liquidityData.liquidity
+        );
+
         return (
             baseAmountRemoved,
             quoteAmountRemoved,
             liquidityData.liquidity,
+            power,
             liquidityData.indexedPipRange,
             _collectFeeData.feeBaseAmount,
             _collectFeeData.feeQuoteAmount,
@@ -578,14 +586,25 @@ abstract contract LiquidityManager is ILiquidityManager {
         );
         for (uint256 i = 0; i < tokens.length; i++) {
             (
-                liquidityData[i].baseVirtual,
-                liquidityData[i].quoteVirtual,
-                liquidityData[i].liquidity,
-                liquidityData[i].indexedPipRange,
-                liquidityData[i].feeBasePending,
-                liquidityData[i].feeQuotePending,
-                liquidityData[i].pool
+                uint128 baseVirtual,
+                uint128 quoteVirtual,
+                uint128 liquidityAmount,
+                uint128 power,
+                uint256 indexedPipRange,
+                uint128 feeBasePending,
+                uint128 feeQuotePending,
+                IMatchingEngineAMM pool
             ) = liquidity(tokens[i]);
+            /// This code below will take contract-size increase
+            /// but this way avoid stack too deep error
+            liquidityData[i].baseVirtual = baseVirtual;
+            liquidityData[i].quoteVirtual = quoteVirtual;
+            liquidityData[i].liquidity = liquidityAmount;
+            liquidityData[i].power = power;
+            liquidityData[i].indexedPipRange = indexedPipRange;
+            liquidityData[i].feeBasePending = feeBasePending;
+            liquidityData[i].feeQuotePending = feeQuotePending;
+            liquidityData[i].pool = pool;
         }
         return liquidityData;
     }
@@ -795,15 +814,19 @@ abstract contract LiquidityManager is ILiquidityManager {
 
         ) = pool.liquidityInfo(indexedPipRange);
 
-        _feeData.feeBaseAmount = Math.mulDiv(
-            _feeData.newFeeGrowthBase - feeGrowthBase,
-            liquidityAmount,
-            FixedPoint128.Q_POW18
+        _feeData.feeBaseAmount = uint128(
+            Math.mulDiv(
+                _feeData.newFeeGrowthBase - feeGrowthBase,
+                liquidityAmount,
+                FixedPoint128.Q_POW18
+            )
         );
-        _feeData.feeQuoteAmount = Math.mulDiv(
-            _feeData.newFeeGrowthQuote - feeGrowthQuote,
-            liquidityAmount,
-            FixedPoint128.Q_POW18
+        _feeData.feeQuoteAmount = uint128(
+            Math.mulDiv(
+                _feeData.newFeeGrowthQuote - feeGrowthQuote,
+                liquidityAmount,
+                FixedPoint128.Q_POW18
+            )
         );
     }
 
@@ -821,6 +844,22 @@ abstract contract LiquidityManager is ILiquidityManager {
         returns (uint256)
     {
         return pool.currentIndexedPipRange();
+    }
+
+    function _calculatePower(
+        uint32 indexedPipRangeNft,
+        uint32 currentIndexedPipRange,
+        uint256 liquidity
+    ) internal pure returns (uint128 power) {
+        if (indexedPipRangeNft > currentIndexedPipRange) {
+            power = uint128(
+                liquidity / ((indexedPipRangeNft - currentIndexedPipRange) + 1)
+            );
+        } else {
+            power = uint128(
+                liquidity / ((currentIndexedPipRange - indexedPipRangeNft) + 1)
+            );
+        }
     }
 
     function _getCurrentPrice(IMatchingEngineAMM pool)

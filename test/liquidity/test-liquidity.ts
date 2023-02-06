@@ -142,7 +142,6 @@ export async function deployAndCreateRouterHelper(
     dexNFT = await deployContract("PositionNondisperseLiquidity", deployer );
     router = await deployContract("PositionRouter", deployer );
     wbnb = await  deployMockWrappedBNB();
-    console.log("wbnb: ", wbnb.address);
     withdrawBNB = await deployContract("WithdrawBNB", deployer, wbnb.address);
 
 
@@ -192,7 +191,6 @@ export async function deployAndCreateRouterHelper(
     // await matching.setCounterParty02(spotHouse.address)
     await approveAndMintToken(quote, base, dexNFT, users, amountMint)
     await approve(quote, base, spotHouse, users)
-    console.log("quote: ", quote.address);
     await matching.approveForTest(spotHouse.address, dexNFT.address);
     await dexNFT.donatePool(matching.address, toWei(1), toWei(1));
     if (!isUseFee) {

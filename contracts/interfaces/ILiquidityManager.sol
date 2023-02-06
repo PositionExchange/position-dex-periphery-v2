@@ -24,9 +24,10 @@ interface ILiquidityManager {
         uint128 baseVirtual;
         uint128 quoteVirtual;
         uint128 liquidity;
+        uint128 power;
         uint256 indexedPipRange;
-        uint256 feeBasePending;
-        uint256 feeQuotePending;
+        uint128 feeBasePending;
+        uint128 feeQuotePending;
         IMatchingEngineAMM pool;
     }
 
@@ -125,9 +126,10 @@ interface ILiquidityManager {
             uint128 baseVirtual,
             uint128 quoteVirtual,
             uint128 liquidity,
+            uint128 power,
             uint256 indexedPipRange,
-            uint256 feeBasePending,
-            uint256 feeQuotePending,
+            uint128 feeBasePending,
+            uint128 feeQuotePending,
             IMatchingEngineAMM pool
         );
 

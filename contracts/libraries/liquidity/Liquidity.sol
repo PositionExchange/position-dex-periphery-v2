@@ -16,8 +16,8 @@ library UserLiquidity {
     }
 
     struct CollectFeeData {
-        uint256 feeBaseAmount;
-        uint256 feeQuoteAmount;
+        uint128 feeBaseAmount;
+        uint128 feeQuoteAmount;
         uint256 newFeeGrowthBase;
         uint256 newFeeGrowthQuote;
     }
