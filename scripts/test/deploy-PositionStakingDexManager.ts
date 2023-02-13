@@ -1,15 +1,45 @@
 import {task} from "hardhat/config";
 import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
 
 
 task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
+    let configData = await readConfig('config-testnet.json');
+    configData = await stakingDex(configData, hre);
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+task('deploy-PositionStakingDexManager-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    let configData = await readConfig('config.json');
+    configData = await stakingDex(configData, hre);
+    await writeConfig('config.json', configData);
+})
+
+
+task('upgrade-PositionStakingDexManager-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
     const configData = await readConfig('config-testnet.json');
+
+    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionStakingDexManager")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.positionStakingDexManager,
+        PositionConcentratedLiquidity
+    );
+    await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+async function stakingDex(configData, hre: HardhatRuntimeEnvironment ) {
 
     const PositionStakingDexManager = await hre.ethers.getContractFactory("PositionStakingDexManager")
 
-    const contractArgs: string[] = [configData.mockRewardToken, configData.positionConcentratedLiquidity, 1000];
+    const contractArgs: any[] = ["0x0000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000", 1000];
 
     const instance = await hre.upgrades.deployProxy(
         PositionStakingDexManager,
@@ -26,19 +56,6 @@ task('deploy-PositionStakingDexManager-testnet', 'How is your girl friend?', asy
     );
     await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
     configData.positionStakingDexManager = address
-    await writeConfig('config-testnet.json', configData);
-})
 
-task('upgrade-PositionStakingDexManager-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
-
-    const configData = await readConfig('config-testnet.json');
-
-    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionStakingDexManager")
-
-    const upgraded = await hre.upgrades.upgradeProxy(
-        configData.positionStakingDexManager,
-        PositionConcentratedLiquidity
-    );
-    await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
-    await writeConfig('config-testnet.json', configData);
-})
+    return configData
+}
