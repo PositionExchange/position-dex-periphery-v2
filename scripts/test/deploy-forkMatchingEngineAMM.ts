@@ -22,12 +22,6 @@ task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (
         "0xe9fA482345737D803b63c12f5e7Be76885D4eb66"
     ];
 
-    // const instance = await forkMatchingEngineAMM.deploy(
-    //     forkMatchingEngineAMM,
-    //     []
-    // );
-    //await instance.deployed();
-
 
     const hardhatDeployContract = await forkMatchingEngineAMM.deploy();
 

@@ -5,7 +5,23 @@ import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 
 task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
-    const configData = await readConfig('config-testnet.json');
+    let configData = await readConfig('config-testnet.json');
+    configData = await  deployWithdrawBNB(configData, hre);
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+
+task('deploy-withdrawBNB-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    let configData = await readConfig('config.json');
+    configData = await  deployWithdrawBNB(configData, hre);
+    await writeConfig('config.json', configData);
+})
+
+
+async function deployWithdrawBNB(configData,hre) {
+
 
     const withdrawBNB = await hre.ethers.getContractFactory("WithdrawBNB")
 
@@ -20,5 +36,7 @@ task('deploy-withdrawBNB-testnet', 'How is your girl friend?', async (taskArgs, 
 
 
     await verifyContract(hre,address, [configData.WBNB],"contracts/WithdrawBNB.sol:WithdrawBNB");
-    await writeConfig('config-testnet.json', configData);
-})
+
+    return configData
+
+}
