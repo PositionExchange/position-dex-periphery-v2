@@ -104,8 +104,6 @@ contract PositionSpotFactory is
                 initialPip: initialPip,
                 pipRange: pipRange,
                 tickSpace: tickSpace,
-                feeShareAmm: feeShareAmm,
-                owner: msg.sender,
                 positionLiquidity: positionLiquidity,
                 spotHouse: spotHouse,
                 router: positionRouter

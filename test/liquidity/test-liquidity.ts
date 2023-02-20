@@ -168,13 +168,13 @@ export async function deployAndCreateRouterHelper(
             initialPip: 100000,
             pipRange: pipRange,
             tickSpace: 1,
-            owner: deployer.address,
             positionLiquidity: dexNFT.address,
             spotHouse: spotHouse.address,
-            feeShareAmm: 6000,
             router :router.address
         });
 
+
+    await matching.setFeeShareAmm(6000)
     await spotHouse.initialize();
 
     await spotHouse.setWBNB(wbnb.address);
