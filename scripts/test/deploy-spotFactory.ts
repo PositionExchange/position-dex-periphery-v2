@@ -34,6 +34,13 @@ task('upgrade-spot-factory-testnet', 'How is your girl friend?', async (taskArgs
     // await writeConfig('config-testnet.json', configData);
 })
 
+task('upgrade-spot-factory-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config.json');
+
+    await upgradeProxy(configData, hre);
+})
+
 
 async function deployFactory(configData, hre: HardhatRuntimeEnvironment) {
 
