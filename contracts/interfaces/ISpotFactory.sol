@@ -99,5 +99,5 @@ interface ISpotFactory {
 
     /// @notice fee share for liquidity provider
     /// @return the rate share
-    function feeShareAmm() external view returns(uint32);
+    function feeShareAmm() external view returns (uint32);
 }

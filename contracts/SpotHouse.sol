@@ -324,19 +324,20 @@ contract SpotHouse is
         IMatchingEngineAMM _pairManager,
         address _payer,
         Asset _asset,
-        uint256 _amount
+        uint256 _amount,
+        SpotFactoryStorage.Pair memory _pair
     ) internal override(SpotDex) returns (uint256) {
         if (_amount == 0) return 0;
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
+        //        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
+        //            _pairManager
+        //        );
 
         address pairManagerAddress = address(_pairManager);
         if (_asset == Asset.Quote) {
-            if (_pairAddress.QuoteAsset == WBNB) {
+            if (_pair.QuoteAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
             } else {
-                IERC20 quoteAsset = IERC20(_pairAddress.QuoteAsset);
+                IERC20 quoteAsset = IERC20(_pair.QuoteAsset);
                 uint256 _balanceBefore = quoteAsset.balanceOf(
                     pairManagerAddress
                 );
@@ -352,10 +353,10 @@ contract SpotHouse is
                     _balanceBefore;
             }
         } else {
-            if (_pairAddress.BaseAsset == WBNB) {
+            if (_pair.BaseAsset == WBNB) {
                 _depositBNB(pairManagerAddress, _amount);
             } else {
-                IERC20 baseAsset = IERC20(_pairAddress.BaseAsset);
+                IERC20 baseAsset = IERC20(_pair.BaseAsset);
                 uint256 _balanceBefore = baseAsset.balanceOf(
                     pairManagerAddress
                 );
@@ -378,12 +379,13 @@ contract SpotHouse is
         address _recipient,
         Asset asset,
         uint256 _amount,
-        bool isTakeFee
+        bool isTakeFee,
+        SpotFactoryStorage.Pair memory _pair
     ) internal override(SpotDex) {
         if (_amount == 0) return;
-        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-            _pairManager
-        );
+        //        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
+        //            _pairManager
+        //        );
 
         if (isTakeFee) {
             uint256 feeCalculatedAmount = _feeCalculator(_amount, _getFee());
@@ -392,22 +394,22 @@ contract SpotHouse is
         }
         address pairManagerAddress = address(_pairManager);
         if (asset == Asset.Quote) {
-            if (_pairAddress.QuoteAsset == WBNB) {
+            if (_pair.QuoteAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
                 TransferHelper.transferFrom(
-                    IERC20(_pairAddress.QuoteAsset),
+                    IERC20(_pair.QuoteAsset),
                     address(_pairManager),
                     _recipient,
                     _amount
                 );
             }
         } else {
-            if (_pairAddress.BaseAsset == WBNB) {
+            if (_pair.BaseAsset == WBNB) {
                 _withdrawBNB(_recipient, pairManagerAddress, _amount);
             } else {
                 TransferHelper.transferFrom(
-                    IERC20(_pairAddress.BaseAsset),
+                    IERC20(_pair.BaseAsset),
                     address(_pairManager),
                     _recipient,
                     _amount
@@ -421,7 +423,8 @@ contract SpotHouse is
         address _recipient,
         Asset asset,
         uint256 _amountRefund,
-        uint256 _amountFilled
+        uint256 _amountFilled,
+        SpotFactoryStorage.Pair memory _pair
     ) internal override(SpotDex) {
         if (_amountFilled > 0) {
             uint256 feeCalculatedAmount = _feeCalculator(
@@ -437,7 +440,8 @@ contract SpotHouse is
             _recipient,
             asset,
             _amountRefund + _amountFilled,
-            false
+            false,
+            _pair
         );
     }
 

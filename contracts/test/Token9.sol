@@ -12,18 +12,15 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * `ERC20` functions.
  */
 contract Token9 is Context, ERC20 {
-
     /**
      * @dev Constructor that gives _msgSender() all of existing tokens.
      */
-    constructor () public ERC20("Token 9", "T9") {
-        _mint(_msgSender(), 10000 * (10 ** uint256(decimals())));
+    constructor() public ERC20("Token 9", "T9") {
+        _mint(_msgSender(), 10000 * (10**uint256(decimals())));
     }
 
-
     function mint(uint256 amount) public {
-        _mint(_msgSender(), 10000 * (10 ** uint256(decimals())));
-
+        _mint(_msgSender(), 10000 * (10**uint256(decimals())));
     }
 
     function decimals() public view virtual override returns (uint8) {

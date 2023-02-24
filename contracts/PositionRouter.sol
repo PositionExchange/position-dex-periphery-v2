@@ -595,8 +595,7 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {
-    }
+    {}
 
     function getAmountsIn(uint256 amountOut, address[] calldata path)
         public
@@ -604,8 +603,7 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {
-    }
+    {}
 
     function blockNumber() internal view virtual returns (uint256) {
         return block.timestamp;
