@@ -22,15 +22,17 @@ task('router-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
 task('upgrade-router-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
     const configData = await readConfig('config-testnet.json');
+    await upgradeRouterProxy(configData, hre);
 
-    const PositionRouter = await hre.ethers.getContractFactory("PositionRouter")
+})
 
-    const upgraded = await hre.upgrades.upgradeProxy(
-        configData.positionRouter,
-        PositionRouter
-    );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionRouter.sol:PositionRouter");
-    await writeConfig('config-testnet.json', configData);
+
+task('upgrade-router-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config.json');
+
+    await upgradeRouterProxy(configData, hre);
+
 })
 
 
@@ -61,5 +63,16 @@ async function deployPositionRouter(configData, hre: HardhatRuntimeEnvironment, 
     return configData
 
 
+
+}
+async function upgradeRouterProxy(configData, hre: HardhatRuntimeEnvironment) {
+
+    const PositionRouter = await hre.ethers.getContractFactory("PositionRouter")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.positionRouter,
+        PositionRouter
+    );
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionRouter.sol:PositionRouter");
 
 }

@@ -475,8 +475,11 @@ contract PositionRouter is
         factory = _newFactory;
     }
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) external onlyOwner {
-        withdrawBNB = _withdrawBNB;
+    function setTransistorBNB(ITransistorBNB _transistorBNB)
+        external
+        onlyOwner
+    {
+        withdrawBNB = _transistorBNB;
     }
 
     function setUniSwpRouter(IUniswapV2Router02 _newUniSwpRouter)
@@ -595,8 +598,7 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {
-    }
+    {}
 
     function getAmountsIn(uint256 amountOut, address[] calldata path)
         public
@@ -604,8 +606,7 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {
-    }
+    {}
 
     function blockNumber() internal view virtual returns (uint256) {
         return block.timestamp;

@@ -65,7 +65,7 @@ contract PositionSpotFactory is
 
         Require._require(
             IERC20Metadata(quoteAsset).decimals() == 18 &&
-            IERC20Metadata(baseAsset).decimals() == 18,
+                IERC20Metadata(baseAsset).decimals() == 18,
             DexErrors.DEX_MUST_TOKEN_DECIMALS_18
         );
 

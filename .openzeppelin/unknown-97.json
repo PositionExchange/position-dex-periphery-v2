@@ -1666,7 +1666,7 @@
             "label": "strategyFee",
             "offset": 0,
             "slot": "202",
-            "type": "t_array(t_struct(FeeDiscount)29454_storage)dyn_storage",
+            "type": "t_array(t_struct(FeeDiscount)8821_storage)dyn_storage",
             "contract": "StrategyFee",
             "src": "contracts/libraries/extensions/StrategyFee.sol:16"
           },
@@ -1674,7 +1674,7 @@
             "label": "spotFactory",
             "offset": 0,
             "slot": "203",
-            "type": "t_contract(ISpotFactory)28641",
+            "type": "t_contract(ISpotFactory)8028",
             "contract": "SpotHouseStorage",
             "src": "contracts/libraries/types/SpotHouseStorage.sol:11"
           },
@@ -1690,7 +1690,7 @@
             "label": "limitOrders",
             "offset": 0,
             "slot": "205",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)29442_storage)dyn_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)8809_storage)dyn_storage))",
             "contract": "SpotHouseStorage",
             "src": "contracts/libraries/types/SpotHouseStorage.sol:15"
           },
@@ -1698,7 +1698,7 @@
             "label": "withdrawBNB",
             "offset": 0,
             "slot": "206",
-            "type": "t_contract(IWithdrawBNB)29425",
+            "type": "t_contract(IWithdrawBNB)8792",
             "contract": "SpotHouseStorage",
             "src": "contracts/libraries/types/SpotHouseStorage.sol:44"
           },
@@ -1716,11 +1716,11 @@
             "label": "address",
             "numberOfBytes": "20"
           },
-          "t_array(t_struct(Data)29442_storage)dyn_storage": {
+          "t_array(t_struct(Data)8809_storage)dyn_storage": {
             "label": "struct SpotLimitOrder.Data[]",
             "numberOfBytes": "32"
           },
-          "t_array(t_struct(FeeDiscount)29454_storage)dyn_storage": {
+          "t_array(t_struct(FeeDiscount)8821_storage)dyn_storage": {
             "label": "struct StrategyFee.FeeDiscount[]",
             "numberOfBytes": "32"
           },
@@ -1736,23 +1736,23 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(ISpotFactory)28641": {
+          "t_contract(ISpotFactory)8028": {
             "label": "contract ISpotFactory",
             "numberOfBytes": "20"
           },
-          "t_contract(IWithdrawBNB)29425": {
+          "t_contract(IWithdrawBNB)8792": {
             "label": "contract IWithdrawBNB",
             "numberOfBytes": "20"
           },
-          "t_mapping(t_address,t_array(t_struct(Data)29442_storage)dyn_storage)": {
+          "t_mapping(t_address,t_array(t_struct(Data)8809_storage)dyn_storage)": {
             "label": "mapping(address => struct SpotLimitOrder.Data[])",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)29442_storage)dyn_storage))": {
+          "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)8809_storage)dyn_storage))": {
             "label": "mapping(address => mapping(address => struct SpotLimitOrder.Data[]))",
             "numberOfBytes": "32"
           },
-          "t_struct(Data)29442_storage": {
+          "t_struct(Data)8809_storage": {
             "label": "struct SpotLimitOrder.Data",
             "members": [
               {
@@ -1800,7 +1800,7 @@
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(FeeDiscount)29454_storage": {
+          "t_struct(FeeDiscount)8821_storage": {
             "label": "struct StrategyFee.FeeDiscount",
             "members": [
               {

@@ -13,6 +13,7 @@ import "@positionex/matching-engine/contracts/libraries/helper/Convert.sol";
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
+import "../libraries/helper/DexErrors.sol";
 import "./Block.sol";
 import "../interfaces/ISpotDex.sol";
 
@@ -85,6 +86,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         uint256 quoteFilled;
         uint256 baseFilled;
         uint256 basicPoint;
+        SpotFactoryStorage.Pair memory pair = _getQuoteAndBase(pairManager);
 
         (quoteFilled, baseFilled, basicPoint) = getAmountClaimable(
             pairManager,
@@ -96,7 +98,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 pairManager,
                 _trader
             );
-
         Require._require(
             _listPendingLimitOrder.length > 0,
             DexErrors.DEX_NO_LIMIT_TO_CANCEL
@@ -145,14 +146,16 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _trader,
             Asset.Quote,
             refundQuote,
-            quoteFilled
+            quoteFilled,
+            pair
         );
         _withdrawCancelAll(
             pairManager,
             _trader,
             Asset.Base,
             refundBase,
-            baseFilled
+            baseFilled,
+            pair
         );
 
         emitAllLimitOrderCancelled(
@@ -174,6 +177,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     ) public virtual {
         address _trader = _msgSender();
         uint256 basicPoint = _basisPoint(pairManager);
+        SpotFactoryStorage.Pair memory pair = _getQuoteAndBase(pairManager);
 
         SpotLimitOrder.Data[] storage _orders = limitOrders[
             address(pairManager)
@@ -211,17 +215,39 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 basicPoint
             );
 
-            _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, false);
-            _withdraw(pairManager, _trader, Asset.Base, partialFilled, true);
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Quote,
+                quoteAmount,
+                false,
+                pair
+            );
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Base,
+                partialFilled,
+                true,
+                pair
+            );
         } else {
-            _withdraw(pairManager, _trader, Asset.Base, refundQuantity, false);
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Base,
+                refundQuantity,
+                false,
+                pair
+            );
             if (partialFilled > 0) {
                 _withdraw(
                     pairManager,
                     _trader,
                     Asset.Quote,
                     _baseToQuote(partialFilled, _order.pip, basicPoint),
-                    true
+                    true,
+                    pair
                 );
             }
         }
@@ -241,6 +267,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
      */
     function claimAsset(IMatchingEngineAMM pairManager) public virtual {
         address _trader = _msgSender();
+        SpotFactoryStorage.Pair memory pair = _getQuoteAndBase(pairManager);
 
         (
             uint256 quoteAmount,
@@ -253,8 +280,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         );
         _clearLimitOrder(address(pairManager), _trader, basicPoint);
 
-        _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, true);
-        _withdraw(pairManager, _trader, Asset.Base, baseAmount, true);
+        _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, true, pair);
+        _withdraw(pairManager, _trader, Asset.Base, baseAmount, true, pair);
 
         emit AssetClaimed(_trader, pairManager, quoteAmount, baseAmount);
     }
@@ -419,6 +446,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         uint256 quoteAmountFilled;
         uint256 feeAmount;
         uint256 basicPoint;
+        SpotFactoryStorage.Pair pair;
     }
 
     function _openLimitOrder(
@@ -430,6 +458,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     ) internal {
         address _pairManagerAddress = address(_pairManager);
         OpenLimitOrderState memory state;
+
+        state.pair = _getQuoteAndBase(_pairManager);
         uint256 quoteAmount;
         state.basicPoint = _basisPoint(_pairManager);
         uint16 fee = _getFee();
@@ -443,7 +473,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Base,
-                _quantity.Uint256ToUint128()
+                _quantity.Uint256ToUint128(),
+                state.pair
             );
         }
         (
@@ -477,7 +508,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Quote,
-                quoteAmount
+                quoteAmount,
+                state.pair
             );
 
             Require._require(
@@ -513,7 +545,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Base,
                 state.sizeOut - state.feeAmount,
-                false
+                false,
+                state.pair
             );
         }
         if (!isBuy) {
@@ -523,7 +556,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Quote,
                 state.quoteAmountFilled - state.feeAmount,
-                false
+                false,
+                state.pair
             );
         }
 
@@ -546,6 +580,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     ) internal {
         address _pairManagerAddress = address(_pairManager);
         OpenLimitOrderState memory state;
+        state.pair = _getQuoteAndBase(_pairManager);
         state.basicPoint = _basisPoint(_pairManager);
 
         uint16 fee = _getFee();
@@ -554,7 +589,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             _pairManager,
             _trader,
             Asset.Quote,
-            _quoteAmount
+            _quoteAmount,
+            state.pair
         );
 
         (
@@ -609,13 +645,21 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManagerAddress
             );
         }
-        _withdraw(_pairManager, _trader, Asset.Base, state.sizeOut, false);
+        _withdraw(
+            _pairManager,
+            _trader,
+            Asset.Base,
+            state.sizeOut,
+            false,
+            state.pair
+        );
     }
 
     struct OpenMarketState {
         uint256 mainSideOut;
         uint256 flipSideOut;
         uint256 feeAmount;
+        SpotFactoryStorage.Pair pair;
     }
 
     function _openMarketOrder(
@@ -627,6 +671,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         /// state.mainSideOut is base asset
         /// state.flipSideOut is quote asset
         OpenMarketState memory state;
+        state.pair = _getQuoteAndBase(_pairManager);
 
         uint16 fee = _getFee();
 
@@ -646,7 +691,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Quote,
-                state.flipSideOut
+                state.flipSideOut,
+                state.pair
             );
 
             Require._require(
@@ -661,7 +707,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Base,
                 _quantity - state.feeAmount,
-                false
+                false,
+                state.pair
             );
         } else {
             // SELL market
@@ -669,7 +716,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Base,
-                _quantity
+                _quantity,
+                state.pair
             );
 
             (
@@ -692,7 +740,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Quote,
                 state.flipSideOut - state.feeAmount,
-                false
+                false,
+                state.pair
             );
 
             _quantity = baseAmountTransferred;
@@ -717,6 +766,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         /// state.mainSideOut is quote asset
         /// state.flipSideOut is base asset
         OpenMarketState memory state;
+        state.pair = _getQuoteAndBase(_pairManager);
 
         uint16 fee = _getFee();
 
@@ -726,7 +776,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Quote,
-                _quoteAmount
+                _quoteAmount,
+                state.pair
             );
             (
                 state.mainSideOut,
@@ -751,7 +802,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Base,
                 state.flipSideOut - state.feeAmount,
-                false
+                false,
+                state.pair
             );
         } else {
             // SELL market
@@ -770,7 +822,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _pairManager,
                 _trader,
                 Asset.Base,
-                state.flipSideOut
+                state.flipSideOut,
+                state.pair
             );
             Require._require(
                 state.mainSideOut == _quoteAmount,
@@ -785,7 +838,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Quote,
                 _quoteAmount - state.feeAmount,
-                false
+                false,
+                state.pair
             );
         }
         emitMarketOrderOpened(
@@ -973,14 +1027,16 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         address _recipient,
         Asset asset,
         uint256 _amount,
-        bool isTakeFee
+        bool isTakeFee,
+        SpotFactoryStorage.Pair memory _pair
     ) internal virtual {}
 
     function _deposit(
         IMatchingEngineAMM _pairManager,
         address _payer,
         Asset _asset,
-        uint256 _amount
+        uint256 _amount,
+        SpotFactoryStorage.Pair memory _pair
     ) internal virtual returns (uint256) {}
 
     function _withdrawCancelAll(
@@ -988,7 +1044,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         address _recipient,
         Asset asset,
         uint256 _amountRefund,
-        uint256 _amountFilled
+        uint256 _amountFilled,
+        SpotFactoryStorage.Pair memory _pair
     ) internal virtual {}
 
     function _msgSender() internal view virtual returns (address) {}

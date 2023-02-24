@@ -6,7 +6,6 @@ pragma solidity ^0.8.9;
 import "@positionex/matching-engine/contracts/MatchingEngineAMM.sol";
 
 contract ForkMatchingEngineAMM is MatchingEngineAMM {
-
     uint32 public _feeShareAmm;
 
     function setCurrentPip(uint128 currentPip) public {
@@ -32,7 +31,6 @@ contract ForkMatchingEngineAMM is MatchingEngineAMM {
     function setFeeShareAmm(uint32 _feeShare) public {
         _feeShareAmm = _feeShare;
     }
-
 
     function feeShareAmm() public view override returns (uint32) {
         return _feeShareAmm;

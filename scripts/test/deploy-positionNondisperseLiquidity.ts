@@ -26,16 +26,27 @@ task('concentrated-liquidity-mainnet', 'How is your girl friend?', async (taskAr
 task('upgrade-concentrated-liquidity-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
     const configData = await readConfig('config-testnet.json');
+    await upgradeConcentratedLiquidityProxy(configData, hre)
 
-    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
-
-    const upgraded = await hre.upgrades.upgradeProxy(
-        configData.positionConcentratedLiquidity,
-        PositionConcentratedLiquidity
-    );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
-    await writeConfig('config-testnet.json', configData);
+    //
+    // const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
+    //
+    // const upgraded = await hre.upgrades.upgradeProxy(
+    //     configData.positionConcentratedLiquidity,
+    //     PositionConcentratedLiquidity
+    // );
+    // await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
+    // await writeConfig('config-testnet.json', configData);
 })
+
+task('upgrade-concentrated-liquidity-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config.json');
+    await upgradeConcentratedLiquidityProxy(configData, hre)
+
+
+})
+
 
 
 async function deployConcentratedLiquidity( configData, hre: HardhatRuntimeEnvironment ) {
@@ -64,3 +75,17 @@ async function deployConcentratedLiquidity( configData, hre: HardhatRuntimeEnvir
     return configData
 
 }
+
+
+async function upgradeConcentratedLiquidityProxy(configData, hre: HardhatRuntimeEnvironment) {
+
+    const PositionNondisperseLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.positionConcentratedLiquidity,
+        PositionNondisperseLiquidity
+    );
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
+
+}
+

@@ -14,7 +14,7 @@ contract PositionRouterStorage {
 
     ISpotHouse public spotHouse;
 
-    IWithdrawBNB public withdrawBNB;
+    ITransistorBNB public withdrawBNB;
 
     address public WBNB;
 
