@@ -22,12 +22,6 @@ task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (
         "0xe9fA482345737D803b63c12f5e7Be76885D4eb66"
     ];
 
-    // const instance = await forkMatchingEngineAMM.deploy(
-    //     forkMatchingEngineAMM,
-    //     []
-    // );
-    //await instance.deployed();
-
 
     const hardhatDeployContract = await forkMatchingEngineAMM.deploy();
 
@@ -50,10 +44,8 @@ task('deploy-forkMatchingEngineAMM-testnet', 'How is your girl friend?', async (
             initialPip: 100000,
             pipRange: 30_000,
             tickSpace: 1,
-            owner: "0x0000000000000000000000000000000000000000",
             positionLiquidity: "0xDfbE56f4e2177a498B5C49C7042171795434e7D1",
             spotHouse: "0xe9fA482345737D803b63c12f5e7Be76885D4eb66",
             router: "0xe9fA482345737D803b63c12f5e7Be76885D4eb66",
-            feeShareAmm: 6000
         })
 })
