@@ -52,8 +52,8 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.8.1",
-    "@openzeppelin/contracts-upgradeable": "^4.8.1",
+    "@openzeppelin/contracts": "4.8.1",
+    "@openzeppelin/contracts-upgradeable": "4.8.1",
     "@openzeppelin/hardhat-upgrades": "^1.21.0",
     "@positionex/matching-engine": "1.3.9",
     "@positionex/posi-token": "^1.1.4",

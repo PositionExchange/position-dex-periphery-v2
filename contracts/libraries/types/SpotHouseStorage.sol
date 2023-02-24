@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "../exchange/SpotOrderData.sol";
 import "../../interfaces/ISpotFactory.sol";
-import "../../WithdrawBNB.sol";
+import "../../interfaces/ITransistorBNB.sol";
 
 contract SpotHouseStorage {
     using SpotLimitOrder for mapping(address => mapping(address => SpotLimitOrder.Data[]));
@@ -41,7 +41,7 @@ contract SpotHouseStorage {
         uint256 sizeOut;
     }
 
-    IWithdrawBNB public withdrawBNB;
+    ITransistorBNB public withdrawBNB;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new

@@ -36,6 +36,13 @@ task('upgrade-spot-house-testnet', 'How is your girl friend?', async (taskArgs, 
 })
 
 
+task('upgrade-spot-house-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    const configData = await readConfig('config.json');
+    await upgradeSpotHouseProxy(configData, hre);
+})
+
+
 
 
 
@@ -89,6 +96,18 @@ async function deploySpotHouse(configData, hre: HardhatRuntimeEnvironment) {
     configData.spotHouse = address
 
     return configData;
+
+}
+
+async function upgradeSpotHouseProxy(configData, hre: HardhatRuntimeEnvironment) {
+
+    const SpotHouse = await hre.ethers.getContractFactory("SpotHouse")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.spotHouse,
+        SpotHouse
+    );
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/SpotHouse.sol:SpotHouse");
 
 }
 

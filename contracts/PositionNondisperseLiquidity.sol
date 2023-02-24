@@ -11,8 +11,8 @@ import "./implement/LiquidityManager.sol";
 import "./implement/LiquidityManagerNFT.sol";
 import "./libraries/helper/TransferHelper.sol";
 import "./implement/LiquidityManager.sol";
-import "./interfaces/IWithdrawBNB.sol";
 import "./interfaces/IWBNB.sol";
+import "./interfaces/ITransistorBNB.sol";
 
 contract PositionNondisperseLiquidity is
     LiquidityManager,
@@ -38,7 +38,7 @@ contract PositionNondisperseLiquidity is
     }
 
     ISpotFactory public spotFactory;
-    IWithdrawBNB withdrawBNB;
+    ITransistorBNB withdrawBNB;
     address WBNB;
 
     mapping(address => bool) public counterParties;
@@ -179,7 +179,7 @@ contract PositionNondisperseLiquidity is
         return spotFactory.stakingManagerOfPair(ownerOfPool, poolAddress);
     }
 
-    function getWithdrawBNB() public view returns (IWithdrawBNB) {
+    function getTransistorBNB() public view returns (ITransistorBNB) {
         return withdrawBNB;
     }
 
@@ -195,11 +195,8 @@ contract PositionNondisperseLiquidity is
         counterParties[_account] = false;
     }
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNBContract)
-        public
-        onlyOwner
-    {
-        withdrawBNB = _withdrawBNBContract;
+    function setTransistorBNB(ITransistorBNB _transistorBNB) public onlyOwner {
+        withdrawBNB = _transistorBNB;
     }
 
     function setBNB(address _BNB) public onlyOwner {

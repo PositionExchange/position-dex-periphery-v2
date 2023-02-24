@@ -7,9 +7,19 @@ pragma solidity ^0.8.9;
 import {DexErrors} from "./libraries/helper/DexErrors.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IWBNB.sol";
-import "./interfaces/IWithdrawBNB.sol";
+import "./interfaces/ITransistorBNB.sol";
 
-contract WithdrawBNB is IWithdrawBNB {
+//* Due the issue with the function withDraw from WBNB, WETH,...
+//* The contract using proxy ERC1967 can NOT receive native coin ( ETH, BNB,...)
+//* from function withDraw of WBNB, WETH,...
+//* So, this contract below is used like a transistor native coin from WBNB, WETH,... to the contract proxy ERC1967
+//* Flow:
+//  - Proxy A ---withDraw---> WETH or WBNB,... ---native-coin--->  transistor
+//  - Proxy A ---withDraw---> transistor ---native-coin---> recipient
+// Details issues:
+// - https://forum.openzeppelin.com/t/proxy-not-working-with-wbnb-withdraw/10134
+//
+contract TransistorBNB is ITransistorBNB {
     using Address for address payable;
     IWBNB public WBNB;
     address public owner;

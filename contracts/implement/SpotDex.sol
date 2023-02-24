@@ -13,6 +13,7 @@ import "@positionex/matching-engine/contracts/libraries/helper/Convert.sol";
 import "../libraries/types/SpotFactoryStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
 import "../libraries/types/SpotHouseStorage.sol";
+import "../libraries/helper/DexErrors.sol";
 import "./Block.sol";
 import "../interfaces/ISpotDex.sol";
 
@@ -97,7 +98,6 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 pairManager,
                 _trader
             );
-
         Require._require(
             _listPendingLimitOrder.length > 0,
             DexErrors.DEX_NO_LIMIT_TO_CANCEL

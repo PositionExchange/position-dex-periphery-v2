@@ -475,8 +475,11 @@ contract PositionRouter is
         factory = _newFactory;
     }
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) external onlyOwner {
-        withdrawBNB = _withdrawBNB;
+    function setTransistorBNB(ITransistorBNB _transistorBNB)
+        external
+        onlyOwner
+    {
+        withdrawBNB = _transistorBNB;
     }
 
     function setUniSwpRouter(IUniswapV2Router02 _newUniSwpRouter)

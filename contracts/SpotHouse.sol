@@ -151,8 +151,11 @@ contract SpotHouse is
         WBNB = _wbnb;
     }
 
-    function setWithdrawBNB(IWithdrawBNB _withdrawBNB) external onlyOperator {
-        withdrawBNB = _withdrawBNB;
+    function setTransistorBNB(ITransistorBNB _transistorBNB)
+        external
+        onlyOperator
+    {
+        withdrawBNB = _transistorBNB;
     }
 
     function claimFee(IMatchingEngineAMM pairManager, address recipient)
@@ -328,10 +331,6 @@ contract SpotHouse is
         SpotFactoryStorage.Pair memory _pair
     ) internal override(SpotDex) returns (uint256) {
         if (_amount == 0) return 0;
-        //        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-        //            _pairManager
-        //        );
-
         address pairManagerAddress = address(_pairManager);
         if (_asset == Asset.Quote) {
             if (_pair.QuoteAsset == WBNB) {
@@ -383,10 +382,6 @@ contract SpotHouse is
         SpotFactoryStorage.Pair memory _pair
     ) internal override(SpotDex) {
         if (_amount == 0) return;
-        //        SpotFactoryStorage.Pair memory _pairAddress = _getQuoteAndBase(
-        //            _pairManager
-        //        );
-
         if (isTakeFee) {
             uint256 feeCalculatedAmount = _feeCalculator(_amount, _getFee());
             _amount -= feeCalculatedAmount;
