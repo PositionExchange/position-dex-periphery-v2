@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@positionex/matching-engine/contracts/interfaces/IMatchingEngineAMM.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@positionex/matching-engine/contracts/libraries/helper/Require.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "./interfaces/ISpotFactory.sol";
 import "./libraries/types/SpotFactoryStorage.sol";
@@ -61,6 +62,12 @@ contract PositionSpotFactory is
             pathPairManagers[baseAsset][quoteAsset] == address(0) &&
                 pathPairManagers[quoteAsset][baseAsset] == address(0),
             DexErrors.DEX_SPOT_MANGER_EXITS
+        );
+
+        Require._require(
+            IERC20Metadata(quoteAsset).decimals() == 18 &&
+            IERC20Metadata(baseAsset).decimals() == 18,
+            DexErrors.DEX_MUST_TOKEN_DECIMALS_18
         );
 
         Require._require(
