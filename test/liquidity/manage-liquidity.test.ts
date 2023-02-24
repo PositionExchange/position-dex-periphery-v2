@@ -43,10 +43,8 @@ describe("manage liquidity",  () => {
                     initialPip: 100000,
                     pipRange: 30_000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: spotHouse.address,
-                    feeShareAmm: 0,
                     router : deployer.address
                 }
             );

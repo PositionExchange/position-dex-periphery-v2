@@ -467,11 +467,6 @@ contract PositionRouter is
         }
     }
 
-    //
-    //    function _approve(address token) internal {
-    //        IERC20(token).approve(address(uniSwapRouterV2), type(uint256).max);
-    //    }
-
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -601,40 +596,6 @@ contract PositionRouter is
         override
         returns (uint256[] memory amounts)
     {
-        (
-            SpotHouseStorage.Side side,
-            address pairManagerAddress
-        ) = getSideAndPairManager(path);
-
-        uint256 sizeOut;
-        uint256 openOtherSide;
-
-        if (pairManagerAddress != address(0)) {
-            IMatchingEngineAMM pairManager = IMatchingEngineAMM(
-                pairManagerAddress
-            );
-            amounts = new uint256[](2);
-            if (side == SpotHouseStorage.Side.BUY) {
-                // quote
-                (sizeOut, openOtherSide) = pairManager.getAmountEstimate(
-                    amountIn,
-                    true,
-                    false
-                );
-                amounts[0] = sizeOut;
-                amounts[1] = openOtherSide;
-            } else {
-                (sizeOut, openOtherSide) = pairManager.getAmountEstimate(
-                    amountIn,
-                    false,
-                    true
-                );
-                amounts[0] = sizeOut;
-                amounts[1] = openOtherSide;
-            }
-        } else {
-            amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
-        }
     }
 
     function getAmountsIn(uint256 amountOut, address[] calldata path)
@@ -644,41 +605,6 @@ contract PositionRouter is
         override
         returns (uint256[] memory amounts)
     {
-        (
-            SpotHouseStorage.Side side,
-            address pairManagerAddress
-        ) = getSideAndPairManager(path);
-        uint256 sizeOut;
-        uint256 openOtherSide;
-
-        if (pairManagerAddress != address(0)) {
-            IMatchingEngineAMM pairManager = IMatchingEngineAMM(
-                pairManagerAddress
-            );
-            amounts = new uint256[](2);
-
-            if (side == SpotHouseStorage.Side.BUY) {
-                // quote
-                (sizeOut, openOtherSide) = pairManager.getAmountEstimate(
-                    amountOut,
-                    true,
-                    true
-                );
-
-                amounts[0] = openOtherSide;
-                amounts[1] = sizeOut;
-            } else {
-                (sizeOut, openOtherSide) = pairManager.getAmountEstimate(
-                    amountOut,
-                    false,
-                    false
-                );
-                amounts[0] = openOtherSide;
-                amounts[1] = sizeOut;
-            }
-        } else {
-            amounts = uniSwapRouterV2.getAmountsIn(amountOut, path);
-        }
     }
 
     function blockNumber() internal view virtual returns (uint256) {

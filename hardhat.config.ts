@@ -75,7 +75,7 @@ const config: HardhatUserConfig = {
     gasPrice : 20
   },
   etherscan: {
-    apiKey: "VKPENS57I9DCN68A844N1RUGK1IU42J9UC",
+    apiKey: "QYSUHDISIYH6T1X6GFGAGXS333WRVPJIR2",
   },
   typechain: {
     outDir: "typeChain",

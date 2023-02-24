@@ -1,11 +1,45 @@
 import {task} from "hardhat/config";
 import {verify} from "@openzeppelin/hardhat-upgrades/dist/verify-proxy";
 import {readConfig, verifyImplContract, writeConfig} from "../utils-deploy";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
 
 
 task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
+    let configData = await readConfig('config-testnet.json');
+
+    configData = await deployConcentratedLiquidity(configData, hre);
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+
+task('concentrated-liquidity-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
+    let configData = await readConfig('config.json');
+
+    configData = await deployConcentratedLiquidity(configData, hre);
+    await writeConfig('config.json', configData);
+})
+
+
+task('upgrade-concentrated-liquidity-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
+
     const configData = await readConfig('config-testnet.json');
+
+    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
+
+    const upgraded = await hre.upgrades.upgradeProxy(
+        configData.positionConcentratedLiquidity,
+        PositionConcentratedLiquidity
+    );
+    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
+    await writeConfig('config-testnet.json', configData);
+})
+
+
+async function deployConcentratedLiquidity( configData, hre: HardhatRuntimeEnvironment ) {
+
 
     const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
 
@@ -26,20 +60,7 @@ task('concentrated-liquidity-testnet', 'How is your girl friend?', async (taskAr
     );
     await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
     configData.positionConcentratedLiquidity = address
-    await writeConfig('config-testnet.json', configData);
-})
 
+    return configData
 
-task('upgrade-concentrated-liquidity-testnet', 'How is your girl friend?', async (taskArgs, hre) => {
-
-    const configData = await readConfig('config-testnet.json');
-
-    const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionNondisperseLiquidity")
-
-    const upgraded = await hre.upgrades.upgradeProxy(
-        configData.positionConcentratedLiquidity,
-        PositionConcentratedLiquidity
-    );
-    await verifyImplContract(hre,upgraded.deployTransaction, "contracts/PositionNondisperseLiquidity.sol:PositionNondisperseLiquidity");
-    await writeConfig('config-testnet.json', configData);
-})
+}

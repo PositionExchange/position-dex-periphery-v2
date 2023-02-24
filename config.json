@@ -1,1 +1,11 @@
-{}
+{
+  "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+  "spotFactory": "0x3E2a76a7bfC4E973cE251B021bdd30220De8DBA4",
+  "spotHouse": "0xC03308f323F99ce3c2749Ad33E20085AC951A91f",
+  "withdrawBNB": "0xD4eB15D5c28f75337743612a943FB8dDb7b600dE",
+  "positionConcentratedLiquidity": "0xeB148700200fe9213ac0877F94E007D617c8edf4",
+  "pancakeRouter": "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+  "positionRouter": "0x77a3A4b832763A34a9757c1A1279BE633222ce6b",
+  "killerPosition": "0xd3f32Dae85464BcDbEc57a975c753e5a8CEdd882",
+  "positionStakingDexManager": "0x0C193d9d76aC79386fB2949fd62F86576cF11F12"
+}

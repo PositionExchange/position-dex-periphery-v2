@@ -23,6 +23,8 @@ library DexErrors {
     string public constant DEX_ONLY_OPERATOR = "DEX_18";
     string public constant DEX_NOT_MUST_BNB = "DEX_19";
     string public constant DEX_MUST_POSI = "DEX_20";
+    string public constant DEX_MUST_TOKEN_DECIMALS_18 = "DEX_21";
+
 
     string public constant LQ_NOT_IMPLEMENT_YET = "LQ_01";
     string public constant LQ_EMPTY_STAKING_MANAGER = "LQ_02";

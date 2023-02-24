@@ -96,4 +96,8 @@ interface ISpotFactory {
     /// @param pair the address of pair
     /// @return address owner of pair
     function ownerPairManager(address pair) external view returns (address);
+
+    /// @notice fee share for liquidity provider
+    /// @return the rate share
+    function feeShareAmm() external view returns(uint32);
 }
