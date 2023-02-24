@@ -5,6 +5,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import '@openzeppelin/hardhat-upgrades';
 import "hardhat-log-remover";
 import "./scripts/deploy";
+import {PRIV_MAINNET_ACCOUNT} from "./env";
 
 const config: HardhatUserConfig = {
   networks: {
@@ -15,9 +16,7 @@ const config: HardhatUserConfig = {
     bsc_mainnet: {
       url: "https://bsc-dataseed2.binance.org/",
       chainId: 56,
-      accounts: process.env.PRIV_MAINNET_ACCOUNT
-          ? [process.env.PRIV_MAINNET_ACCOUNT]
-          : [],
+      accounts: [PRIV_MAINNET_ACCOUNT],
     },
     bsc_mainnet_test: {
       url: "https://bsc-dataseed2.binance.org/",
