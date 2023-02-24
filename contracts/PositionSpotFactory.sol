@@ -49,7 +49,6 @@ contract PositionSpotFactory is
         uint32 tickSpace
     ) external override(ISpotFactory) nonReentrant {
         address creator = msg.sender;
-
         Require._require(
             quoteAsset != address(0) && baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
