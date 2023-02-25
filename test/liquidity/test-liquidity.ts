@@ -5,7 +5,7 @@ import YAML from "js-yaml";
     MockSpotHouse,
     MockToken,
     MockReflexToken,
-    PositionSpotFactory, PositionNondisperseLiquidity, MockWBNB, WithdrawBNB, PositionRouter
+    PositionSpotFactory, PositionNondisperseLiquidity, MockWBNB, TransistorBNB, PositionRouter
 } from "../../typeChain";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -127,7 +127,7 @@ export async function deployAndCreateRouterHelper(
     let quote : any;
     let base : any;
     let wbnb : MockWBNB;
-    let withdrawBNB : WithdrawBNB
+    let withdrawBNB : TransistorBNB
     let testHelper: TestLiquidity;
     let dexNFT : PositionNondisperseLiquidity;
     let router : PositionRouter;
@@ -142,7 +142,7 @@ export async function deployAndCreateRouterHelper(
     dexNFT = await deployContract("PositionNondisperseLiquidity", deployer );
     router = await deployContract("PositionRouter", deployer );
     wbnb = await  deployMockWrappedBNB();
-    withdrawBNB = await deployContract("WithdrawBNB", deployer, wbnb.address);
+    withdrawBNB = await deployContract("TransistorBNB", deployer, wbnb.address);
 
 
     quote = await deployMockToken("Quote");
@@ -179,11 +179,11 @@ export async function deployAndCreateRouterHelper(
 
     await spotHouse.setWBNB(wbnb.address);
     await spotHouse.setFactory(factory.address);
-    await spotHouse.setWithdrawBNB(withdrawBNB.address);
+    await spotHouse.setTransistorBNB(withdrawBNB.address);
     await dexNFT.initialize();
     await dexNFT.setFactory(factory.address);
     await dexNFT.setBNB(wbnb.address)
-    await dexNFT.setWithdrawBNB(withdrawBNB.address);
+    await dexNFT.setTransistorBNB(withdrawBNB.address);
     await factory.initialize();
 
     await factory.addPairManagerManual(matching.address, base.address, quote.address);

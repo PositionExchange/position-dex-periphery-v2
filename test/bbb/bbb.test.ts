@@ -127,10 +127,8 @@ describe("killer-position", async function () {
                 initialPip: 50000,
                 pipRange: 30000,
                 tickSpace: 1,
-                owner: deployer.address,
                 positionLiquidity: dexNFT.address,
                 spotHouse: spotHouse.address,
-                feeShareAmm: 0,
                 router: posiRouter.address
             });
 
@@ -143,10 +141,8 @@ describe("killer-position", async function () {
                 initialPip: 50000,
                 pipRange: 30000,
                 tickSpace: 1,
-                owner: deployer.address,
                 positionLiquidity: dexNFT.address,
                 spotHouse: spotHouse.address,
-                feeShareAmm: 0,
                 router: posiRouter.address
             });
         await factory.addPairManagerManual(pair.address, base.address, quote.address);

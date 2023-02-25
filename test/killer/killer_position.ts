@@ -137,10 +137,8 @@ describe("killer-position", async function () {
                     initialPip: 89999,
                     pipRange: 30000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0,
                     router: deployer.address
                 });
 
@@ -336,10 +334,8 @@ describe("killer-position", async function () {
                     initialPip: 100000,
                     pipRange: 30000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0,
                     router: deployer.address
                 });
 
@@ -509,10 +505,8 @@ describe("killer-position", async function () {
                     initialPip: 1000,
                     pipRange: 30000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0,
                     router: deployer.address
                 });
 
@@ -607,10 +601,8 @@ describe("killer-position", async function () {
                     initialPip: 1000,
                     pipRange: 30000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0,
                     router: deployer.address
                 });
 
@@ -824,10 +816,8 @@ describe("killer-position", async function () {
                     initialPip: 1000,
                     pipRange: 30000,
                     tickSpace: 1,
-                    owner: deployer.address,
                     positionLiquidity: dexNFT.address,
                     spotHouse: deployer.address,
-                    feeShareAmm: 0,
                     router: deployer.address
                 });
 
