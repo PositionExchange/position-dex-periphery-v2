@@ -23,7 +23,7 @@ import {TransferHelper} from "../libraries/helper/TransferHelper.sol";
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
-    IUniswapV2Router01 public uniswapRouter;
+    IUniswapV2Router02 public uniswapRouter;
     IUniswapV2Factory public uniswapV2Factory;
     IPositionNondisperseLiquidity public positionLiquidity;
     ISpotFactory public spotFactory;
@@ -43,7 +43,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     );
 
     constructor(
-        IUniswapV2Router01 _uniswapRouter,
+        IUniswapV2Router02 _uniswapRouter,
         IPositionNondisperseLiquidity _positionLiquidity,
         ISpotFactory _spotFactory,
         IWBNB _WBNB
@@ -67,7 +67,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     }
 
     // TODO remove when testing done
-    function updateUniswapRouter(IUniswapV2Router01 _new) external onlyOwner {
+    function updateUniswapRouter(IUniswapV2Router02 _new) external onlyOwner {
         uniswapRouter = _new;
     }
 
@@ -128,7 +128,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
         require(state.pairManager != address(0x00), "!0x0");
         if (token0 == address(WBNB) || token1 == address(WBNB)) {
-            uniswapRouter.removeLiquidityETH(
+            uniswapRouter.removeLiquidityETHSupportingFeeOnTransferTokens(
                 token0 == address(WBNB) ? token1 : token0,
                 liquidity,
                 0,
@@ -460,7 +460,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             user
         );
 
-        emit PositionLiquidityMigrated(
+            emit PositionLiquidityMigrated(
             user,
             positionLiquidity.tokenID(),
             liquidity,
