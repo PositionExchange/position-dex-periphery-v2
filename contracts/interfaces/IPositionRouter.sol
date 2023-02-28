@@ -13,6 +13,15 @@ interface IPositionRouter {
         uint256 deadline
     ) external returns (uint256[] memory amounts);
 
+    function swapExactTokensForTokensWithFeeShares(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        uint32[] calldata feeSharesAMM,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
     function swapTokensForExactTokens(
         uint256 amountOut,
         uint256 amountInMax,
@@ -24,6 +33,14 @@ interface IPositionRouter {
     function swapExactETHForTokens(
         uint256 amountOutMin,
         address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
+
+    function swapExactETHForTokensFeeShares(
+        uint256 amountOutMin,
+        address[] calldata path,
+        uint32[] calldata feeShares,
         address to,
         uint256 deadline
     ) external payable returns (uint256[] memory amounts);
@@ -75,6 +92,19 @@ interface IPositionRouter {
     ) external;
 
     function isPosiDexSupportPair(address tokenA, address tokenB)
+        external
+        view
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        );
+
+    function isPosiDexSupportPairV2(
+        address tokenA,
+        address tokenB,
+        uint32 feeShareAmm
+    )
         external
         view
         returns (

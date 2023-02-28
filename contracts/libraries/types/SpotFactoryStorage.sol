@@ -8,7 +8,7 @@ abstract contract SpotFactoryStorage is ISpotFactory {
 
     address public positionLiquidity;
 
-    //  baseAsset address => quoteAsset address => spotManager address
+    //  baseAsset address => quoteAsset address => pairManager address
     mapping(address => mapping(address => address)) internal pathPairManagers;
 
     mapping(address => Pair) internal allPairManager;
@@ -35,4 +35,18 @@ abstract contract SpotFactoryStorage is ISpotFactory {
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
     uint256[49] private __gap;
+
+    // Mapping level => free share amm
+    // level low => free share low
+    // level high => free share high
+    // example:
+    // 0 => 1000 ( 10%)
+    // 1 => 3000 (30%)
+    mapping(uint256 => uint32) public levelFeeShareAmm;
+
+    mapping(address => PairV2) internal allPairManagerV2;
+
+    //  baseAsset address => quoteAsset address => feeShare => pairManager address
+    mapping(address => mapping(address => mapping(uint32 => address)))
+        internal pathPairManagersV2;
 }

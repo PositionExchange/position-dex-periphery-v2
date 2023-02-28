@@ -69,11 +69,42 @@ contract PositionRouter is
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        //        require(
-        //            path[0] != WBNB && path[path.length - 1] != WBNB,
-        //            DexErrors.DEX_NOT_MUST_BNB
-        //        );
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
+        if (sidesAndPairs[0].pairManager == address(0)) {
+            amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
+            _deposit(path[0], _msgSender(), amounts[0]);
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
+            }
+            uniSwapRouterV2.swapExactTokensForTokens(
+                amountIn,
+                amountOutMin,
+                path,
+                to,
+                deadline
+            );
+        } else {
+            amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = amountIn;
+            return _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
+    function swapExactTokensForTokensWithFeeShares(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        uint32[] calldata feeShares,
+        address to,
+        uint256 deadline
+    )
+        external
+        virtual
+        override
+        ensure(deadline)
+        returns (uint256[] memory amounts)
+    {
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs2(path, feeShares);
         if (sidesAndPairs[0].pairManager == address(0)) {
             amounts = uniSwapRouterV2.getAmountsOut(amountIn, path);
             _deposit(path[0], _msgSender(), amounts[0]);
@@ -126,6 +157,39 @@ contract PositionRouter is
         require(path[0] == WBNB, DexErrors.DEX_MUST_BNB);
         SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
 
+        if (sidesAndPairs[0].pairManager == address(0)) {
+            if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
+                TransferHelper.approve(path[0], address(uniSwapRouterV2));
+            }
+            uniSwapRouterV2.swapExactETHForTokens{value: msg.value}(
+                amountOutMin,
+                path,
+                to,
+                deadline
+            );
+        } else {
+            amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = msg.value;
+            return _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
+    function swapExactETHForTokensFeeShares(
+        uint256 amountOutMin,
+        address[] calldata path,
+        uint32[] calldata feeShares,
+        address to,
+        uint256 deadline
+    )
+        external
+        payable
+        virtual
+        override
+        ensure(deadline)
+        returns (uint256[] memory amounts)
+    {
+        require(path[0] == WBNB, DexErrors.DEX_MUST_BNB);
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs2(path, feeShares);
         if (sidesAndPairs[0].pairManager == address(0)) {
             if (!TransferHelper.isApprove(path[0], address(uniSwapRouterV2))) {
                 TransferHelper.approve(path[0], address(uniSwapRouterV2));
@@ -559,6 +623,37 @@ contract PositionRouter is
         return sidesAndPairs;
     }
 
+    function getSidesAndPairs2(
+        address[] calldata path,
+        uint32[] calldata feeShares
+    ) public view returns (SideAndPair[] memory) {
+        SideAndPair[] memory sidesAndPairs = new SideAndPair[](path.length - 1);
+        address baseToken;
+        address quoteToken;
+        address pairManager;
+
+        for (uint256 i = 0; i < path.length - 1; i++) {
+            (baseToken, quoteToken, pairManager) = isPosiDexSupportPairV2(
+                path[i],
+                path[i + 1],
+                feeShares[i]
+            );
+
+            if (quoteToken == path[i]) {
+                // Buy
+                // path[0] -> path[path.length - 1] and path[0] is quote
+                sidesAndPairs[i].side = SpotHouseStorage.Side.BUY;
+            } else {
+                sidesAndPairs[i].side = SpotHouseStorage.Side.SELL;
+            }
+            sidesAndPairs[i].pairManager = pairManager;
+            sidesAndPairs[i].baseToken = baseToken;
+            sidesAndPairs[i].quoteToken = quoteToken;
+        }
+
+        return sidesAndPairs;
+    }
+
     function getReserves(address tokenA, address tokenB)
         external
         view
@@ -590,6 +685,24 @@ contract PositionRouter is
             tokenA,
             tokenB
         );
+    }
+
+    function isPosiDexSupportPairV2(
+        address tokenA,
+        address tokenB,
+        uint32 feeShareAmm
+    )
+        public
+        view
+        override
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        )
+    {
+        (baseToken, quoteToken, pairManager) = factory
+            .getPairManagerSupportedWithFeeShare(tokenA, tokenB, feeShareAmm);
     }
 
     function getAmountsOut(uint256 amountIn, address[] calldata path)

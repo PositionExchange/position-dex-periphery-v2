@@ -25,6 +25,13 @@ interface ISpotFactory {
         address QuoteAsset;
     }
 
+    struct PairV2 {
+        address BaseAsset;
+        address QuoteAsset;
+        uint32 FeeShareAmm;
+        uint128 PipRange;
+    }
+
     /// @notice create new pair for dex
     /// @param quoteAsset address of quote asset
     /// @param baseAsset address of base asset
@@ -41,6 +48,26 @@ interface ISpotFactory {
         uint128 initialPip,
         uint128 pipRange,
         uint32 tickSpace
+    ) external;
+
+    /// @notice create new pair for dex
+    /// @param quoteAsset address of quote asset
+    /// @param baseAsset address of base asset
+    /// @param basisPoint the basis point for pip and price
+    /// @param maxFindingWordsIndex the max word can finding
+    /// @param initialPip the pip start of the pair
+    /// @param pipRange the range of liquidity index
+    /// @param tickSpace tick space for generate orderbook
+    /// @param levelFeeShare levelFeeShare
+    function createPairManagerV2(
+        address quoteAsset,
+        address baseAsset,
+        uint256 basisPoint,
+        uint128 maxFindingWordsIndex,
+        uint128 initialPip,
+        uint128 pipRange,
+        uint32 tickSpace,
+        uint256 levelFeeShare
     ) external;
 
     /// @notice get pair manager address
@@ -83,6 +110,25 @@ interface ISpotFactory {
             address pairManager
         );
 
+    /// @notice check pair and assets is supported with random two token
+    /// @param tokenA the first token
+    /// @param tokenB the second token
+    /// @return baseToken the address of base token
+    /// @return quoteToken the address of quote token
+    /// @return pairManager the address of pair
+    function getPairManagerSupportedWithFeeShare(
+        address tokenA,
+        address tokenB,
+        uint32 feeShareAmm
+    )
+        external
+        view
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        );
+
     /// @notice get staking manager of pair
     /// @param owner the owner of pair
     /// @param pair the address of pair
@@ -100,4 +146,12 @@ interface ISpotFactory {
     /// @notice fee share for liquidity provider
     /// @return the rate share
     function feeShareAmm() external view returns (uint32);
+
+    /// @notice fee share for liquidity provider
+    /// @param pairManager the address of pair want to know the pai
+    /// @return the rate share
+    function feeShareAmmWithPair(address pairManager)
+        external
+        view
+        returns (uint32);
 }

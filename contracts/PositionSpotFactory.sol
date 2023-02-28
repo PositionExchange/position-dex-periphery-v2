@@ -49,6 +49,147 @@ contract PositionSpotFactory is
         uint32 tickSpace
     ) external override(ISpotFactory) nonReentrant {
         address creator = msg.sender;
+        _require(
+            quoteAsset,
+            baseAsset,
+            basisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            pipRange,
+            tickSpace
+        );
+
+        address pair = _clone(creator);
+
+        pathPairManagers[baseAsset][quoteAsset] = pair;
+
+        allPairManager[pair] = Pair({
+            BaseAsset: baseAsset,
+            QuoteAsset: quoteAsset
+        });
+
+        _init(
+            pair,
+            quoteAsset,
+            baseAsset,
+            basisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            pipRange,
+            tickSpace,
+            creator
+        );
+    }
+
+    function createPairManagerV2(
+        address quoteAsset,
+        address baseAsset,
+        uint256 basisPoint,
+        uint128 maxFindingWordsIndex,
+        uint128 initialPip,
+        uint128 pipRange,
+        uint32 tickSpace,
+        uint256 levelFee
+    ) external override(ISpotFactory) nonReentrant {
+        address creator = msg.sender;
+
+        _require(
+            quoteAsset,
+            baseAsset,
+            basisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            pipRange,
+            tickSpace
+        );
+
+        address pair = _clone(creator);
+
+        uint32 feeLevelShareAmm = levelFeeShareAmm[levelFee];
+        // save
+        pathPairManagersV2[baseAsset][quoteAsset][feeLevelShareAmm] = pair;
+
+        allPairManagerV2[pair] = PairV2({
+            BaseAsset: baseAsset,
+            QuoteAsset: quoteAsset,
+            FeeShareAmm: feeLevelShareAmm,
+            PipRange: pipRange
+        });
+
+        _init(
+            pair,
+            quoteAsset,
+            baseAsset,
+            basisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            pipRange,
+            tickSpace,
+            creator
+        );
+    }
+
+    function _init(
+        address pair,
+        address quoteAsset,
+        address baseAsset,
+        uint256 basisPoint,
+        uint128 maxFindingWordsIndex,
+        uint128 initialPip,
+        uint128 pipRange,
+        uint32 tickSpace,
+        address creator
+    ) internal {
+        ownerPairManager[pair] = creator;
+
+        IMatchingEngineAMM(pair).initialize(
+            IMatchingEngineAMM.InitParams({
+                quoteAsset: IERC20(quoteAsset),
+                baseAsset: IERC20(baseAsset),
+                basisPoint: 10**basisPoint,
+                maxFindingWordsIndex: maxFindingWordsIndex,
+                initialPip: initialPip,
+                pipRange: pipRange,
+                tickSpace: tickSpace,
+                positionLiquidity: positionLiquidity,
+                spotHouse: spotHouse,
+                router: positionRouter
+            })
+        );
+
+        emit PairManagerInitialized(
+            quoteAsset,
+            baseAsset,
+            10**basisPoint,
+            maxFindingWordsIndex,
+            initialPip,
+            creator,
+            pair,
+            pipRange,
+            tickSpace
+        );
+    }
+
+    function _clone(address creator) internal returns (address pair) {
+        bytes32 salt = keccak256(
+            abi.encodePacked(creator, address(this), block.timestamp)
+        );
+
+        pair = Clones.cloneDeterministic(
+            mappingVersionTemplate[latestVersion],
+            salt
+        );
+    }
+
+    function _require(
+        address quoteAsset,
+        address baseAsset,
+        uint256 basisPoint,
+        uint128 maxFindingWordsIndex,
+        uint128 initialPip,
+        uint128 pipRange,
+        uint32 tickSpace
+    ) internal {
         Require._require(
             quoteAsset != address(0) && baseAsset != address(0),
             DexErrors.DEX_EMPTY_ADDRESS
@@ -79,54 +220,17 @@ contract PositionSpotFactory is
                 tickSpace > 0,
             DexErrors.DEX_INVALID_PAIR_INFO
         );
+    }
 
-        address pair;
+    function feeShareAmmWithPair(address pairManager)
+        external
+        view
+        override(ISpotFactory)
+        returns (uint32)
+    {
+        PairV2 memory pairV2 = allPairManagerV2[pairManager];
 
-        bytes32 salt = keccak256(
-            abi.encodePacked(creator, address(this), block.timestamp)
-        );
-
-        pair = Clones.cloneDeterministic(
-            mappingVersionTemplate[latestVersion],
-            salt
-        );
-
-        // save
-        pathPairManagers[baseAsset][quoteAsset] = pair;
-
-        allPairManager[pair] = Pair({
-            BaseAsset: baseAsset,
-            QuoteAsset: quoteAsset
-        });
-
-        ownerPairManager[pair] = creator;
-
-        IMatchingEngineAMM(pair).initialize(
-            IMatchingEngineAMM.InitParams({
-                quoteAsset: IERC20(quoteAsset),
-                baseAsset: IERC20(baseAsset),
-                basisPoint: 10**basisPoint,
-                maxFindingWordsIndex: maxFindingWordsIndex,
-                initialPip: initialPip,
-                pipRange: pipRange,
-                tickSpace: tickSpace,
-                positionLiquidity: positionLiquidity,
-                spotHouse: spotHouse,
-                router: positionRouter
-            })
-        );
-
-        emit PairManagerInitialized(
-            quoteAsset,
-            baseAsset,
-            10**basisPoint,
-            maxFindingWordsIndex,
-            initialPip,
-            creator,
-            pair,
-            pipRange,
-            tickSpace
-        );
+        return pairV2.FeeShareAmm == 0 ? feeShareAmm : pairV2.FeeShareAmm;
     }
 
     /// @notice set staking manager for pair, only owner of pair can set
@@ -182,6 +286,43 @@ contract PositionSpotFactory is
         }
         if (pathPairManagers[tokenB][tokenA] != address(0)) {
             return (tokenB, tokenA, pathPairManagers[tokenB][tokenA]);
+        }
+    }
+
+    /// @notice get pair manager from any two address
+    /// @param tokenA address of quote
+    /// @param tokenB address of base
+    /// @param feeShareAmm fee share amm
+    /// @return baseToken the address of base asset
+    /// @return quoteToken the address of quote asset
+    /// @return pairManager the address of pair address
+    function getPairManagerSupportedWithFeeShare(
+        address tokenA,
+        address tokenB,
+        uint32 feeShareAmm
+    )
+        public
+        view
+        override
+        returns (
+            address baseToken,
+            address quoteToken,
+            address pairManager
+        )
+    {
+        if (pathPairManagersV2[tokenA][tokenB][feeShareAmm] != address(0)) {
+            return (
+                tokenA,
+                tokenB,
+                pathPairManagersV2[tokenA][tokenB][feeShareAmm]
+            );
+        }
+        if (pathPairManagersV2[tokenB][tokenA][feeShareAmm] != address(0)) {
+            return (
+                tokenB,
+                tokenA,
+                pathPairManagersV2[tokenA][tokenB][feeShareAmm]
+            );
         }
     }
 
