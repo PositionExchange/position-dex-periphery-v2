@@ -69,7 +69,7 @@ contract LiquidityManagerNFT is
     function _burnNFT(uint256 tokenId) internal {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721Burn: caller is not owner nor approved"
+            "!Burn"
         );
         _burn(tokenId);
     }

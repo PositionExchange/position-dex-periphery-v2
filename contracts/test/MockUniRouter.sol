@@ -129,4 +129,34 @@ contract MockUniRouter {
             IERC20(token1).transfer(caller, amountToken);
         }
     }
+
+    function removeLiquidityETHSupportingFeeOnTransferTokens(
+        address token,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountToken, uint256 amountETH) {
+        address caller = msg.sender;
+
+        if (token0 == address(WBNB)) {
+            amountETH = IWBNB(WBNB).balanceOf(address(this));
+
+            _withdrawBNB(caller, amountETH);
+        } else {
+            amountToken = IERC20(token0).balanceOf(address(this));
+
+            IERC20(token0).transfer(caller, amountToken);
+        }
+
+        if (token1 == address(WBNB)) {
+            amountETH = IWBNB(WBNB).balanceOf(address(this));
+
+            _withdrawBNB(caller, amountETH);
+        } else {
+            amountToken = IERC20(token1).balanceOf(address(this));
+            IERC20(token1).transfer(caller, amountToken);
+        }
+    }
 }

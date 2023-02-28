@@ -5,7 +5,7 @@ import {
     PositionSpotFactory,
     PositionStakingDexManager,
     SpotHouse,
-    WithdrawBNB
+    TransistorBNB
 } from "../typeChain";
 import {HardhatRuntimeEnvironment} from "hardhat/types";
 
@@ -43,7 +43,7 @@ async function setup(configData, hre: HardhatRuntimeEnvironment) {
     const instanceSpotHouse =  (await  spotHouse.attach(configData.spotHouse)) as  unknown as SpotHouse;
     const instancePositionNondisperseLiquidity =  (await  positionConcentratedLiquidity.attach(configData.positionConcentratedLiquidity)) as  unknown as PositionNondisperseLiquidity;
     const instanceSpotFactory =  (await  positionSpotFactory.attach(configData.spotFactory)) as  unknown as PositionSpotFactory;
-    const instanceWithdrawBNB =  (await  positionSpotFactory.attach(configData.withdrawBNB)) as  unknown as WithdrawBNB;
+    const instanceWithdrawBNB =  (await  positionSpotFactory.attach(configData.withdrawBNB)) as  unknown as TransistorBNB;
     const instancePositionStakingDexManager = configData.positionStakingDexManager? (await  positionStakingDexManager.attach(configData.positionStakingDexManager)) as  unknown as PositionStakingDexManager : undefined;
     const instancePositionRouter =  (await  positionRouter.attach(configData.positionRouter)) as  unknown as PositionRouter;
 
@@ -67,7 +67,7 @@ async function setup(configData, hre: HardhatRuntimeEnvironment) {
 
         tx = await instancePositionNondisperseLiquidity.setFactory(configData.spotFactory)
         await  tx.wait(5);
-        tx = await instancePositionNondisperseLiquidity.setWithdrawBNB(configData.withdrawBNB)
+        tx = await instancePositionNondisperseLiquidity.setTransistorBNB(configData.withdrawBNB)
         await  tx.wait(5);
 
         tx = await instancePositionNondisperseLiquidity.setBNB(configData.WBNB)
@@ -87,7 +87,7 @@ async function setup(configData, hre: HardhatRuntimeEnvironment) {
         console.log("start spotHouse setup")
         tx = await instanceSpotHouse.setFactory(configData.spotFactory);
         await tx.wait(5);
-        tx = await instanceSpotHouse.setWithdrawBNB(configData.withdrawBNB);
+        tx = await instanceSpotHouse.setTransistorBNB(configData.withdrawBNB);
         await tx.wait(5);
         tx = await instanceSpotHouse.setWBNB(configData.WBNB);
         await tx.wait(5);
@@ -96,7 +96,7 @@ async function setup(configData, hre: HardhatRuntimeEnvironment) {
     if(configData.positionRouter){
         console.log("start position router setup")
 
-        tx = await instancePositionRouter.setWithdrawBNB(configData.withdrawBNB);
+        tx = await instancePositionRouter.setTransistorBNB(configData.withdrawBNB);
         await tx.wait(5);
 
     }

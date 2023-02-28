@@ -17,8 +17,6 @@ import "../libraries/helper/U128Math.sol";
 import "../libraries/liquidity/Liquidity.sol";
 import "../libraries/types/PositionStakingDexManagerStorage.sol";
 
-interface IPositionStakingDexManager {}
-
 contract PositionStakingDexManager is
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
@@ -335,6 +333,10 @@ contract PositionStakingDexManager is
         pool.lastRewardBlock = block.number;
     }
 
+    function stakeAfterMigrate(uint256 nftId, address user ) public {
+        _stake(nftId, address(0), user);
+    }
+
     // Deposit LP tokens to PosiStakingManager for Position allocation.
     function stake(uint256 _nftId) public nonReentrant {
         _stake(_nftId, address(0), _msgSender());
@@ -405,7 +407,7 @@ contract PositionStakingDexManager is
         ) {
             positionReferral.recordReferral(userAddress, _referrer);
         }
-        _payOrLockupPendingPosition(poolAddress, _msgSender());
+        _payOrLockupPendingPosition(poolAddress, userAddress);
         _transferNFTIn(_nftId);
         uint128 power = _calculatePower(
             nftData.indexedPipRange,

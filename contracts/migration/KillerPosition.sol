@@ -19,15 +19,18 @@ import "../libraries/helper/LiquidityHelper.sol";
 import "../interfaces/IUniswapV2Factory.sol";
 import "../interfaces/ISpotFactory.sol";
 import {TransferHelper} from "../libraries/helper/TransferHelper.sol";
+import "../interfaces/IPositionStakingDexManager.sol";
 
 contract KillerPosition is ReentrancyGuard, Ownable {
     using Address for address payable;
 
-    IUniswapV2Router01 public uniswapRouter;
+    IUniswapV2Router02 public uniswapRouter;
     IUniswapV2Factory public uniswapV2Factory;
     IPositionNondisperseLiquidity public positionLiquidity;
     ISpotFactory public spotFactory;
     IWBNB public WBNB;
+
+    IPositionStakingDexManager public stakingDexManager;
 
     receive() external payable {
         //        assert(msg.sender == address(uniswapRouter));
@@ -43,7 +46,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
     );
 
     constructor(
-        IUniswapV2Router01 _uniswapRouter,
+        IUniswapV2Router02 _uniswapRouter,
         IPositionNondisperseLiquidity _positionLiquidity,
         ISpotFactory _spotFactory,
         IWBNB _WBNB
@@ -66,10 +69,19 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uint256 balance1;
     }
 
+    function approveStaking() public {
+        positionLiquidity.setApprovalForAll(address(stakingDexManager), true);
+    }
+
     // TODO remove when testing done
-    function updateUniswapRouter(IUniswapV2Router01 _new) external onlyOwner {
+    function updateUniswapRouter(IUniswapV2Router02 _new) external onlyOwner {
         uniswapRouter = _new;
     }
+
+    function updateStakingDexManager(IPositionStakingDexManager _stakingDexManager) external onlyOwner {
+        stakingDexManager = _stakingDexManager;
+    }
+
 
     function updatePositionLiquidity(
         IPositionNondisperseLiquidity _positionLiquidity
@@ -106,12 +118,17 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return uniswapV2Factory.getPair(pair.QuoteAsset, pair.BaseAsset);
     }
 
+    function stake(uint256 ndtId, address user) internal {
+        stakingDexManager.stakeAfterMigrate(ndtId, user);
+    }
+
     function migratePosition(IUniswapV2Pair pair, uint256 liquidity)
         public
         nonReentrant
     {
         State memory state;
         address user = _msgSender();
+
         address token0 = pair.token0();
         address token1 = pair.token1();
 
@@ -128,7 +145,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
 
         require(state.pairManager != address(0x00), "!0x0");
         if (token0 == address(WBNB) || token1 == address(WBNB)) {
-            uniswapRouter.removeLiquidityETH(
+            uniswapRouter.removeLiquidityETHSupportingFeeOnTransferTokens(
                 token0 == address(WBNB) ? token1 : token0,
                 liquidity,
                 0,
@@ -193,7 +210,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     indexedPipRange: state.currentIndexedPipRange,
                     isBase: true
                 }),
-                user
+                address(this)
             );
         } else if (maxPip == state.currentPip) {
             uint256 _value;
@@ -221,7 +238,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                     indexedPipRange: state.currentIndexedPipRange,
                     isBase: false
                 }),
-                user
+                address(this)
             );
         } else {
             uint128 amountBase;
@@ -256,7 +273,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 indexedPipRange: state.currentIndexedPipRange,
                                 isBase: true
                             }),
-                            user
+                            address(this)
                         )
                     {} catch Error(string memory reason) {
                         if (_isCatch(reason)) {
@@ -277,7 +294,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                         .currentIndexedPipRange,
                                     isBase: false
                                 }),
-                                user
+                                address(this)
                             );
                         } else revert(reason);
                     }
@@ -308,7 +325,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 indexedPipRange: state.currentIndexedPipRange,
                                 isBase: true
                             }),
-                            user
+                            address(this)
                         )
                     {} catch Error(string memory reason) {
                         if (_isCatch(reason)) {
@@ -329,7 +346,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                         .currentIndexedPipRange,
                                     isBase: false
                                 }),
-                                user
+                                address(this)
                             );
                         } else revert(reason);
                     }
@@ -361,7 +378,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 indexedPipRange: state.currentIndexedPipRange,
                                 isBase: true
                             }),
-                            user
+                            address(this)
                         )
                     {} catch Error(string memory reason) {
                         if (_isCatch(reason)) {
@@ -382,7 +399,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                         .currentIndexedPipRange,
                                     isBase: false
                                 }),
-                                user
+                                address(this)
                             );
                         } else revert(reason);
                     }
@@ -414,7 +431,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                 indexedPipRange: state.currentIndexedPipRange,
                                 isBase: true
                             }),
-                            user
+                            address(this)
                         )
                     {} catch Error(string memory reason) {
                         if (_isCatch(reason)) {
@@ -435,7 +452,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
                                         .currentIndexedPipRange,
                                     isBase: false
                                 }),
-                                user
+                                address(this)
                             );
                         } else revert(reason);
                     }
@@ -459,6 +476,9 @@ contract KillerPosition is ReentrancyGuard, Ownable {
             ),
             user
         );
+
+        stake(positionLiquidity.tokenID(), user);
+
 
         emit PositionLiquidityMigrated(
             user,

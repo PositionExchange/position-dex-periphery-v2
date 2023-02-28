@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
     },
 
     bsc_mainnet: {
-      url: "https://bsc-dataseed2.binance.org/",
+      url: "https://bsc-dataseed4.ninicoin.io/",
       chainId: 56,
       accounts: [PRIV_MAINNET_ACCOUNT],
     },

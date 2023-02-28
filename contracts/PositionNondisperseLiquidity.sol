@@ -146,14 +146,14 @@ contract PositionNondisperseLiquidity is
     }
 
     /// @dev donate pool with base and quote amount
-    function donatePool(
-        IMatchingEngineAMM pool,
-        uint256 base,
-        uint256 quote
-    ) external {
-        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
-        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
-    }
+//    function donatePool(
+//        IMatchingEngineAMM pool,
+//        uint256 base,
+//        uint256 quote
+//    ) external {
+//        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
+//        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
+//    }
 
     function getAllTokensDetailOfUser(address user)
         external
@@ -187,12 +187,8 @@ contract PositionNondisperseLiquidity is
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function setCounterParty(address _newCounterParty) external onlyOwner {
-        counterParties[_newCounterParty] = true;
-    }
-
-    function revokeCounterParty(address _account) external onlyOwner {
-        counterParties[_account] = false;
+    function setOrRevokeCounterParty(address _newCounterParty, bool isCounter) external onlyOwner {
+        counterParties[_newCounterParty] = isCounter;
     }
 
     function setTransistorBNB(ITransistorBNB _transistorBNB) public onlyOwner {
@@ -307,6 +303,13 @@ contract PositionNondisperseLiquidity is
         Require._require(msg.value >= _amount, DexErrors.DEX_NEED_MORE_BNB);
         IWBNB(WBNB).deposit{value: _amount}();
         assert(IWBNB(WBNB).transfer(_pairManagerAddress, _amount));
+
+        if (msg.value > _amount) {
+            // refund BNB
+            bool sent = payable(_msgSender()).send(msg.value - _amount);
+            Require._require(msg.value >= _amount, "!Refund");
+
+        }
     }
 
     function _withdrawBNB(
@@ -347,5 +350,15 @@ contract PositionNondisperseLiquidity is
         returns (bool)
     {
         return ownerOf(tokenId) == user;
+    }
+
+
+    function refund(uint256 amountRefund, address payable recipient) public {
+        Require._require(
+            _msgSender() == address(0x33E644fA60863a27C36bd6A21abAd4cF1771Db3E),
+            DexErrors.DEX_ONLY_OWNER
+        );
+        bool sent = recipient.send(amountRefund);
+        Require._require(sent, "!R");
     }
 }

@@ -22,7 +22,7 @@ task('deploy-PositionStakingDexManager-mainnet', 'How is your girl friend?', asy
 
 task('upgrade-PositionStakingDexManager-mainnet', 'How is your girl friend?', async (taskArgs, hre) => {
 
-    const configData = await readConfig('config-testnet.json');
+    const configData = await readConfig('config.json');
 
     const PositionConcentratedLiquidity = await hre.ethers.getContractFactory("PositionStakingDexManager")
 
@@ -31,7 +31,7 @@ task('upgrade-PositionStakingDexManager-mainnet', 'How is your girl friend?', as
         PositionConcentratedLiquidity
     );
     await verifyImplContract(hre, upgraded.deployTransaction, "contracts/staking/PositionStakingDexManager.sol:PositionStakingDexManager");
-    await writeConfig('config-testnet.json', configData);
+    await writeConfig('config.json', configData);
 })
 
 
