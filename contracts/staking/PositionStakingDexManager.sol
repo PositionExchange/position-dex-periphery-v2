@@ -333,7 +333,7 @@ contract PositionStakingDexManager is
         pool.lastRewardBlock = block.number;
     }
 
-    function stakeAfterMigrate(uint256 nftId, address user ) public {
+    function stakeAfterMigrate(uint256 nftId, address user) public {
         _stake(nftId, address(0), user);
     }
 

@@ -90,7 +90,7 @@ contract PositionSpotFactory is
         uint128 pipRange,
         uint32 tickSpace,
         uint256 levelFee
-    ) external override(ISpotFactory) nonReentrant {
+    ) external override(ISpotFactory) nonReentrant onlyOwner {
         address creator = msg.sender;
 
         _require(
@@ -106,6 +106,7 @@ contract PositionSpotFactory is
         address pair = _clone(creator);
 
         uint32 feeLevelShareAmm = levelFeeShareAmm[levelFee];
+        Require._require(feeLevelShareAmm != 0, "!level");
         // save
         pathPairManagersV2[baseAsset][quoteAsset][feeLevelShareAmm] = pair;
 
@@ -321,7 +322,7 @@ contract PositionSpotFactory is
             return (
                 tokenB,
                 tokenA,
-                pathPairManagersV2[tokenA][tokenB][feeShareAmm]
+                pathPairManagersV2[tokenB][tokenA][feeShareAmm]
             );
         }
     }
@@ -335,7 +336,18 @@ contract PositionSpotFactory is
         override(ISpotFactory)
         returns (Pair memory)
     {
-        return allPairManager[pairManager];
+        Pair memory pair = allPairManager[pairManager];
+
+        if (pair.BaseAsset == address(0)) {
+            PairV2 memory pairV2 = allPairManagerV2[pairManager];
+            return
+                Pair({
+                    BaseAsset: pairV2.BaseAsset,
+                    QuoteAsset: pairV2.QuoteAsset
+                });
+        } else {
+            return pair;
+        }
     }
 
     /// @notice check pair manager exist in posi dex
@@ -349,12 +361,25 @@ contract PositionSpotFactory is
     {
         // Just 1 in 2 address needRequire._require != address 0x000
         // Because when we added pair, alreadyRequire._require both of them difference address 0x00
-        return allPairManager[pairManager].BaseAsset != address(0);
+        return
+            allPairManager[pairManager].BaseAsset != address(0) ||
+            allPairManagerV2[pairManager].BaseAsset != address(0);
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
+
+    function updateFeeShare(
+        uint32 level0,
+        uint32 level1,
+        uint32 level2
+    ) external onlyOwner {
+        Require._require(level0 < level1 && level1 < level2, "!level");
+        levelFeeShareAmm[0] = level0;
+        levelFeeShareAmm[1] = level1;
+        levelFeeShareAmm[2] = level2;
+    }
 
     function setSpotHouse(address newSpotHouse) external onlyOwner {
         spotHouse = newSpotHouse;
@@ -412,6 +437,45 @@ contract PositionSpotFactory is
             BaseAsset: _baseAsset,
             QuoteAsset: _quoteAsset
         });
+        ownerPairManager[_pairManager] = msg.sender;
+    }
+
+    function addPairManagerManualV2(
+        address _pairManager,
+        address _baseAsset,
+        address _quoteAsset,
+        uint256 _levelFee
+    ) external onlyOwner {
+        Require._require(
+            _quoteAsset != address(0) && _baseAsset != address(0),
+            DexErrors.DEX_EMPTY_ADDRESS
+        );
+        Require._require(
+            _quoteAsset != _baseAsset,
+            DexErrors.DEX_MUST_IDENTICAL_ADDRESSES
+        );
+        Require._require(
+            pathPairManagers[_baseAsset][_quoteAsset] == address(0),
+            DexErrors.DEX_SPOT_MANGER_EXITS
+        );
+
+        uint32 feeLevelShareAmm = levelFeeShareAmm[_levelFee];
+        Require._require(feeLevelShareAmm != 0, "!level");
+
+        // save
+        pathPairManagersV2[_baseAsset][_quoteAsset][
+            feeLevelShareAmm
+        ] = _pairManager;
+
+        allPairManagerV2[_pairManager] = PairV2({
+            BaseAsset: _baseAsset,
+            QuoteAsset: _quoteAsset,
+            FeeShareAmm: feeLevelShareAmm,
+            PipRange: uint128(
+                IMatchingEngineAMM(_pairManager).currentIndexedPipRange()
+            )
+        });
+
         ownerPairManager[_pairManager] = msg.sender;
     }
 
