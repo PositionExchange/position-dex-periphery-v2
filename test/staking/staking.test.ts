@@ -84,6 +84,15 @@ describe("killer-position", async function () {
         await reflex.approve(dexNFT.address, ethers.constants.MaxInt256);
 
 
+
+        await base.connect(users[1]).approve(dexNFT.address, ethers.constants.MaxInt256);
+        await quote.connect(users[1]).approve(dexNFT.address, ethers.constants.MaxInt256);
+        await reflex.connect(users[1]).approve(dexNFT.address, ethers.constants.MaxInt256);
+
+        await base.mint(users[1].address, toWei(1000000000));
+        await quote.mint(users[1].address, toWei(1000000000));
+
+
         await mockPairUni.mint(deployer.address, toWei(10000000000000))
         await dexNFT.setBNB(wbnb.address);
 
@@ -118,6 +127,7 @@ describe("killer-position", async function () {
         await factory.setStakingManagerForPair(pair.address, staking.address);
 
         await dexNFT.setApprovalForAll(staking.address, true)
+        await dexNFT.connect(users[1]).setApprovalForAll(staking.address, true)
 
 
     })
@@ -139,7 +149,6 @@ describe("killer-position", async function () {
 
     async function addLiquidity(amountVirtual: number, indexInLiquidity: number, isBase: boolean, valueEther = 0) {
 
-        console.log("value ether");
         await dexNFT.addLiquidity({
                 amountVirtual: toWei(amountVirtual.toString()),
                 indexedPipRange: indexInLiquidity,
@@ -191,6 +200,65 @@ describe("killer-position", async function () {
         console.log("quoteVirtual: ", toEther(liquidity.quoteVirtual.toString()))
     }
 
+    async function logTotalStake() {
+
+        const poolInfo = await staking.poolInfo(pair.address)
+        console.log("poolInfo totalStaked: ", toEther(poolInfo.totalStaked.toString()));
+
+        const userInfo = await staking.userInfo(pair.address, deployer.address)
+        console.log("userInfo user amount: ", toEther(userInfo.amount.toString()));
+
+    }
+
+    function calPower(liquidity, indexPipRangeNft, currentIndexPipRange ){
+
+        return liquidity / ( Math.abs(indexPipRangeNft - currentIndexPipRange) + 1);
+    }
+
+    async function logTotalLiquidity(listIndex : number[]) {
+
+        let totalLiquidity = 0;
+        const currentIndexPipRange = (await pair.currentIndexedPipRange()).toString();
+
+        for (let i = 0; i < listIndex.length; i++) {
+            const liquidity = (await pair.liquidityInfo(listIndex[i])).sqrtK.toString()
+            const liquidityPower = calPower(toEther(liquidity), listIndex[i], currentIndexPipRange)
+            totalLiquidity += liquidityPower;
+        }
+
+        console.log("totalLiquidity: ", totalLiquidity);
+
+    }
+
+    async function logLiquidity(listIndex : number[]) {
+        console.log("**********START LOG LIQUIDITY**********")
+        await logTotalStake()
+        await logTotalLiquidity(listIndex)
+        console.log("**********END LOG LIQUIDITY********** \n")
+
+    }
+
+    async function marketMaker(isBuy: boolean, size) {
+
+        console.log("**********START LOG MARKET**********")
+        const startPip = await pair.getCurrentPip()
+        let currentIndex = await pair.currentIndexedPipRange()
+
+
+        console.log(`Start pip: ${startPip.toString()}  , currentIndex: ${currentIndex.toString()} ` )
+        await pair.openMarket(toWei(size), isBuy, deployer.address, 20)
+        const endPip = await pair.getCurrentPip()
+        currentIndex = await pair.currentIndexedPipRange()
+        console.log(`End pip: ${endPip.toString()}, currentIndex: ${currentIndex.toString()} ` )
+        console.log("**********END LOG MARKET********** \n")
+
+
+
+
+
+
+    }
+
     describe("should update staking amount when liquidity action", function (){
 
 
@@ -199,13 +267,22 @@ describe("killer-position", async function () {
             await addLiquidity(10, 1, true)
 
             await staking.stake(1000001)
+            await logLiquidity([0,1,2,3,4,5])
+
+
             await mine(1000);
             await increaseLiquidity(1000001, 10, true)
+
+            await logLiquidity([0,1,2,3,4,5])
+
+
 
 
             await addLiquidity(10, 1, true)
             await staking.stake(1000002)
             await mine(1000);
+            await logLiquidity([0,1,2,3,4,5])
+
 
         })
 
@@ -295,6 +372,8 @@ describe("killer-position", async function () {
             await addLiquidity(100, 1, true)
             await staking.stake(1000001)
             await logPower(users[0].address)
+            await logLiquidity([0,1,2,3,4,5])
+
             await mine(10);
 
 
@@ -309,11 +388,15 @@ describe("killer-position", async function () {
             console.log("shiftRange");
             await shiftRange(1000001, 2, 0, true);
             await logPower(users[0].address)
+            await logLiquidity([0,1,2,3,4,5])
+
 
 
             await addLiquidity(100, 1, true)
             await staking.stake(1000003)
             await logPower(users[0].address)
+            await logLiquidity([0,1,2,3,4,5])
+
             await mine(10);
 
 
@@ -362,6 +445,58 @@ describe("killer-position", async function () {
             // await balanceTokenReward(users[0].address)
         });
 
+        it('should stake #3 and shift', async function () {
+            await dexNFT.donatePool(pair.address, toWei(1), toWei(1))
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000001)
+            await logLiquidity([0,1,2,3,4,5])
+
+            await mine(10);
+
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000002)
+            await logLiquidity([0,1,2,3,4,5])
+
+            await mine(10);
+
+
+
+
+            console.log("shiftRange");
+            await shiftRange(1000001, 2, 0, true);
+            await logLiquidity([0,1,2,3,4,5])
+
+
+            await shiftRange(1000002, 0, 50, false);
+            await logLiquidity([0,1,2,3,4,5])
+
+
+            await shiftRange(1000002, 4, 50, true);
+            await logLiquidity([0,1,2,3,4,5])
+
+
+            await shiftRange(1000001, 4, 0, true);
+            await logLiquidity([0,1,2,3,4,5])
+
+
+            await addLiquidity(100, 1, true)
+            await staking.stake(1000003)
+
+
+            console.log("marketMaker")
+            await marketMaker(true, 120)
+            await logLiquidity([0,1,2,3,4,5])
+            console.log("start addLiquidity")
+            await addLiquidity(100, 1, false)
+            await staking.stake(1000004)
+
+
+            await logLiquidity([0,1,2,3,4,5])
+
+
+        });
     })
 
 })

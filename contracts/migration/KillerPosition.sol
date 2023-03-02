@@ -78,10 +78,11 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         uniswapRouter = _new;
     }
 
-    function updateStakingDexManager(IPositionStakingDexManager _stakingDexManager) external onlyOwner {
+    function updateStakingDexManager(
+        IPositionStakingDexManager _stakingDexManager
+    ) external onlyOwner {
         stakingDexManager = _stakingDexManager;
     }
-
 
     function updatePositionLiquidity(
         IPositionNondisperseLiquidity _positionLiquidity
@@ -118,7 +119,7 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         return uniswapV2Factory.getPair(pair.QuoteAsset, pair.BaseAsset);
     }
 
-    function stake(uint256 ndtId, address user) internal {
+    function stake(uint256 ndtId, address user) internal virtual {
         stakingDexManager.stakeAfterMigrate(ndtId, user);
     }
 
@@ -478,7 +479,6 @@ contract KillerPosition is ReentrancyGuard, Ownable {
         );
 
         stake(positionLiquidity.tokenID(), user);
-
 
         emit PositionLiquidityMigrated(
             user,

@@ -888,8 +888,6 @@ abstract contract LiquidityManager is ILiquidityManager {
         returns (ISpotFactory.Pair memory pair)
     {}
 
-    function _getWBNBAddress() internal view virtual returns (address) {}
-
     function _updateStakingLiquidity(
         address user,
         uint256 tokenId,

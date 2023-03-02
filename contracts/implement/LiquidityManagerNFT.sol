@@ -67,10 +67,7 @@ contract LiquidityManagerNFT is
     }
 
     function _burnNFT(uint256 tokenId) internal {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "!Burn"
-        );
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "!Burn");
         _burn(tokenId);
     }
 }
