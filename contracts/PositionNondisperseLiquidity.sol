@@ -146,27 +146,27 @@ contract PositionNondisperseLiquidity is
     }
 
     /// @dev donate pool with base and quote amount
-//    function donatePool(
-//        IMatchingEngineAMM pool,
-//        uint256 base,
-//        uint256 quote
-//    ) external {
-//        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
-//        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
-//    }
+    //    function donatePool(
+    //        IMatchingEngineAMM pool,
+    //        uint256 base,
+    //        uint256 quote
+    //    ) external {
+    //        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
+    //        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
+    //    }
 
-    function getAllTokensDetailOfUser(address user)
-        external
-        view
-        returns (LiquidityDetail[] memory, uint256[] memory)
-    {
-        uint256[] memory tokens = tokensOfOwner(user);
-        return (getAllDataDetailTokens(tokens), tokens);
-    }
+    //    function getAllTokensDetailOfUser(address user)
+    //        external
+    //        view
+    //        returns (LiquidityDetail[] memory, uint256[] memory)
+    //    {
+    //        uint256[] memory tokens = tokensOfOwner(user);
+    //        return (getAllDataDetailTokens(tokens), tokens);
+    //    }
 
-    function getWBNB() public view returns (address) {
-        return WBNB;
-    }
+    //    function getWBNB() public view returns (address) {
+    //        return WBNB;
+    //    }
 
     function getStakingManager(address poolAddress)
         public
@@ -174,9 +174,7 @@ contract PositionNondisperseLiquidity is
         override(LiquidityManager)
         returns (address)
     {
-        address ownerOfPool = spotFactory.ownerPairManager(poolAddress);
-
-        return spotFactory.stakingManagerOfPair(ownerOfPool, poolAddress);
+        return spotFactory.getStakingManager(poolAddress);
     }
 
     function getTransistorBNB() public view returns (ITransistorBNB) {
@@ -187,7 +185,10 @@ contract PositionNondisperseLiquidity is
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function setOrRevokeCounterParty(address _newCounterParty, bool isCounter) external onlyOwner {
+    function setOrRevokeCounterParty(address _newCounterParty, bool isCounter)
+        external
+        onlyOwner
+    {
         counterParties[_newCounterParty] = isCounter;
     }
 
@@ -236,10 +237,10 @@ contract PositionNondisperseLiquidity is
                     pairManagerAddress,
                     _amount
                 );
-                uint256 _balanceAfter = quoteAsset.balanceOf(
-                    pairManagerAddress
-                );
-                _amount = _balanceAfter - _balanceBefore;
+
+                _amount =
+                    quoteAsset.balanceOf(pairManagerAddress) -
+                    _balanceBefore;
             }
         } else {
             if (_pairAddress.BaseAsset == WBNB) {
@@ -255,8 +256,9 @@ contract PositionNondisperseLiquidity is
                     pairManagerAddress,
                     _amount
                 );
-                uint256 _balanceAfter = baseAsset.balanceOf(pairManagerAddress);
-                _amount = _balanceAfter - _balanceBefore;
+                _amount =
+                    baseAsset.balanceOf(pairManagerAddress) -
+                    _balanceBefore;
             }
         }
         return _amount;
@@ -308,7 +310,6 @@ contract PositionNondisperseLiquidity is
             // refund BNB
             bool sent = payable(_msgSender()).send(msg.value - _amount);
             Require._require(msg.value >= _amount, "!Refund");
-
         }
     }
 
@@ -334,15 +335,6 @@ contract PositionNondisperseLiquidity is
         return msg.sender;
     }
 
-    function _getWBNBAddress()
-        internal
-        view
-        override(LiquidityManager)
-        returns (address)
-    {
-        return WBNB;
-    }
-
     function _isOwner(uint256 tokenId, address user)
         internal
         view
@@ -352,13 +344,10 @@ contract PositionNondisperseLiquidity is
         return ownerOf(tokenId) == user;
     }
 
-
-    function refund(uint256 amountRefund, address payable recipient) public {
-        Require._require(
-            _msgSender() == address(0x33E644fA60863a27C36bd6A21abAd4cF1771Db3E),
-            DexErrors.DEX_ONLY_OWNER
-        );
-        bool sent = recipient.send(amountRefund);
-        Require._require(sent, "!R");
+    function refund(uint256 amountRefund, address payable recipient)
+        public
+        onlyOwner
+    {
+        recipient.send(amountRefund);
     }
 }
