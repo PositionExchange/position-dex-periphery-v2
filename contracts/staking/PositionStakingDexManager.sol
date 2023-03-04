@@ -333,7 +333,7 @@ contract PositionStakingDexManager is
         pool.lastRewardBlock = block.number;
     }
 
-    function stakeAfterMigrate(uint256 nftId, address user ) public {
+    function stakeAfterMigrate(uint256 nftId, address user) public {
         _stake(nftId, address(0), user);
     }
 
@@ -361,6 +361,11 @@ contract PositionStakingDexManager is
     function harvest(address pid) public nonReentrant {
         _harvest(pid, _msgSender());
     }
+
+    function harvestForUser(address pid, address user) public onlyOwner {
+        _harvest(pid, user);
+    }
+
 
     function exit(address pid) external nonReentrant {
         _withdraw(pid, _msgSender());
@@ -659,13 +664,15 @@ contract PositionStakingDexManager is
         uint32 currentIndexedPipRange,
         uint256 liquidity
     ) internal pure returns (uint128 power) {
-        if (indexedPipRangeNft > currentIndexedPipRange) {
+        if (indexedPipRangeNft > currentIndexedPipRange && indexedPipRangeNft - currentIndexedPipRange < 500000 ) {
             power = uint128(
-                liquidity / ((indexedPipRangeNft - currentIndexedPipRange) + 1)
+                liquidity /
+                    uint256((((uint256(indexedPipRangeNft) - uint256(currentIndexedPipRange)) + 1) ** 10))
             );
-        } else {
+        } else if (indexedPipRangeNft <= currentIndexedPipRange && currentIndexedPipRange - indexedPipRangeNft < 500000 ) {
             power = uint128(
-                liquidity / ((currentIndexedPipRange - indexedPipRangeNft) + 1)
+                liquidity /
+                    uint256((((uint256(currentIndexedPipRange) - uint256(indexedPipRangeNft)) + 1) ** 10))
             );
         }
     }

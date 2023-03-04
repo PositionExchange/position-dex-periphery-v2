@@ -851,13 +851,15 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint32 currentIndexedPipRange,
         uint256 liquidity
     ) internal pure returns (uint128 power) {
-        if (indexedPipRangeNft > currentIndexedPipRange) {
+        if (indexedPipRangeNft > currentIndexedPipRange && indexedPipRangeNft - currentIndexedPipRange < 500000 ) {
             power = uint128(
-                liquidity / ((indexedPipRangeNft - currentIndexedPipRange) + 1)
+                liquidity /
+                uint256((((uint256(indexedPipRangeNft) - uint256(currentIndexedPipRange)) + 1) ** 10))
             );
-        } else {
+        } else if (indexedPipRangeNft <= currentIndexedPipRange && currentIndexedPipRange - indexedPipRangeNft < 500000 ) {
             power = uint128(
-                liquidity / ((currentIndexedPipRange - indexedPipRangeNft) + 1)
+                liquidity /
+                uint256((((uint256(currentIndexedPipRange) - uint256(indexedPipRangeNft)) + 1) ** 10))
             );
         }
     }
@@ -888,7 +890,7 @@ abstract contract LiquidityManager is ILiquidityManager {
         returns (ISpotFactory.Pair memory pair)
     {}
 
-    function _getWBNBAddress() internal view virtual returns (address) {}
+    //    function _getWBNBAddress() internal view virtual returns (address) {}
 
     function _updateStakingLiquidity(
         address user,
@@ -959,11 +961,5 @@ abstract contract LiquidityManager is ILiquidityManager {
         view
         virtual
         returns (address)
-    {}
-
-    function _trackingId(address pairManager)
-        internal
-        virtual
-        returns (uint256)
     {}
 }
