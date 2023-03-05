@@ -851,15 +851,27 @@ abstract contract LiquidityManager is ILiquidityManager {
         uint32 currentIndexedPipRange,
         uint256 liquidity
     ) internal pure returns (uint128 power) {
-        if (indexedPipRangeNft > currentIndexedPipRange && indexedPipRangeNft - currentIndexedPipRange < 500000 ) {
+        if (
+            indexedPipRangeNft > currentIndexedPipRange &&
+            indexedPipRangeNft - currentIndexedPipRange < 500000
+        ) {
             power = uint128(
                 liquidity /
-                uint256((((uint256(indexedPipRangeNft) - uint256(currentIndexedPipRange)) + 1) ** 10))
+                    uint256(
+                        (((uint256(indexedPipRangeNft) -
+                            uint256(currentIndexedPipRange)) + 1)**10)
+                    )
             );
-        } else if (indexedPipRangeNft <= currentIndexedPipRange && currentIndexedPipRange - indexedPipRangeNft < 500000 ) {
+        } else if (
+            indexedPipRangeNft <= currentIndexedPipRange &&
+            currentIndexedPipRange - indexedPipRangeNft < 500000
+        ) {
             power = uint128(
                 liquidity /
-                uint256((((uint256(currentIndexedPipRange) - uint256(indexedPipRangeNft)) + 1) ** 10))
+                    uint256(
+                        (((uint256(currentIndexedPipRange) -
+                            uint256(indexedPipRangeNft)) + 1)**10)
+                    )
             );
         }
     }

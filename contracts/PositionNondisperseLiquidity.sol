@@ -146,14 +146,14 @@ contract PositionNondisperseLiquidity is
     }
 
     /// @dev donate pool with base and quote amount
-    //    function donatePool(
-    //        IMatchingEngineAMM pool,
-    //        uint256 base,
-    //        uint256 quote
-    //    ) external {
-    //        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
-    //        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
-    //    }
+    function donatePool(
+        IMatchingEngineAMM pool,
+        uint256 base,
+        uint256 quote
+    ) external {
+        _depositLiquidity(pool, _msgSender(), Asset.Type.Quote, quote);
+        _depositLiquidity(pool, _msgSender(), Asset.Type.Base, base);
+    }
 
     //    function getAllTokensDetailOfUser(address user)
     //        external

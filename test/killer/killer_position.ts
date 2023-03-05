@@ -1,9 +1,9 @@
 import {
-    ForkMatchingEngineAMM,
-    KillerPosition,
-    MatchingEngineAMM, MockPairUni,
-    MockUniRouter, PositionNondisperseLiquidity, PositionRouter,
-    PositionSpotFactory, SpotHouse,
+    ForkMatchingEngineAMM, MockKillerPosition,
+
+    MockPairUni,
+    MockUniRouter, PositionNondisperseLiquidity,
+    PositionSpotFactory,
 } from "../../typeChain";
 import {deployContract, getAccount, toEther, toWei} from "../utils/utils";
 import {deployMockReflexToken, deployMockToken, deployMockWrappedBNB} from "../utils/mock";
@@ -16,7 +16,7 @@ describe("killer-position", async function () {
 
 
     let factory: PositionSpotFactory;
-    let killer: KillerPosition;
+    let killer: MockKillerPosition;
     let pair: ForkMatchingEngineAMM;
     let dexNFT: PositionNondisperseLiquidity;
     let uniRouter: MockUniRouter;
@@ -60,7 +60,7 @@ describe("killer-position", async function () {
         reflex = await deployMockReflexToken("posi");
         await uniRouter.setWBNB(wbnb.address)
 
-        killer = await deployContract("KillerPosition", deployer,
+        killer = await deployContract("MockKillerPosition", deployer,
             uniRouter.address, dexNFT.address, factory.address, wbnb.address);
 
 
