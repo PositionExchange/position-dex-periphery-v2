@@ -6885,6 +6885,334 @@
           }
         }
       }
+    },
+    "bad419f2e294a34f677b6004c8bf6a6931657a490d064447c75084c1d0e537f1": {
+      "address": "0x94C28183E109f12267Dee9ae29da8EF89C27D8b0",
+      "txHash": "0xcb6fc5e7f02b21662de189cebef6d697d3d05e896518c871576af62d7bfb158b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "defaultFeePercentage",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_uint16",
+            "contract": "StrategyFee",
+            "src": "contracts/libraries/extensions/StrategyFee.sol:11"
+          },
+          {
+            "label": "strategyFee",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_array(t_struct(FeeDiscount)6845_storage)dyn_storage",
+            "contract": "StrategyFee",
+            "src": "contracts/libraries/extensions/StrategyFee.sol:19"
+          },
+          {
+            "label": "positionRouter",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_contract(IPositionRouter)6209",
+            "contract": "BuyBackAndBurn",
+            "src": "contracts/libraries/extensions/BuyBackAndBurn.sol:16"
+          },
+          {
+            "label": "posiToken",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_contract(IERC20)1012",
+            "contract": "BuyBackAndBurn",
+            "src": "contracts/libraries/extensions/BuyBackAndBurn.sol:18"
+          },
+          {
+            "label": "totalBurned",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_uint256",
+            "contract": "BuyBackAndBurn",
+            "src": "contracts/libraries/extensions/BuyBackAndBurn.sol:20"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "BuyBackAndBurn",
+            "src": "contracts/libraries/extensions/BuyBackAndBurn.sol:96"
+          },
+          {
+            "label": "spotFactory",
+            "offset": 0,
+            "slot": "255",
+            "type": "t_contract(ISpotFactory)6569",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:11"
+          },
+          {
+            "label": "WBNB",
+            "offset": 0,
+            "slot": "256",
+            "type": "t_address",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:13"
+          },
+          {
+            "label": "limitOrders",
+            "offset": 0,
+            "slot": "257",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)6652_storage)dyn_storage))",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:15"
+          },
+          {
+            "label": "withdrawBNB",
+            "offset": 0,
+            "slot": "258",
+            "type": "t_contract(ITransistorBNB)6588",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "259",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:51"
+          },
+          {
+            "label": "operator",
+            "offset": 0,
+            "slot": "308",
+            "type": "t_address",
+            "contract": "SpotHouseStorage",
+            "src": "contracts/libraries/types/SpotHouseStorage.sol:53"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_struct(Data)6652_storage)dyn_storage": {
+            "label": "struct SpotLimitOrder.Data[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(FeeDiscount)6845_storage)dyn_storage": {
+            "label": "struct StrategyFee.FeeDiscount[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20)1012": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPositionRouter)6209": {
+            "label": "contract IPositionRouter",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ISpotFactory)6569": {
+            "label": "contract ISpotFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ITransistorBNB)6588": {
+            "label": "contract ITransistorBNB",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_struct(Data)6652_storage)dyn_storage)": {
+            "label": "mapping(address => struct SpotLimitOrder.Data[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_array(t_struct(Data)6652_storage)dyn_storage))": {
+            "label": "mapping(address => mapping(address => struct SpotLimitOrder.Data[]))",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Data)6652_storage": {
+            "label": "struct SpotLimitOrder.Data",
+            "members": [
+              {
+                "label": "pip",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "orderId",
+                "type": "t_uint64",
+                "offset": 16,
+                "slot": "0"
+              },
+              {
+                "label": "isBuy",
+                "type": "t_bool",
+                "offset": 24,
+                "slot": "0"
+              },
+              {
+                "label": "blockNumber",
+                "type": "t_uint40",
+                "offset": 25,
+                "slot": "0"
+              },
+              {
+                "label": "fee",
+                "type": "t_uint16",
+                "offset": 30,
+                "slot": "0"
+              },
+              {
+                "label": "quoteAmount",
+                "type": "t_uint128",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "baseAmount",
+                "type": "t_uint128",
+                "offset": 16,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(FeeDiscount)6845_storage": {
+            "label": "struct StrategyFee.FeeDiscount",
+            "members": [
+              {
+                "label": "minHold",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "maxHold",
+                "type": "t_uint32",
+                "offset": 4,
+                "slot": "0"
+              },
+              {
+                "label": "fee",
+                "type": "t_uint16",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint40": {
+            "label": "uint40",
+            "numberOfBytes": "5"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
     }
   }
 }

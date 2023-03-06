@@ -117,8 +117,12 @@ contract SpotHouse is
     // ONLY OPERATOR FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-
-
+    function modifyLimitOrder(
+        IMatchingEngineAMM pairManager,
+        ModifyLimitOrder[] memory modifyData
+    ) public override(SpotDex) onlyOperator {
+        super.modifyLimitOrder(pairManager, modifyData);
+    }
 
     /**
      * @dev see {BuyBackAndBurn-setPositionRouter}
