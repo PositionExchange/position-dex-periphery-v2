@@ -471,6 +471,10 @@ contract PositionRouter is
     // ONLY OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    function setEstimateLogic(IEstimateLogic _estimateLogic) public onlyOwner {
+        estimateLogic = _estimateLogic;
+    }
+
     function setFactory(ISpotFactory _newFactory) public onlyOwner {
         factory = _newFactory;
     }
@@ -598,7 +602,38 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {}
+    {
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
+        uint256 mainSizeOut;
+        uint256 flipSizeOut;
+
+        amounts = new uint256[](sidesAndPairs.length + 1);
+        uint256 mainSideOut;
+        uint256 flipSideOut;
+
+        IEstimateLogic _estimateLogic = estimateLogic;
+        amounts[0] = amountIn;
+
+        for (uint256 i = 0; i < sidesAndPairs.length; i++) {
+            if (sidesAndPairs[i].side == SpotHouseStorage.Side.BUY) {
+                (mainSideOut, flipSideOut) = estimateLogic.getAmountEstimate(
+                    IMatchingEngineAMM(sidesAndPairs[i].pairManager),
+                    amounts[i],
+                    true,
+                    false
+                );
+            } else {
+                (mainSideOut, flipSideOut) = estimateLogic.getAmountEstimate(
+                    IMatchingEngineAMM(sidesAndPairs[i].pairManager),
+                    amounts[i],
+                    false,
+                    true
+                );
+            }
+            amounts[i + 1] = flipSideOut;
+        }
+        return amounts;
+    }
 
     function getAmountsIn(uint256 amountOut, address[] calldata path)
         public
@@ -606,7 +641,38 @@ contract PositionRouter is
         virtual
         override
         returns (uint256[] memory amounts)
-    {}
+    {
+        SideAndPair[] memory sidesAndPairs = getSidesAndPairs(path);
+        uint256 mainSizeOut;
+        uint256 flipSizeOut;
+
+        amounts = new uint256[](sidesAndPairs.length + 1);
+        uint256 mainSideOut;
+        uint256 flipSideOut;
+
+        IEstimateLogic _estimateLogic = estimateLogic;
+        amounts[sidesAndPairs.length] = amountOut;
+
+        for (uint256 i = sidesAndPairs.length; i > 0; i--) {
+            if (sidesAndPairs[i - 1].side == SpotHouseStorage.Side.BUY) {
+                (mainSideOut, flipSideOut) = _estimateLogic.getAmountEstimate(
+                    IMatchingEngineAMM(sidesAndPairs[i - 1].pairManager),
+                    amounts[i],
+                    true,
+                    true
+                );
+            } else {
+                (mainSideOut, flipSideOut) = _estimateLogic.getAmountEstimate(
+                    IMatchingEngineAMM(sidesAndPairs[i - 1].pairManager),
+                    amounts[i],
+                    false,
+                    false
+                );
+            }
+            amounts[i - 1] = flipSideOut;
+        }
+        return amounts;
+    }
 
     function blockNumber() internal view virtual returns (uint256) {
         return block.timestamp;

@@ -848,6 +848,16 @@ export async function expectBalanceWithSliceAddress(
 }
 
 
+export function expectDataInRange(_expect: number, _actual: number, _percentage: number): boolean {
+    console.log("actual, expect: ", _actual, _expect);
+    if (_actual > 0) {
+        return _expect >= _actual * (1 - _percentage) && _expect <= _actual * (1 + _percentage);
+    }
+    return _expect <= _actual * (1 - _percentage) && _expect >= _actual * (1 + _percentage);
+
+}
+
+
 
 
 export function CalcRefundFee(amount : number, fee : number) : number {

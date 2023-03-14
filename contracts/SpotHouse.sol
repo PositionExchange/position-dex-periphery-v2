@@ -120,30 +120,19 @@ contract SpotHouse is
     function modifyLimitOrder(
         IMatchingEngineAMM pairManager,
         ModifyLimitOrder[] memory modifyData
-    ) public override(SpotDex) onlyOperator {
+    ) public override(SpotDex) {
         super.modifyLimitOrder(pairManager, modifyData);
     }
 
     /**
      * @dev see {BuyBackAndBurn-setPositionRouter}
      */
-    function setPositionRouter(IPositionRouter _positionRouter)
+    function setBuyBackAnBurn(IBuyBackAndBurnDex _buyBackAndBurnDex)
         public
         override(BuyBackAndBurn)
         onlyOperator
     {
-        super.setPositionRouter(_positionRouter);
-    }
-
-    /**
-     * @dev see {BuyBackAndBurn-setPosiToken}
-     */
-    function setPosiToken(IERC20 _posiToken)
-        public
-        override(BuyBackAndBurn)
-        onlyOperator
-    {
-        super.setPosiToken(_posiToken);
+        super.setBuyBackAnBurn(_buyBackAndBurnDex);
     }
 
     function setFactory(address _factoryAddress) external onlyOperator {
@@ -224,55 +213,10 @@ contract SpotHouse is
         super.setFee(_defaultFeePercentage);
     }
 
-    /**
-     * @dev see {BuyBackAndBurn-buyBackAndBurn}
-     */
     function buyBackAndBurn(
         IMatchingEngineAMM pairManager,
         address[] memory pathBuyBack
-    ) external override(BuyBackAndBurn) onlyOperator {
-        SpotFactoryStorage.Pair memory _pair = _getQuoteAndBase(pairManager);
-        bool isBase = pathBuyBack[0] == _pair.BaseAsset;
-
-        (uint256 baseFeeFunding, uint256 quoteFeeFunding) = pairManager
-            .getFee();
-
-        uint256 amount = isBase
-            ? (baseFeeFunding * 9999) / FixedPoint128.BASIC_POINT_FEE
-            : (quoteFeeFunding * 9999) / FixedPoint128.BASIC_POINT_FEE;
-
-        bool userEther;
-        if (pathBuyBack[0] == WBNB) {
-            _withdrawBNB(address(this), address(pairManager), amount);
-            userEther = true;
-        } else {
-            TransferHelper.transferFrom(
-                IERC20(pathBuyBack[0]),
-                address(pairManager),
-                address(this),
-                amount
-            );
-        }
-
-        uint256[] memory amounts = _buyBackAndBurn(
-            pathBuyBack,
-            amount,
-            userEther
-        );
-
-        if (isBase) {
-            pairManager.decreaseBaseFeeFunding(amount);
-        } else {
-            pairManager.decreaseQuoteFeeFunding(amount);
-        }
-
-        emit BuyBackAndBurned(
-            pairManager,
-            pathBuyBack[0],
-            amount,
-            amounts[pathBuyBack.length - 1]
-        );
-    }
+    ) external onlyOperator {}
 
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS

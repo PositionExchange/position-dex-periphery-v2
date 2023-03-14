@@ -8,6 +8,7 @@ import "../../interfaces/IUniswapV2Router.sol";
 import "../../interfaces/ISpotFactory.sol";
 import "../../interfaces/ISpotHouse.sol";
 import "../../interfaces/IUniswapV2Router.sol";
+import "../../interfaces/IEstimateLogic.sol";
 
 contract PositionRouterStorage {
     ISpotFactory public factory;
@@ -26,4 +27,6 @@ contract PositionRouterStorage {
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
     uint256[49] private __gap;
+
+    IEstimateLogic public estimateLogic;
 }

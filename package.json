@@ -55,7 +55,7 @@
     "@openzeppelin/contracts": "4.8.1",
     "@openzeppelin/contracts-upgradeable": "4.8.1",
     "@openzeppelin/hardhat-upgrades": "^1.21.0",
-    "@positionex/matching-engine": "1.4.0",
+    "@positionex/matching-engine": "1.4.2",
     "@positionex/posi-token": "^1.1.4",
     "prettier-plugin-solidity": "^1.0.0-beta.24"
   }

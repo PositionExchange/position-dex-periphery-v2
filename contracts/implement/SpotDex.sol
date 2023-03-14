@@ -175,6 +175,13 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         uint256 totalRefundBase;
         uint256 totalRefundQuote;
         uint128 currentPip;
+        IMatchingEngineAMM pairManager;
+        uint128 editToPip;
+        uint256 basicPoint;
+        bool isBuy;
+        bool isFilled;
+        uint256 partialFilled;
+        uint256 refundQuantity;
     }
 
     function modifyLimitOrder(
@@ -182,100 +189,139 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         ModifyLimitOrder[] memory modifyData
     ) public virtual {
         OpenLimitOrderState memory state;
-        ModifyLimitOrderState memory modifyState;
         state.pair = _getQuoteAndBase(pairManager);
-        state.basicPoint = _basisPoint(pairManager);
-        modifyState.currentPip = pairManager.getCurrentPip();
+        ModifyLimitOrderState memory modifyState = ModifyLimitOrderState({
+            totalRefundBase: 0,
+            totalRefundQuote: 0,
+            currentPip: pairManager.getCurrentPip(),
+            pairManager: pairManager,
+            editToPip: 0,
+            basicPoint: _basisPoint(pairManager),
+            isBuy: false,
+            isFilled: false,
+            partialFilled: 0,
+            refundQuantity: 0
+        });
 
         address _trader = _msgSender();
         SpotLimitOrder.Data[] storage _orders = limitOrders[
-            address(pairManager)
+            address(modifyState.pairManager)
         ][_trader];
-        uint16 fee = _getFee();
 
         for (uint256 i = 0; i < modifyData.length; i++) {
-            SpotLimitOrder.Data memory _order = _orders[modifyData[i].orderIdx];
-            Require._require(
-                _order.baseAmount != 0 && _order.quoteAmount != 0,
-                DexErrors.DEX_NO_LIMIT_TO_CANCEL
-            );
+            ModifyLimitOrder memory _modifyData = modifyData[i];
+            uint64 _orderIdx = _modifyData.orderIdx;
+            SpotLimitOrder.Data memory _order = _orders[_orderIdx];
+            uint128 _editToPip = _modifyData.editToPip;
 
-            (bool isFilled, bool isBuy, , ) = pairManager.getPendingOrderDetail(
+            (modifyState.isFilled, modifyState.isBuy, , ) = _getPendingOrder(
+                modifyState.pairManager,
                 _order.pip,
                 _order.orderId
             );
 
-            if (isFilled) continue;
+            if (
+                modifyState.isFilled ||
+                (_order.baseAmount == 0 && _order.quoteAmount == 0)
+            ) continue;
 
-            (uint256 refundQuantity, uint256 partialFilled) = pairManager
-                .cancelLimitOrder(_order.pip, _order.orderId);
-
-            uint256 _quoteAmount = _baseToQuote(
-                refundQuantity,
+            (
+                modifyState.refundQuantity,
+                modifyState.partialFilled
+            ) = modifyState.pairManager.cancelLimitOrder(
                 _order.pip,
-                state.basicPoint
+                _order.orderId
             );
-            if (isBuy) {
-                modifyState.totalRefundBase += partialFilled;
 
-                refundQuantity = _quoteToBase(
-                    _quoteAmount,
-                    modifyData[i].editToPip,
-                    state.basicPoint
+            state.quoteAmount = _baseToQuote(
+                modifyState.refundQuantity,
+                _order.pip,
+                modifyState.basicPoint
+            );
+            if (modifyState.isBuy) {
+                modifyState.totalRefundBase += modifyState.partialFilled;
+
+                modifyState.refundQuantity = _quoteToBase(
+                    state.quoteAmount,
+                    _editToPip,
+                    modifyState.basicPoint
                 );
             } else {
                 modifyState.totalRefundQuote += _baseToQuote(
-                    partialFilled,
+                    modifyState.partialFilled,
                     _order.pip,
-                    state.basicPoint
+                    modifyState.basicPoint
                 );
             }
             Require._require(
-                (isBuy && modifyData[i].editToPip < modifyState.currentPip) ||
-                    (!isBuy &&
-                        modifyData[i].editToPip > modifyState.currentPip),
+                (modifyState.isBuy &&
+                    _modifyData.editToPip < modifyState.currentPip) ||
+                    (!modifyState.isBuy &&
+                        _modifyData.editToPip > modifyState.currentPip),
                 "!LO"
             );
 
-            (state.orderId, , , ) = pairManager.openLimit(
-                modifyData[i].editToPip,
-                refundQuantity.Uint256ToUint128(),
-                isBuy,
-                _trader,
-                0,
-                fee
-            );
+            {
+                (state.orderId, , , ) = modifyState.pairManager.openLimit(
+                    _editToPip,
+                    modifyState.refundQuantity.Uint256ToUint128(),
+                    modifyState.isBuy,
+                    _trader,
+                    0,
+                    0
+                );
+            }
 
-            pushLimitOrder(
-                address(pairManager),
-                _trader,
-                modifyData[i].editToPip,
-                state.orderId,
-                isBuy,
-                _quoteAmount.Uint256ToUint128(),
-                (refundQuantity).Uint256ToUint128(),
-                fee
-            );
+            _orders[_orderIdx].pip = _editToPip;
+            _orders[_orderIdx].orderId = state.orderId;
+            _orders[_orderIdx].baseAmount = modifyState
+                .refundQuantity
+                .Uint256ToUint128();
+            _orders[_orderIdx].quoteAmount = state
+                .quoteAmount
+                .Uint256ToUint128();
 
-            delete _orders[modifyData[i].orderIdx];
+            {
+                {
+                    emitLimitOrderCancelled(
+                        _trader,
+                        IMatchingEngineAMM(_trader),
+                        _order.pip,
+                        modifyState.isBuy ? Side.BUY : Side.SELL,
+                        _order.orderId
+                    );
+
+                    emitLimitOrderOpened(
+                        state.orderId,
+                        _trader,
+                        modifyState.refundQuantity.Uint256ToUint128(),
+                        0,
+                        _editToPip,
+                        modifyState.isBuy ? Side.BUY : Side.SELL,
+                        address(modifyState.pairManager)
+                    );
+                }
+            }
         }
 
-        _withdraw(
-            pairManager,
-            _trader,
-            Asset.Quote,
-            modifyState.totalRefundQuote,
-            false,
-            state.pair
-        );
-        _withdraw(
-            pairManager,
-            _trader,
-            Asset.Base,
-            modifyState.totalRefundBase,
-            false,
-            state.pair
-        );
+        {
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Quote,
+                modifyState.totalRefundQuote,
+                false,
+                state.pair
+            );
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Base,
+                modifyState.totalRefundBase,
+                false,
+                state.pair
+            );
+        }
     }
 
     /**
@@ -306,7 +352,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             DexErrors.DEX_NO_LIMIT_TO_CANCEL
         );
 
-        (bool isFilled, , , ) = pairManager.getPendingOrderDetail(
+        (bool isFilled, , , ) = _getPendingOrder(
+            pairManager,
             _order.pip,
             _order.orderId
         );
@@ -385,16 +432,21 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
             uint256 baseAmount,
             uint256 basicPoint
         ) = getAmountClaimable(pairManager, _trader);
-        Require._require(
-            quoteAmount > 0 || baseAmount > 0,
-            DexErrors.DEX_NO_AMOUNT_TO_CLAIM
-        );
-        _clearLimitOrder(address(pairManager), _trader, basicPoint);
+        if (quoteAmount > 0 || baseAmount > 0) {
+            _clearLimitOrder(address(pairManager), _trader, basicPoint);
 
-        _withdraw(pairManager, _trader, Asset.Quote, quoteAmount, true, pair);
-        _withdraw(pairManager, _trader, Asset.Base, baseAmount, true, pair);
+            _withdraw(
+                pairManager,
+                _trader,
+                Asset.Quote,
+                quoteAmount,
+                true,
+                pair
+            );
+            _withdraw(pairManager, _trader, Asset.Base, baseAmount, true, pair);
 
-        emit AssetClaimed(_trader, pairManager, quoteAmount, baseAmount);
+            emit AssetClaimed(_trader, pairManager, quoteAmount, baseAmount);
+        }
     }
 
     /**
@@ -462,7 +514,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 bool isBuy,
                 uint256 quantity,
                 uint256 partialFilled
-            ) = pairManager.getPendingOrderDetail(
+            ) = _getPendingOrder(
+                    pairManager,
                     listLimitOrder[i].pip,
                     listLimitOrder[i].orderId
                 );
@@ -1011,7 +1064,8 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 ,
                 uint256 size,
                 uint256 partialFilled
-            ) = _pairManager.getPendingOrderDetail(
+            ) = _getPendingOrder(
+                    _pairManager,
                     listLimitOrder[i].pip,
                     listLimitOrder[i].orderId
                 );
@@ -1127,6 +1181,23 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
     }
 
     // INTERNAL FUNCTIONS
+
+    function _getPendingOrder(
+        IMatchingEngineAMM pair,
+        uint128 pip,
+        uint64 orderId
+    )
+        internal
+        view
+        returns (
+            bool isFilled,
+            bool isBuy,
+            uint256 quantity,
+            uint256 partialFilled
+        )
+    {
+        return pair.getPendingOrderDetail(pip, orderId);
+    }
 
     function _baseToQuote(
         uint256 baseAmount,
