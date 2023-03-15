@@ -5,7 +5,7 @@ import {
     MockUniRouter, PositionNondisperseLiquidity, PositionRouter,
     PositionSpotFactory, PositionStakingDexManager, SpotHouse,
 } from "../../typeChain";
-import {deployContract, getAccount, SIDE, toEther, toWei} from "../utils/utils";
+import {deployContract, expectDataInRange, getAccount, SIDE, toEther, toWei} from "../utils/utils";
 import {deployMockReflexToken, deployMockToken, deployMockWrappedBNB} from "../utils/mock";
 import {BASIS_POINT} from "../liquidity/test-liquidity";
 import {ethers} from "hardhat";
@@ -13,6 +13,7 @@ import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 import {mine} from "@nomicfoundation/hardhat-network-helpers";
 import {boolean} from "hardhat/internal/core/params/argumentTypes";
 import {BigNumber} from "ethers";
+import {expect} from "chai";
 
 
 enum ActionType {
@@ -33,10 +34,17 @@ interface Pending {
     pip: number,
     quantity: number,
     orderIdOfTrader: number,
-    partialFilled: boolean
+    partialFilled: number
+
+    amountRemainFill: number,
 
 
+}
 
+interface ExpectPending {
+    orderIdx : number,
+    pip : number,
+    quantity : number,
 }
 
 describe("killer-position", async function () {
@@ -191,13 +199,10 @@ describe("killer-position", async function () {
 
         await spotHouse.setWBNB(wbnb.address);
         await spotHouse.setFactory(factory.address);
-        await spotHouse.setPosiToken(reflex.address);
-        await spotHouse.setPositionRouter(posiRouter.address);
-
-
         await posiRouter.setWBNB(wbnb.address);
         await posiRouter.setFactory(factory.address);
         await posiRouter.setSpotHouse(spotHouse.address);
+        await spotHouse.setFee(0);
     })
 
 
@@ -228,20 +233,45 @@ describe("killer-position", async function () {
 
         const pendingOrders = await spotHouse.getPendingLimitOrders(pair.address, deployer.address);
 
-
         let pending :Pending[] =[]
         pendingOrders.map((order) => {
 
             pending.push({
-                partialFilled: !order.partialFilled,
                 isBuy:order.isBuy,
                 pip: order.pip.toNumber(),
                 quantity: Number(toEther(order.quantity.toString())),
+                partialFilled: Number(toEther(order.partialFilled.toString())),
+                amountRemainFill: Number(toEther(order.quantity.toString())) - Number(toEther(order.partialFilled.toString())),
                 orderIdOfTrader: order.orderIdOfTrader.toNumber()
             })
 
         })
         console.table(pending)
+    }
+
+    async function expectPendingOrders(expected: ExpectPending[]) {
+
+        const pendingOrders = await spotHouse.getPendingLimitOrders(pair.address, deployer.address);
+
+        expected.forEach(value => {
+
+            let pe = pendingOrders.find((p) => {return p.orderIdOfTrader.toNumber() === value.orderIdx})
+            if (pe){
+                expect(pe.pip).to.be.equal(value.pip);
+                expect(expectDataInRange(Number(toEther(pe.quantity.toString()))- Number(toEther( pe.partialFilled.toString())),value.quantity, 0.001)).to.equal(true, "quantity wrong");
+            }
+
+        });
+    }
+
+    async function expectBalance(baseExpected?: number, quotExpected?: number) {
+
+        const balanceQuote = await quote.balanceOf(deployer.address);
+        const balanceBase = await base.balanceOf(deployer.address);
+
+        if  (balanceQuote) expect(expectDataInRange(Number(toEther(balanceQuote.toString())),quotExpected, 0.001)).to.equal(true, "quote wrong");
+        if (balanceBase) expect(expectDataInRange(Number(toEther(balanceBase.toString())),baseExpected, 0.001)).to.equal(true, "base wrong");
+
     }
 
     describe("modify limit order", async () => {
@@ -253,6 +283,79 @@ describe("killer-position", async function () {
 
             await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
             await logPendingOrders();
+
+            await expectPendingOrders([{orderIdx:0, pip: 60000, quantity: 1}])
+
+            await expectBalance(9999,10000);
+        })
+
+
+
+        it("should modify limit sell partial fill order", async () => {
+;
+            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
+
+            await openMarket(true, 5)
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
+            await openMarket(true, 2)
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 61000}])
+
+            await logPendingOrders();
+            await expectPendingOrders([{orderIdx:0, pip: 61000, quantity: 3}])
+
+            await expectBalance(9990,10039.5);
+        })
+
+        it("should modify limit sell partial fill order and cancel", async () => {
+
+            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
+
+            await openMarket(true, 5)
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
+            await openMarket(true, 2)
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 61000}])
+            await spotHouse.cancelLimitOrder(pair.address,0,61000)
+
+            await logPendingOrders()
+
+            await expectBalance(9993,10039.5);
+        })
+
+        it("should modify limit sell partial fill order and claim", async () => {
+
+            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
+
+            await openMarket(true, 5)
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
+            await openMarket(true, 2)
+            await spotHouse.claimAsset(pair.address)
+
+            await logPendingOrders()
+            await expectPendingOrders([{orderIdx:0, pip: 60000, quantity: 3}])
+            await expectBalance(9990,10039.5);
+        })
+
+
+        it("should ignore limit sell full fill order", async () => {
+
+            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
+
+            await logPendingOrders();
+
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
+            await openMarket(true, 10)
+            await logPendingOrders();
+
+
+            await logPendingOrders();
+
+            await spotHouse.claimAsset(pair.address);
+
+            await expectBalance(9990,10060);
         })
 
         it("should modify multi limit sell order", async () => {
@@ -265,41 +368,17 @@ describe("killer-position", async function () {
             await logPendingOrders();
 
             await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 60000},
-                {orderIdx:1, editToPip: 61000},
-                {orderIdx:2, editToPip: 62000},
+                {orderIdx:0, editToPip: 61000},
+                {orderIdx:1, editToPip: 62000},
+                {orderIdx:2, editToPip: 63000},
             ])
             await logPendingOrders();
-        })
+            await expectPendingOrders([
+                {orderIdx:0, pip: 61000, quantity: 10},
+                {orderIdx:1, pip: 62000, quantity: 20},
+                {orderIdx:2, pip: 63000, quantity: 30}])
 
-        it("should modify limit sell partial fill order", async () => {
-            await logBalance()
-            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
-            await logBalance()
-            await openMarket(true, 5)
-
-
-            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
-            await logBalance()
-            await logPendingOrders();
-        })
-
-        it("should ignore limit sell full fill order", async () => {
-            await logBalance()
-            await openLimitOrder([{quantity: 10, pip: 55000, isBuy: false}])
-            await logBalance()
-            await logPendingOrders();
-
-            await openMarket(true, 10)
-            await logPendingOrders();
-
-            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 60000}])
-            await logBalance()
-            await logPendingOrders();
-
-            await spotHouse.claimAsset(pair.address);
-            await logBalance()
-
+            await expectBalance(9940,10000);
         })
 
         it("should modify multi limit sell partial fill order", async () => {
@@ -308,18 +387,47 @@ describe("killer-position", async function () {
                 {quantity: 20, pip: 56000, isBuy: false},
                 {quantity: 30, pip: 57000, isBuy: false}  ])
             await logPendingOrders();
-            await logBalance()
-            await openMarket(true, 5)
+
+            await openMarket(true, 35)
+
 
 
             await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 60000},
-                {orderIdx:1, editToPip: 61000},
-                {orderIdx:2, editToPip: 62000},
+                {orderIdx:2, editToPip: 62000}
             ])
-            await logBalance()
+
             await logPendingOrders();
+
+            await expectPendingOrders([
+                {orderIdx:2, pip: 62000, quantity: 25}])
+
+            await expectBalance(9940,10028.5);
         });
+
+
+        it("should modify multi limit sell partial fill order 2", async () => {
+            await openLimitOrder([
+                {quantity: 10, pip: 55000, isBuy: false},
+                {quantity: 20, pip: 56000, isBuy: false},
+                {quantity: 30, pip: 57000, isBuy: false}  ])
+            await logPendingOrders();
+
+            await spotHouse.modifyLimitOrder(pair.address, [
+                {orderIdx:0, editToPip: 62000},
+                {orderIdx:1, editToPip: 62000},
+                {orderIdx:2, editToPip: 63000}
+            ])
+            await logPendingOrders();
+            await openMarket(true, 35)
+;
+            await logPendingOrders();
+
+            await expectPendingOrders([
+                {orderIdx:2, pip: 63000, quantity: 25}])
+            await spotHouse.claimAsset(pair.address);
+            await expectBalance(9940,10217.5);
+        });
+
 
         it("should modify multi limit sell partial fill and ignore full fill order", async () => {
             await openLimitOrder([
@@ -327,19 +435,77 @@ describe("killer-position", async function () {
                 {quantity: 20, pip: 56000, isBuy: false},
                 {quantity: 30, pip: 57000, isBuy: false}  ])
             await logPendingOrders();
-            await logBalance()
-            await openMarket(true, 20)
+
+            // await openMarket(true, 20)
 
             await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 67000},
+                {orderIdx:0, editToPip: 57000},
                 {orderIdx:1, editToPip: 58000},
-                {orderIdx:2, editToPip: 59000},
+                {orderIdx:2, editToPip: 55000},
             ])
-            await logBalance()
+
+            await logPendingOrders()
+            await openMarket(true, 35)
+            await expectPendingOrders([
+                {orderIdx:0, pip: 57000, quantity: 5},
+                {orderIdx:1, pip: 58000, quantity: 20}
+            ])
+            await spotHouse.claimAsset(pair.address);
+            await expectBalance(9940,10193.5);
+
+        });
+
+
+        it("should modify multi limit BUY SELL", async () => {
+            await openLimitOrder([
+                {quantity: 10, pip: 55000, isBuy: false},
+                {quantity: 20, pip: 56000, isBuy: false},
+                {quantity: 30, pip: 57000, isBuy: false},
+
+                {quantity: 10, pip: 49000, isBuy: true},
+                {quantity: 20, pip: 47000, isBuy: true},
+                {quantity: 20, pip: 45000, isBuy: true}]);
+
             await logPendingOrders();
 
-            await spotHouse.claimAsset(pair.address);
-            await logBalance()
+
+            await spotHouse.modifyLimitOrder(pair.address, [
+                {orderIdx:0, editToPip: 51000},
+                {orderIdx:1, editToPip: 62000},
+                {orderIdx:2, editToPip: 57000},
+                {orderIdx:3, editToPip: 49500},
+                {orderIdx:4, editToPip: 46000},
+                {orderIdx:5, editToPip: 45000}
+            ])
+            await logPendingOrders();
+            await openMarket(true, 35)
+;
+            await logPendingOrders();
+
+            await expectPendingOrders([
+                {orderIdx:1, pip: 62000, quantity: 20},
+                {orderIdx:2, pip: 57000, quantity: 5},
+                {orderIdx:3, pip: 49500, quantity: 9.898989898989898},
+                {orderIdx:4, pip: 46000, quantity: 20.434782608695652},
+                {orderIdx:5, pip: 45000, quantity: 20}
+            ])
+            await spotHouse.modifyLimitOrder(pair.address, [
+                {orderIdx:1, editToPip: 59000},
+                {orderIdx:2, editToPip: 59000},
+                {orderIdx:3, editToPip: 49500},
+                {orderIdx:4, editToPip: 45000}
+
+            ])
+            await logPendingOrders();
+            await openMarket(true, 23)
+            await openMarket(false, 25)
+;
+            await logPendingOrders();
+            await expectPendingOrders([
+                {orderIdx:2, pip: 59000, quantity: 2},
+                {orderIdx:4, pip: 45000, quantity: 20.88888888888889},
+                {orderIdx:5, pip: 45000, quantity: 4.8989898989899}
+            ])
 
         });
 
@@ -353,108 +519,150 @@ describe("killer-position", async function () {
 
             await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 40000}])
             await logPendingOrders();
+            await expectPendingOrders([
+                {orderIdx:0, pip: 40000, quantity: 1.125}])
 
-        })
-
-
-
-        it("should multi modify limit buy order", async () => {
-
-            await openLimitOrder([
-                {quantity: 10, pip: 45000, isBuy: true},
-                {quantity: 20, pip: 44000, isBuy: true},
-                {quantity: 30, pip: 43000, isBuy: true},
-            ])
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 49000}])
             await logPendingOrders();
-
-            await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 49000},
-                {orderIdx:1, editToPip: 48000},
-                {orderIdx:2, editToPip: 47000},
-            ])
-            await logPendingOrders();
-
-        })
-
-
-        it("should multi modify limit partial fill buy order", async () => {
-
-            await openLimitOrder([
-                {quantity: 10, pip: 45000, isBuy: true},
-                {quantity: 20, pip: 44000, isBuy: true},
-                {quantity: 30, pip: 43000, isBuy: true},
-            ])
-            await logPendingOrders();
-
-            await openMarket(false, 5)
-
-
-            await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 44000},
-                {orderIdx:1, editToPip: 43000},
-                {orderIdx:2, editToPip: 42000},
-            ])
-            await logPendingOrders();
-
-        })
-        it("should multi modify limit partial fill and ignore full fill buy order", async () => {
-
-            await openLimitOrder([
-                {quantity: 10, pip: 45000, isBuy: true},
-                {quantity: 20, pip: 44000, isBuy: true},
-                {quantity: 30, pip: 43000, isBuy: true},
-            ])
-            await logPendingOrders();
-
-            await openMarket(false, 20)
-
-
-            await spotHouse.modifyLimitOrder(pair.address, [
-                {orderIdx:0, editToPip: 43000},
-                {orderIdx:1, editToPip: 42000},
-                {orderIdx:2, editToPip: 41000},
-            ])
-            await logPendingOrders();
-
-
+            await expectPendingOrders([
+                {orderIdx:0, pip: 49000, quantity: 0.9183673469387754}])
             await spotHouse.claimAsset(pair.address);
-            await logBalance()
+            await expectBalance(10001,9995.5);
 
         })
+
 
         it("should modify limit buy partial fill order", async () => {
 
             await openLimitOrder([{quantity: 10, pip: 45000, isBuy: true}])
-            await logBalance()
+
             await logPendingOrders();
 
             await openMarket(false, 5)
-            await logBalance()
+
 
             await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 40000}])
             await logPendingOrders();
-            await logBalance()
+
+
+            await openMarket(false, 2)
+            await logPendingOrders();
+
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 39000}])
+            await logPendingOrders();
+
+
+            await expectPendingOrders([{orderIdx:0, pip: 39000, quantity: 3.717948717948718}])
+
+            await expectBalance(10000,9955);
+
+        })
+
+
+        it("should modify limit buy partial fill order and cancel", async () => {
+
+          await openLimitOrder([{quantity: 10, pip: 45000, isBuy: true}])
+
+          await logPendingOrders();
+
+          await openMarket(false, 5)
+
+
+          await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 40000}])
+          await logPendingOrders();
+
+
+          await openMarket(false, 2)
+          await logPendingOrders();
+
+
+          await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 39000}])
+          await logPendingOrders();
+
+          await spotHouse.cancelLimitOrder(pair.address,0,39000)
+
+          await expectBalance(10007,9969.5);
+
+      })
+        it("should modify limit buy partial fill order and claim", async () => {
+
+            await openLimitOrder([{quantity: 10, pip: 45000, isBuy: true}])
+
+            await logPendingOrders();
+
+            await openMarket(false, 5)
+
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 40000}])
+            await logPendingOrders();
+
+
+            await openMarket(false, 2)
+            await logPendingOrders();
+
+
+            await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 39000}])
+            await logPendingOrders();
+
+            await spotHouse.claimAsset(pair.address)
+
+            await expectBalance(10007,9955);
 
         })
 
         it("should ignore limit buy full fill order", async () => {
 
             await openLimitOrder([{quantity: 10, pip: 45000, isBuy: true}])
-            await logBalance()
-            await logPendingOrders();
 
-            await openMarket(false, 10)
-            await logBalance()
+            await logPendingOrders();
 
             await spotHouse.modifyLimitOrder(pair.address, [{orderIdx:0, editToPip: 40000}])
             await logPendingOrders();
-            await logBalance()
+
+
+            await openMarket(false, 11.25)
+
 
             await spotHouse.claimAsset(pair.address);
-            await logBalance()
 
+            await expectBalance(10011.25,9955);
 
         })
+
+        it("should multi modify limit buy order", async () => {
+
+            await openLimitOrder([
+                {quantity: 10, pip: 45000, isBuy: true},
+                {quantity: 20, pip: 45000, isBuy: true},
+                {quantity: 30, pip: 43000, isBuy: true},
+            ])
+            await logPendingOrders();
+
+            await spotHouse.modifyLimitOrder(pair.address, [
+                {orderIdx:0, editToPip: 44000},
+                {orderIdx:1, editToPip: 44000},
+                {orderIdx:2, editToPip: 44000},
+            ])
+            await expectPendingOrders([
+                {orderIdx:0, pip: 44000, quantity: 10.227272727272727},
+                {orderIdx:1, pip: 44000, quantity: 20.454545454545453},
+                {orderIdx:2, pip: 44000, quantity: 29.318181818181817}
+            ])
+            await openMarket(false, 36)
+            await logPendingOrders();
+
+
+            await expectPendingOrders([
+
+                {orderIdx:2, pip: 44000, quantity: 23.999999999999996}
+            ])
+            await expectBalance(10000,9736);
+
+        })
+
+
+
     })
 
 
