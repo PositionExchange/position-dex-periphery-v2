@@ -94,6 +94,28 @@ contract PositionRouter is
         }
     }
 
+    struct SwapMultiRouters {
+        uint256 amountIn;
+        uint256 amountOutMin;
+        address[] path;
+    }
+    function swapExactTokensForTokensMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external ensure(deadline) returns (uint256[][] memory multiRouters){
+
+        multiRouters = new uint256[][](multiRouter.length);
+
+        for (uint i =0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
+        }
+
+    }
+
     function swapTokensForExactTokens(
         uint256 amountOut,
         uint256 amountInMax,
@@ -143,6 +165,21 @@ contract PositionRouter is
         }
     }
 
+    /// msg.value MUST be grater equal SUM(amountIn) of  SwapMultiRouters
+    function swapExactETHForTokensMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external payable ensure(deadline) returns (uint256[][] memory multiRouters){
+        multiRouters = new uint256[][](multiRouter.length);
+        for (uint i =0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
     function swapTokensForExactETH(
         uint256 amountOut,
         uint256 amountInMax,
@@ -187,6 +224,20 @@ contract PositionRouter is
             amounts = new uint256[](sidesAndPairs.length + 1);
             amounts[0] = amountIn;
             return _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
+    function swapExactTokensForETHMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external ensure(deadline) returns (uint256[][] memory multiRouters){
+        multiRouters = new uint256[][](multiRouter.length);
+        for (uint i = 0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
         }
     }
 
@@ -242,6 +293,21 @@ contract PositionRouter is
         }
     }
 
+
+    function swapExactTokensForTokensSupportingFeeOnTransferTokensMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external ensure(deadline) returns (uint256[][] memory multiRouters){
+        multiRouters = new uint256[][](multiRouter.length);
+        for (uint i = 0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
     function swapExactETHForTokensSupportingFeeOnTransferTokens(
         uint256 amountOutMin,
         address[] calldata path,
@@ -264,6 +330,22 @@ contract PositionRouter is
             _swap(amounts, sidesAndPairs, to);
         }
     }
+
+
+    function swapExactETHForTokensSupportingFeeOnTransferTokensMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external payable ensure(deadline) returns (uint256[][] memory multiRouters){
+        multiRouters = new uint256[][](multiRouter.length);
+        for (uint i = 0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
 
     function swapExactTokensForETHSupportingFeeOnTransferTokens(
         uint256 amountIn,
@@ -294,6 +376,21 @@ contract PositionRouter is
             uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
             amounts[0] = amountIn;
             _swap(amounts, sidesAndPairs, to);
+        }
+    }
+
+
+    function swapExactTokensForETHSupportingFeeOnTransferTokensMultiRouter(
+        SwapMultiRouters[] calldata multiRouter,
+        address to,
+        uint256 deadline
+    ) external ensure(deadline) returns (uint256[][] memory multiRouters){
+        multiRouters = new uint256[][](multiRouter.length);
+        for (uint i = 0; i< multiRouter.length; i++) {
+            SideAndPair[] memory sidesAndPairs = getSidesAndPairs(multiRouter[i].path);
+            uint256[] memory amounts = new uint256[](sidesAndPairs.length + 1);
+            amounts[0] = multiRouter[i].amountIn;
+            multiRouters[i]= _swap(amounts, sidesAndPairs, to);
         }
     }
 

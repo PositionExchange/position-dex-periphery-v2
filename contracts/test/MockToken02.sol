@@ -13,7 +13,7 @@ contract MockToken02 is ERC20 {
         owner = msg.sender;
     }
 
-    function mint(address recipient, uint256 amount) public onlyOwner {
+    function mint(address recipient, uint256 amount) public  {
         _mint(recipient, amount);
     }
 

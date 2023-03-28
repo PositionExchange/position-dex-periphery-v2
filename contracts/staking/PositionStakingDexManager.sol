@@ -114,6 +114,11 @@ contract PositionStakingDexManager is
     // ONLY_OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
+    function setWhitelistScheduleVesting(address user, bool val) public onlyOwner {
+        _setWhitelistVesting(user, val);
+    }
+
+
     function setPositionPerBlock(uint256 _positionPerBlock) public onlyOwner {
         massUpdatePools();
         positionPerBlock = _positionPerBlock;
@@ -244,6 +249,10 @@ contract PositionStakingDexManager is
             "setReferralCommissionRate: invalid referral commission rate basis points"
         );
         referralCommissionRate = _referralCommissionRate;
+    }
+
+    function isWhiteListVesting(address user) public view returns (bool) {
+        return _isWhitelistVesting(user);
     }
 
     // Return reward multiplier over the given _from to _to block.

@@ -4,7 +4,7 @@
   "positionConcentratedLiquidity": "0xD0Be3b3d3E4B3830c15d027bD3fBBB3709EdD69D",
   "withdrawBNB": "0x4401c57Fcc6306f1A6f3cC4d0ab25aD29c2ffBC4",
   "WBNB": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-  "positionRouter": "0xFCA38C659dEcFAC7F14b266d17ef40A4943889AA",
+  "positionRouter": "0xe73f2b7291cFB20487f48B03E9fEe5c276102946",
   "mockRewardToken": "0xa8ab8adf2a4695cdd756bf8094f883cf17f384da",
   "mockTokenTreasury": "0x6E461bb6dA0D8E8875DAb4cBf73b9623caF8aB86",
   "positionStakingDexManager": "0x92CB0A4512cCc2e910614269d80424F9C7B723F0",
