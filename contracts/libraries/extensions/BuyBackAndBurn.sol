@@ -20,12 +20,6 @@ abstract contract BuyBackAndBurn {
 
     uint256 public totalBurned;
 
-    function setBuyBackAnBurn(IBuyBackAndBurnDex _buyBackAndBurnDex)
-        public
-        virtual
-    {
-        buyBackAndBurnDex = _buyBackAndBurnDex;
-    }
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -34,5 +28,4 @@ abstract contract BuyBackAndBurn {
      */
     uint256[49] private __gap;
 
-    IBuyBackAndBurnDex public buyBackAndBurnDex;
 }
