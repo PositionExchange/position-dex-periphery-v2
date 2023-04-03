@@ -285,7 +285,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 {
                     emitLimitOrderCancelled(
                         _trader,
-                        IMatchingEngineAMM(_trader),
+                        modifyState.pairManager,
                         _order.pip,
                         modifyState.isBuy ? Side.BUY : Side.SELL,
                         _order.orderId
@@ -310,7 +310,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Quote,
                 modifyState.totalRefundQuote,
-                false,
+                true,
                 state.pair
             );
             _withdraw(
@@ -318,7 +318,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
                 _trader,
                 Asset.Base,
                 modifyState.totalRefundBase,
-                false,
+                true,
                 state.pair
             );
         }

@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 import "../exchange/SpotOrderData.sol";
 import "../../interfaces/ISpotFactory.sol";
 import "../../interfaces/ITransistorBNB.sol";
+import "../../interfaces/IBuyBackAndBurnDex.sol";
 
 contract SpotHouseStorage {
     using SpotLimitOrder for mapping(address => mapping(address => SpotLimitOrder.Data[]));
@@ -51,4 +52,6 @@ contract SpotHouseStorage {
     uint256[49] private __gap;
 
     address public operator;
+
+    IBuyBackAndBurnDex public buyBackAndBurnDex;
 }

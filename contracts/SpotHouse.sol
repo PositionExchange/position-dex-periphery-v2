@@ -129,10 +129,9 @@ contract SpotHouse is
      */
     function setBuyBackAnBurn(IBuyBackAndBurnDex _buyBackAndBurnDex)
         public
-        override(BuyBackAndBurn)
         onlyOperator
     {
-        super.setBuyBackAnBurn(_buyBackAndBurnDex);
+        buyBackAndBurnDex = _buyBackAndBurnDex;
     }
 
     function setFactory(address _factoryAddress) external onlyOperator {

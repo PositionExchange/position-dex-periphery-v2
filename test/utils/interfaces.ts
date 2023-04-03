@@ -1,8 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  MockToken
+  MockToken, SpotHouse,ForkMatchingEngineAMM
 } from "../../typechain";
-import { string } from "hardhat/internal/core/params/argumentTypes";
+import {boolean, string} from "hardhat/internal/core/params/argumentTypes";
 import { BytesLike } from "@ethersproject/bytes";
 import internal from "stream";
 
@@ -12,7 +12,7 @@ export interface OpenLimitOrderParams {
   side: any;
   quantity: string | number;
   pip: string | number;
-  pairManager: PairManager;
+  pairManager: ForkMatchingEngineAMM;
 }
 
 export interface OpenMarketOrderParams {
@@ -20,7 +20,7 @@ export interface OpenMarketOrderParams {
   contract: SpotHouse;
   side: any;
   quantity: string | number;
-  pairManager: PairManager;
+  pairManager: ForkMatchingEngineAMM;
   baseAsset: any;
   quoteAsset: any;
 }
@@ -36,7 +36,7 @@ export interface CancelLimitOrderParameters {
   side: any;
   orderIdx: number;
   pip: number;
-  pairManager: PairManager;
+  ForkMatchingEngineAMM: ForkMatchingEngineAMM;
   isPartialFilled: boolean;
   quoteAsset: MockToken;
   baseAsset: MockToken;
@@ -53,4 +53,10 @@ export interface ExpectOrderAddLiquidity {
   pip: number,
   amount: number,
   hasLiquidity: boolean
+}
+
+export interface LimitOrder {
+  isBuy: boolean,
+  pip: number,
+  quantity: number
 }

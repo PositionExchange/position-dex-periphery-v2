@@ -572,213 +572,213 @@ export async function openLimitOrderAndExpect(
 }
 
 
-export async function openLimitOrderQuoteAndExpect(
-  { user, contract, side, quantity, pip, pairManager }: OpenLimitOrderParams,
-  quoteAmount : number,
-  expectedSizeLimitOrder: number = 0,
-  notFilledSamePip: boolean = true,
-  isBNB: boolean = false,
-  fee : number = 0
-): Promise<string> {
+// export async function openLimitOrderQuoteAndExpect(
+//   { user, contract, side, quantity, pip, pairManager }: OpenLimitOrderParams,
+//   quoteAmount : number,
+//   expectedSizeLimitOrder: number = 0,
+//   notFilledSamePip: boolean = true,
+//   isBNB: boolean = false,
+//   fee : number = 0
+// ): Promise<string> {
+//
+//
+//   let tx: any;
+//   if (!isBNB) {
+//     tx = await contract
+//       .connect(user)
+//       .openLimitOrderWithQuote(pairManager.address, side, toWei(quoteAmount), pip);
+//
+//
+//   } else {
+//     const valueBNB = (quoteAmount as number) * (pip as number) /1000;
+//
+//     tx = await contract
+//       .connect(user)
+//       .openLimitOrderWithQuote(pairManager.address, side, toWei(quoteAmount), pip, { value: toWei(valueBNB) });
+//   }
+//
+//
+//   if (notFilledSamePip) {
+//     console.log(
+//       "GAS USED OPEN LIMIT ORDER",
+//       (await tx.wait()).gasUsed.toString()
+//     );
+//
+//     console.log("GAS USED LIMIT", (await tx.wait()).gasUsed.toString());
+//
+//
+//     const orderId = await getOrderIdByTx(tx);
+//     const { isFilled, isBuy, size, partialFilled } =
+//       await pairManager.getPendingOrderDetail(
+//         pip,
+//         BigNumber.from(orderId.toString())
+//       );
+//
+//
+//     if (fee == 0) {
+//       expect(size).to.equal(
+//         expectedSizeLimitOrder == 0
+//           ? toWei(quantity)
+//           : toWei(expectedSizeLimitOrder)
+//       );
+//     }else {
+//       expect(size).to.equal(
+//         expectedSizeLimitOrder == 0
+//           ? toWei(  (quantity as number ) * (1- fee))
+//           : toWei(expectedSizeLimitOrder)
+//       );
+//     }
+//
+//     if (side == SIDE.BUY) {
+//       expect(isBuy).to.equal(true);
+//     } else {
+//       expect(isBuy).to.equal(false);
+//     }
+//     expect(isFilled).to.equal(false);
+//     expect(partialFilled).to.equal(0);
+//     return orderId.toString();
+//   } else {
+//     // TODO open Market Order
+//   }
+//   return "";
+// }
 
 
-  let tx: any;
-  if (!isBNB) {
-    tx = await contract
-      .connect(user)
-      .openLimitOrderWithQuote(pairManager.address, side, toWei(quoteAmount), pip);
-
-
-  } else {
-    const valueBNB = (quoteAmount as number) * (pip as number) /1000;
-
-    tx = await contract
-      .connect(user)
-      .openLimitOrderWithQuote(pairManager.address, side, toWei(quoteAmount), pip, { value: toWei(valueBNB) });
-  }
-
-
-  if (notFilledSamePip) {
-    console.log(
-      "GAS USED OPEN LIMIT ORDER",
-      (await tx.wait()).gasUsed.toString()
-    );
-
-    console.log("GAS USED LIMIT", (await tx.wait()).gasUsed.toString());
-
-
-    const orderId = await getOrderIdByTx(tx);
-    const { isFilled, isBuy, size, partialFilled } =
-      await pairManager.getPendingOrderDetail(
-        pip,
-        BigNumber.from(orderId.toString())
-      );
-
-
-    if (fee == 0) {
-      expect(size).to.equal(
-        expectedSizeLimitOrder == 0
-          ? toWei(quantity)
-          : toWei(expectedSizeLimitOrder)
-      );
-    }else {
-      expect(size).to.equal(
-        expectedSizeLimitOrder == 0
-          ? toWei(  (quantity as number ) * (1- fee))
-          : toWei(expectedSizeLimitOrder)
-      );
-    }
-
-    if (side == SIDE.BUY) {
-      expect(isBuy).to.equal(true);
-    } else {
-      expect(isBuy).to.equal(false);
-    }
-    expect(isFilled).to.equal(false);
-    expect(partialFilled).to.equal(0);
-    return orderId.toString();
-  } else {
-    // TODO open Market Order
-  }
-  return "";
-}
-
-
-export async function cancelLimitOrderAndExpect(
-    {
-        user,
-        contract,
-        side,
-        orderIdx,
-        pip,
-        pairManager,
-        isPartialFilled,
-        quoteAsset,
-        baseAsset,
-    }: CancelLimitOrderParameters,
-    quoteExpected: number | string = 0,
-    baseExpected: number | string= 0,
-    decimal : boolean = false
-) {
-    const limitOrder = await contract.limitOrders(
-        pairManager.address,
-        user.address,
-        orderIdx
-    );
-
-  const pendingOrder = await pairManager.getPendingOrderDetail(
-    pip,
-    limitOrder.orderId
-  );
-
-  const quoteBalanceUserBefore = await quoteAsset.balanceOf(user.address);
-  const baseBalanceUserBefore = await baseAsset.balanceOf(user.address);
-
-  const quoteBalanceFundingBefore = await quoteAsset.balanceOf(
-    pairManager.address
-  );
-  const baseBalanceFundingBefore = await baseAsset.balanceOf(
-    pairManager.address
-  );
-
-  const tx = await contract
-    .connect(user)
-    .cancelLimitOrder(pairManager.address, orderIdx, pip);
-
-  console.log(
-    "GAS USED CANCELED LIMIT ORDER",
-    (await tx.wait()).gasUsed.toString()
-  );
-  if (side == SIDE.BUY) {
-    const quoteBalanceUserAfter = await quoteAsset.balanceOf(user.address);
-    if (isPartialFilled) {
-      if(decimal){
-        expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
-          quoteExpected
-        );
-      }else {
-        expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
-          toWeiWithRound(quoteExpected)
-        );
-      }
-
-
-      const baseBalanceFundingAfter = await baseAsset.balanceOf(
-        pairManager.address
-      );
-
-      if (decimal){
-        expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
-          baseExpected
-        );
-      }else
-      expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
-        toWei(baseExpected)
-      );
-    } else {
-      const quoteBalanceUserAfter = await quoteAsset.balanceOf(user.address);
-      expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
-       toWei(quoteExpected)
-      );
-
-      const quoteBalanceFundingAfter = await quoteAsset.balanceOf(
-        pairManager.address
-      );
-      expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
-       toWei(quoteExpected)
-      );
-    }
-  } else {
-    const baseBalanceUserAfter = await baseAsset.balanceOf(user.address);
-    if (isPartialFilled) {
-      if (decimal) {
-        expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
-          baseExpected
-        );
-      }else{
-        expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
-          toWeiWithRound(baseExpected)
-        );
-
-      }
-
-
-      const quoteBalanceFundingAfter = await quoteAsset.balanceOf(
-        pairManager.address
-      );
-      if (decimal) {
-        expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
-          quoteExpected
-        );
-      }else
-      expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
-        toWei(quoteExpected)
-      );
-    } else {
-      expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
-        toWei(baseExpected)
-      );
-
-      const baseBalanceFundingAfter = await baseAsset.balanceOf(
-        pairManager.address
-      );
-      expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
-        toWei(baseExpected)
-      );
-    }
-  }
-
-  const limitOrderData = await contract.limitOrders(
-    pairManager.address,
-    user.address,
-    orderIdx
-  );
-
-  expect(limitOrderData.pip).to.equal(0);
-  expect(limitOrderData.orderId).to.equal(0);
-  expect(limitOrderData.baseAmount).to.equal(0);
-  expect(limitOrderData.quoteAmount).to.equal(0);
-}
+// export async function cancelLimitOrderAndExpect(
+//     {
+//         user,
+//         contract,
+//         side,
+//         orderIdx,
+//         pip,
+//         pairManager,
+//         isPartialFilled,
+//         quoteAsset,
+//         baseAsset,
+//     }: CancelLimitOrderParameters,
+//     quoteExpected: number | string = 0,
+//     baseExpected: number | string= 0,
+//     decimal : boolean = false
+// ) {
+//     const limitOrder = await contract.limitOrders(
+//         pairManager.address,
+//         user.address,
+//         orderIdx
+//     );
+//
+//   const pendingOrder = await pairManager.getPendingOrderDetail(
+//     pip,
+//     limitOrder.orderId
+//   );
+//
+//   const quoteBalanceUserBefore = await quoteAsset.balanceOf(user.address);
+//   const baseBalanceUserBefore = await baseAsset.balanceOf(user.address);
+//
+//   const quoteBalanceFundingBefore = await quoteAsset.balanceOf(
+//     pairManager.address
+//   );
+//   const baseBalanceFundingBefore = await baseAsset.balanceOf(
+//     pairManager.address
+//   );
+//
+//   const tx = await contract
+//     .connect(user)
+//     .cancelLimitOrder(pairManager.address, orderIdx, pip);
+//
+//   console.log(
+//     "GAS USED CANCELED LIMIT ORDER",
+//     (await tx.wait()).gasUsed.toString()
+//   );
+//   if (side == SIDE.BUY) {
+//     const quoteBalanceUserAfter = await quoteAsset.balanceOf(user.address);
+//     if (isPartialFilled) {
+//       if(decimal){
+//         expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
+//           quoteExpected
+//         );
+//       }else {
+//         expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
+//           toWeiWithRound(quoteExpected)
+//         );
+//       }
+//
+//
+//       const baseBalanceFundingAfter = await baseAsset.balanceOf(
+//         pairManager.address
+//       );
+//
+//       if (decimal){
+//         expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
+//           baseExpected
+//         );
+//       }else
+//       expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
+//         toWei(baseExpected)
+//       );
+//     } else {
+//       const quoteBalanceUserAfter = await quoteAsset.balanceOf(user.address);
+//       expect(quoteBalanceUserAfter.sub(quoteBalanceUserBefore)).to.equal(
+//        toWei(quoteExpected)
+//       );
+//
+//       const quoteBalanceFundingAfter = await quoteAsset.balanceOf(
+//         pairManager.address
+//       );
+//       expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
+//        toWei(quoteExpected)
+//       );
+//     }
+//   } else {
+//     const baseBalanceUserAfter = await baseAsset.balanceOf(user.address);
+//     if (isPartialFilled) {
+//       if (decimal) {
+//         expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
+//           baseExpected
+//         );
+//       }else{
+//         expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
+//           toWeiWithRound(baseExpected)
+//         );
+//
+//       }
+//
+//
+//       const quoteBalanceFundingAfter = await quoteAsset.balanceOf(
+//         pairManager.address
+//       );
+//       if (decimal) {
+//         expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
+//           quoteExpected
+//         );
+//       }else
+//       expect(quoteBalanceFundingBefore.sub(quoteBalanceFundingAfter)).to.equal(
+//         toWei(quoteExpected)
+//       );
+//     } else {
+//       expect(baseBalanceUserAfter.sub(baseBalanceUserBefore)).to.equal(
+//         toWei(baseExpected)
+//       );
+//
+//       const baseBalanceFundingAfter = await baseAsset.balanceOf(
+//         pairManager.address
+//       );
+//       expect(baseBalanceFundingBefore.sub(baseBalanceFundingAfter)).to.equal(
+//         toWei(baseExpected)
+//       );
+//     }
+//   }
+//
+//   const limitOrderData = await contract.limitOrders(
+//     pairManager.address,
+//     user.address,
+//     orderIdx
+//   );
+//
+//   expect(limitOrderData.pip).to.equal(0);
+//   expect(limitOrderData.orderId).to.equal(0);
+//   expect(limitOrderData.baseAmount).to.equal(0);
+//   expect(limitOrderData.quoteAmount).to.equal(0);
+// }
 
 
 
