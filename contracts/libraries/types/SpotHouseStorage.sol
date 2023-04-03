@@ -54,5 +54,4 @@ contract SpotHouseStorage {
     address public operator;
 
     IBuyBackAndBurnDex public buyBackAndBurnDex;
-
 }

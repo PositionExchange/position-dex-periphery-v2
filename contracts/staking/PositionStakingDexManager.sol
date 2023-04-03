@@ -114,10 +114,12 @@ contract PositionStakingDexManager is
     // ONLY_OWNER FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
 
-    function setWhitelistScheduleVesting(address user, bool val) public onlyOwner {
+    function setWhitelistScheduleVesting(address user, bool val)
+        public
+        onlyOwner
+    {
         _setWhitelistVesting(user, val);
     }
-
 
     function setPositionPerBlock(uint256 _positionPerBlock) public onlyOwner {
         massUpdatePools();
