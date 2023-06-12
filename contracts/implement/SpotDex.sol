@@ -29,8 +29,7 @@ abstract contract SpotDex is ISpotDex, SpotHouseStorage {
         uint256 quantity,
         uint128 pip
     ) public payable virtual {
-        address trader = _msgSender();
-        _openLimitOrder(pairManager, quantity, pip, trader, side);
+        _openLimitOrder(pairManager, quantity, pip, _msgSender(), side);
     }
 
     /**

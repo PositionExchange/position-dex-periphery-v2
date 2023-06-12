@@ -196,10 +196,6 @@ contract PositionNondisperseLiquidity is
         withdrawBNB = _transistorBNB;
     }
 
-    function setBNB(address _BNB) public onlyOwner {
-        WBNB = _BNB;
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // INTERNAL FUNCTIONS
     //------------------------------------------------------------------------------------------------------------------
@@ -308,7 +304,7 @@ contract PositionNondisperseLiquidity is
 
         if (msg.value > _amount) {
             // refund BNB
-            bool sent = payable(_msgSender()).send(msg.value - _amount);
+            payable(_msgSender()).transfer(msg.value - _amount);
             Require._require(msg.value >= _amount, "!Refund");
         }
     }
@@ -342,12 +338,5 @@ contract PositionNondisperseLiquidity is
         returns (bool)
     {
         return ownerOf(tokenId) == user;
-    }
-
-    function refund(uint256 amountRefund, address payable recipient)
-        public
-        onlyOwner
-    {
-        recipient.send(amountRefund);
     }
 }

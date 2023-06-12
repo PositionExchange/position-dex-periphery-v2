@@ -173,9 +173,10 @@ abstract contract LiquidityManager is ILiquidityManager {
             Asset.Type.Quote,
             _collectFeeData.feeQuoteAmount
         );
+        uint128 _resLiquidity = uint128(_resultAddLiquidity.liquidity);
 
         concentratedLiquidity[nftTokenId].updateLiquidity(
-            liquidityData.liquidity + uint128(_resultAddLiquidity.liquidity),
+            liquidityData.liquidity + _resLiquidity,
             liquidityData.indexedPipRange,
             _collectFeeData.newFeeGrowthBase,
             _collectFeeData.newFeeGrowthQuote
@@ -185,7 +186,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             user,
             nftTokenId,
             address(liquidityData.pool),
-            uint128(_resultAddLiquidity.liquidity),
+            _resLiquidity,
             ModifyType.INCREASE
         );
 
@@ -197,7 +198,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             _resultAddLiquidity.quoteAmountAdded,
             ModifyType.INCREASE,
             liquidityData.indexedPipRange,
-            uint128(_resultAddLiquidity.liquidity)
+            _resLiquidity
         );
     }
 
@@ -849,14 +850,14 @@ abstract contract LiquidityManager is ILiquidityManager {
     function _calculatePower(
         uint32 indexedPipRangeNft,
         uint32 currentIndexedPipRange,
-        uint256 liquidity
+        uint256 _liquidity
     ) internal pure returns (uint128 power) {
         if (
             indexedPipRangeNft > currentIndexedPipRange &&
             indexedPipRangeNft - currentIndexedPipRange < 500000
         ) {
             power = uint128(
-                liquidity /
+                _liquidity /
                     uint256(
                         (((uint256(indexedPipRangeNft) -
                             uint256(currentIndexedPipRange)) + 1)**10)
@@ -867,7 +868,7 @@ abstract contract LiquidityManager is ILiquidityManager {
             currentIndexedPipRange - indexedPipRangeNft < 500000
         ) {
             power = uint128(
-                liquidity /
+                _liquidity /
                     uint256(
                         (((uint256(currentIndexedPipRange) -
                             uint256(indexedPipRangeNft)) + 1)**10)
